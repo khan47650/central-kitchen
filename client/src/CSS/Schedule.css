@@ -1,0 +1,52 @@
+.schedule-page {
+  padding: 20px;
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.slot {
+  border: 1px solid #ccc;
+  padding: 12px;
+  border-radius: 6px;
+  background-color: #f9f9f9;
+  transition: background-color 0.3s ease;
+}
+
+.slot.booked {
+  background-color: #ffcdd2;
+  color: #b71c1c;
+}
+
+.slot button {
+  margin-top: 8px;
+  padding: 6px 12px;
+  border: none;
+  background-color: #1976d2;
+  color: white;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.slot button:disabled {
+  background-color: #90caf9;
+  cursor: not-allowed;
+}
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.5);
+  display: flex; justify-content: center; align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  width: 400px;
+}

@@ -1,0 +1,183 @@
+/* Signup page professional styles */
+.signup-page {
+  background: linear-gradient(180deg, #fbfbfc 0%, #f6f8fa 100%);
+  min-height: 100vh;
+}
+
+/* Card */
+.signup-card {
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+/* Logo + heading */
+.signup-logo {
+  width: 52px;
+  height: 52px;
+  object-fit: contain;
+}
+
+.signup-heading {
+  color: #f97316;
+  font-weight: 700;
+  margin: 0;
+}
+
+/* Stepper (top-right desktop) */
+.stepper {
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+}
+
+.step {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: #e9ecef;
+  color: #657080;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: 600;
+  border: 2px solid rgba(0,0,0,0.04);
+}
+
+.step.active {
+  background: #f97316;
+  color: #fff;
+  box-shadow: 0 6px 16px rgba(249, 115, 22, 0.12);
+}
+
+.stepline {
+  width: 48px;
+  height: 3px;
+  background: #e9ecef;
+  border-radius: 2px;
+}
+
+.stepline.active {
+  background: linear-gradient(90deg, #f97316, #fb923c);
+}
+
+/* inner card with accent border */
+.inner-card {
+  border-radius: 8px;
+  background: transparent;
+  border: 2px solid rgba(249,115,22,0.06);
+}
+
+/* section title */
+.section-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin-bottom: .75rem;
+}
+
+/* accent border on the top-left of the inner-card like screenshot */
+.border-accent {
+  position: relative;
+  padding-top: .75rem;
+}
+
+.border-accent::before {
+  content: "Business Information";
+  position: absolute;
+  left: 16px;
+  top: -12px;
+  background: #fff;
+  padding: 0 .5rem;
+  color: #f97316;
+  font-weight: 600;
+  font-size: .85rem;
+}
+
+/* form controls styling */
+.form-control,
+.form-select,
+textarea.form-control {
+  border-radius: 8px;
+  border: 1px solid #e6e6e6;
+  padding: .75rem .9rem;
+  box-shadow: none;
+}
+
+.form-control:focus,
+.form-select:focus,
+textarea.form-control:focus {
+  border-color: #f97316;
+  box-shadow: 0 4px 18px rgba(249,115,22,0.08);
+  outline: none;
+}
+
+/* buttons */
+.btn-next, .btn-prev, .btn-submit {
+  border-radius: 999px;
+  padding: .55rem 1.1rem;
+}
+
+.btn-next {
+  background: transparent;
+  border: 1.5px solid #f97316;
+  color: #f97316;
+}
+
+.btn-next:hover {
+  background: linear-gradient(90deg,#f97316,#fb923c);
+  color: #fff;
+  border-color: transparent;
+}
+
+.btn-prev {
+  background: transparent;
+  border: 1px solid #d6d6d6;
+  color: #333;
+}
+
+.btn-submit {
+  background: linear-gradient(90deg,#f97316,#fb923c);
+  border: none;
+  color: #fff;
+  box-shadow: 0 10px 30px rgba(249,115,22,0.18);
+}
+
+/* small helper text */
+.progress-labels small {
+  font-weight: 600;
+}
+
+/* step pane transitions */
+.step-pane {
+  transition: opacity 0.35s ease, transform 0.35s ease;
+}
+
+.step-pane.d-none {
+  display: none;
+  opacity: 0;
+  transform: translateY(6px);
+}
+
+.step-pane.active {
+  display: block;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* responsive tweaks */
+@media (max-width: 992px) {
+  .stepper { display: none; }
+  .border-accent::before { left: 12px; top: -10px; font-size: .8rem; }
+  .inner-card { padding: .9rem; }
+  .signup-card { padding: 1.1rem; }
+}
+
+@media (max-width: 576px) {
+  .signup-card { padding: .9rem; }
+  .signup-logo { width: 48px; height: 48px; }
+  .section-title { font-size: 1rem; }
+  .btn-next, .btn-prev, .btn-submit {
+    padding: .6rem 1rem;
+    font-size: .95rem;
+  }
+}

@@ -1,0 +1,27 @@
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 24px;
+  background-color: #ffffff;
+  border-bottom: 1px solid #eee;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.topbar .greeting {
+  font-weight: 500;
+  color: #666;
+}
+
+.topbar .logout-btn {
+  color: #d32f2f;
+  font-weight: bold;
+  text-transform: uppercase;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.topbar .logout-btn:hover {
+  text-decoration: underline;
+}

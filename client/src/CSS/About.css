@@ -1,0 +1,202 @@
+.about-page {
+  --bg-start: #f7fbf9;
+  --bg-end: #f0f7f5;
+  --accent: #004d25;
+  --accent-2: #f9b625;
+  --muted: #6b6b6b;
+  --card-shadow: 0 10px 30px rgba(6, 30, 20, 0.06);
+  background: linear-gradient(180deg, var(--bg-start) 0%, var(--bg-end) 100%);
+  padding: 90px 20px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+}
+
+.section-title h2 {
+  font-size: 2.4rem;
+  font-weight: 800;
+  text-align: center;
+  color: var(--accent);
+  margin-bottom: 48px;
+  position: relative;
+}
+
+.section-title h2::after {
+  content: '';
+  display: block;
+  width: 90px;
+  height: 6px;
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+  margin: 18px auto 0;
+  border-radius: 6px;
+}
+
+.about-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 40px;
+  align-items: stretch;
+  padding: 6px 12px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.about-card {
+  background: linear-gradient(180deg, #ffffff 0%, #fbfcfd 100%);
+  border-radius: 18px;
+  padding: 36px;
+  box-shadow: var(--card-shadow);
+  transition: transform 0.45s cubic-bezier(.2,.9,.3,1), box-shadow 0.3s ease;
+  min-height: 260px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.about-card::before {
+  content: '';
+  position: absolute;
+  right: -60px;
+  top: -60px;
+  width: 160px;
+  height: 160px;
+  background: radial-gradient(circle at 30% 30%, rgba(249,182,37,0.12), transparent 40%);
+  transform: rotate(25deg);
+}
+
+.about-card:hover {
+  transform: translateY(-8px) scale(1.01);
+  box-shadow: 0 18px 45px rgba(6, 30, 20, 0.12);
+}
+
+.about-card h3 {
+  font-size: 1.45rem;
+  font-weight: 700;
+  color: var(--accent);
+  margin-bottom: 18px;
+}
+
+.about-card p {
+  font-size: 1rem;
+  color: var(--muted);
+  line-height: 1.8;
+  margin-bottom: 16px;
+}
+
+.about-card .meta {
+  margin-top: 18px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.about-card .meta .dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--accent-2);
+}
+
+.about-image {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  border-radius: 12px;
+  margin-bottom: 22px;
+  box-shadow: 0 8px 28px rgba(3, 20, 12, 0.07);
+}
+
+.features-list {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-top: 18px;
+}
+
+.feature-pill {
+  background: rgba(4,77,37,0.06);
+  color: var(--accent);
+  padding: 8px 12px;
+  border-radius: 999px;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.cta-section {
+  text-align: center;
+  margin-top: 80px;
+}
+
+.cta-section h2 {
+  font-size: 2rem;
+  color: var(--accent);
+  margin-bottom: 12px;
+}
+
+.cta-section p {
+  font-size: 1rem;
+  color: #6b6b6b;
+  margin-bottom: 18px;
+}
+
+.cta-button {
+  background-color: var(--accent-2);
+  color: #fff;
+  padding: 0.75rem 1.8rem;
+  border-radius: 30px;
+  font-weight: 700;
+  font-size: 1.05rem;
+  text-decoration: none;
+  transition: transform 0.22s ease, box-shadow 0.22s ease;
+  display: inline-block;
+}
+
+.cta-button:hover {
+  background-color: #e89e00;
+  transform: translateY(-3px);
+  box-shadow: 0 12px 30px rgba(232,158,0,0.12);
+}
+
+.cta-banner {
+  position: relative;
+ background-image: url('../assets/img/hero-carousel-1.jpg'); /* Replace with your actual image */
+  background-size: cover;
+  background-position: center;
+  height: 60vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.cta-overlay {
+  background: rgba(0, 0, 0, 0.48);
+  padding: 2.5rem;
+  border-radius: 12px;
+  color: #fff;
+  max-width: 900px;
+}
+
+.cta-overlay h2 {
+  font-size: 2.4rem;
+  font-weight: 800;
+  margin-bottom: 0.75rem;
+}
+
+.cta-overlay p {
+  font-size: 1.05rem;
+  margin-bottom: 1.25rem;
+}
+
+@media (max-width: 720px) {
+  .section-title h2 { font-size: 1.6rem; }
+  .about-page { padding: 50px 16px; }
+  .about-card { padding: 22px; min-height: 0; }
+  .about-image { height: 140px; }
+}
+
+@media (min-width: 1400px) {
+  .about-page { padding: 100px 20px; }
+}

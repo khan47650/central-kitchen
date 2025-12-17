@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333333;
+        }
+
+        .container {
+            width: 80%;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border: 1px solid #dddddd;
+            border-radius: 5px;
+        }
+
+        .header {
+            background-color: #ffffff;
+            color: #006232;
+            padding: 10px 0;
+            text-align: center;
+            border-radius: 5px 5px 0 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .header img {
+            height: 50px; /* Adjust the height as needed */
+            max-width: 100px; /* Adjust the width as needed */
+            margin-right: 10px; /* Space between logo and text */
+        }
+
+        .content {
+            padding: 20px;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            font-size: 16px;
+            color: #ffd700 !important; /* Yellow text */
+            background-color: #006232; /* Green background */
+            text-align: center;
+            border-radius: 5px;
+            text-decoration: none !important; /* Remove underline */
+            border: 2px solid #006232; /* Match button background color */
+            transition: all 0.3s ease;
+        }
+
+        .button:hover {
+            color: #ffd700 !important; /* Yellow text on hover */
+            border-color: #ffd700; /* Yellow outline on hover */
+            background-color: #ffffff; /* Slightly darker green background */
+            text-decoration: none !important; /* Remove underline on hover */
+        }
+
+        .footer {
+            text-align: center;
+            padding: 10px 0;
+            font-size: 0.9em;
+            color: #777777;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <img src="https://centralkitchen.us/assets/img/logo.png" alt="Central Kitchen Logo">
+        <h1>CENTRAL KITCHEN</h1>
+    </div>
+    <div class="content">
+        <p>Dear @userName,</p>
+        <p>We are pleased to inform you that your registration request is approved. You can now log in to our portal and
+            start your bookings. Click the button below to confirm your email:</p>
+        <hr>
+        <a href="@confirmationLink" class="button">Confirm Email</a>
+        <hr>
+
+        <p><em>We thank you for your patience and cooperation.</em></p>
+    </div>
+    <div class="footer">
+        <p>Warm regards,</p>
+        <p><strong>Central Kitchen App Team</strong></p>
+    </div>
+</div>
+</body>

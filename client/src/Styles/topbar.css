@@ -1,0 +1,60 @@
+.topbar {
+  background-color: #fff;
+  color: #ff6f00;
+  border-bottom: 1px solid #eee;
+  padding: 8px 16px; /* mobile first */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* wider screens: increase horizontal padding to match MUI spacing */
+@media (min-width: 900px) {
+  .topbar {
+    padding-left: 32px;
+    padding-right: 32px;
+  }
+}
+
+.topbar-title {
+  font-weight: 600;
+  font-size: 1.25rem;
+  line-height: 1;
+}
+
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.topbar-greeting {
+  font-weight: 500;
+  color: #666;
+  font-size: 0.95rem;
+}
+
+.topbar-logout {
+  font-weight: 700;
+  text-transform: uppercase;
+  border-radius: 8px;
+  border: 1px solid #d32f2f;
+  color: #d32f2f;
+  background-color: transparent;
+  padding: 6px 12px;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.topbar-logout:hover {
+  background-color: rgba(211,47,47,0.06);
+}
+
+/* compact on very small screens */
+@media (max-width: 420px) {
+  .topbar-title { font-size: 1rem; }
+  .topbar-greeting { display: none; }
+  .topbar-logout { padding: 4px 8px; font-size: 0.8rem; }
+}
