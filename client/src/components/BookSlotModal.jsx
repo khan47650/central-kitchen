@@ -24,7 +24,8 @@ const DEFAULT_API = process.env.REACT_APP_API_URL || "";
 const durations = [1, 2, 3];
 
 const BookSlotModal = ({ open, onClose, userId, isAdmin, onBooked }) => {
-
+  
+  const [loading,setLoading]=useState(false);
   // 🔹 Arizona time
   const today = moment.tz(AZ_TIMEZONE);
   const startOfWeek = moment.tz(AZ_TIMEZONE).startOf('week').add(1, 'day'); // Monday
@@ -82,6 +83,8 @@ const BookSlotModal = ({ open, onClose, userId, isAdmin, onBooked }) => {
       return;
     }
 
+    setLoading(true);
+
     try {
       const res = await axios.post(`${DEFAULT_API}/api/slots/create`, {
         date: startDate,
@@ -103,6 +106,7 @@ const BookSlotModal = ({ open, onClose, userId, isAdmin, onBooked }) => {
       console.error(err);
       setError(err.response?.data?.error || 'Booking failed');
     }
+    setLoading(false);
   };
 
   return (
@@ -168,8 +172,8 @@ const BookSlotModal = ({ open, onClose, userId, isAdmin, onBooked }) => {
         </Box>
       </DialogContent>
       <DialogActions>
-        <Button onClick={handleSubmit} variant="contained" color="warning">
-          BOOK SLOT
+        <Button onClick={handleSubmit} variant="contained" color="warning" disabled={loading}>
+          {loading? "Booking Slot...":"BOOK SLOT"}
         </Button>
       </DialogActions>
     </Dialog>
