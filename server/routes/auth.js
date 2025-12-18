@@ -114,4 +114,15 @@ router.get('/me', verifyToken, async (req, res) => {
   }
 });
 
+// ------------------- Logout Route -------------------
+router.post('/logout', (req, res) => {
+  try {
+    res.status(200).json({ message: 'Logged out successfully' });
+  } catch (err) {
+    console.error('Logout error:', err);
+    res.status(500).json({ message: 'Server error during logout' });
+  }
+});
+
+
 module.exports = router;
