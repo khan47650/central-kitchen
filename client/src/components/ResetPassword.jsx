@@ -40,7 +40,7 @@ const ResetPassword = () => {
 
       if (res.ok) {
         toast.success("Password updated successfully!", {
-       onClose: () => navigate("/successPassword", { replace: true }),
+       onClose: () => navigate("/client/dashboard", { replace: true }),
       autoClose: 1200
        });
 } else {
