@@ -21,6 +21,7 @@ import { useAuth } from '../../context/AuthContext';
 import axios from 'axios';
 import moment from 'moment';
 import '../../Styles/clientDashboard.css';
+import { Skeleton } from "@mui/material";
 
 const DEFAULT_API = process.env.REACT_APP_API_URL || '';
 
@@ -51,13 +52,34 @@ const ClientDashboard = () => {
     fetchClientData();
   }, [user, accessToken]);
 
-  if (loading) {
-    return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', mt: 10 }}>
-        <CircularProgress size={60} />
-      </Box>
-    );
-  }
+ if (loading) {
+  return (
+    <Box sx={{ width: "100%" }}>
+      {/* Header */}
+      <Skeleton variant="text" width={200} height={40} />
+      <Skeleton variant="text" width={300} height={20} />
+
+      {/* Stat cards */}
+      <Grid container spacing={2} sx={{ mt: 2 }}>
+        {[1, 2, 3, 4].map((i) => (
+          <Grid item xs={12} sm={6} md={3} key={i}>
+            <Skeleton variant="rounded" height={150} />
+          </Grid>
+        ))}
+      </Grid>
+
+      {/* Content */}
+      <Grid container spacing={2} sx={{ mt: 2 }}>
+        <Grid item xs={12} md={8}>
+          <Skeleton variant="rounded" height={350} />
+        </Grid>
+        <Grid item xs={12} md={4}>
+          <Skeleton variant="rounded" height={350} />
+        </Grid>
+      </Grid>
+    </Box>
+  );
+}
 
   const statCards = [
     {

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {
   Table, TableHead, TableRow, TableCell, TableBody, TablePagination, Typography, Box,
-  Button
+  Button,Skeleton
 } from '@mui/material';
 import moment from 'moment-timezone';
 import axios from 'axios';
@@ -16,6 +16,8 @@ const FutureAppointments = () => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
+
 
   useEffect(() => {
     const fetchUsersAndAppointments = async () => {
@@ -59,9 +61,11 @@ const FutureAppointments = () => {
         });
 
         setAppointments(mappedSlots);
+        setLoading(false);
 
       } catch (err) {
         console.error('Error fetching users or appointments:', err);
+        setLoading(false);
       }
     };
 
@@ -90,21 +94,41 @@ const FutureAppointments = () => {
             <TableCell>Action</TableCell>
           </TableRow>
         </TableHead>
-        <TableBody>
-          {appointments
-            .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-            .map((slot, index) => (
-              <TableRow key={index}>
-                <TableCell>{slot.userName || '-'}</TableCell>
-                <TableCell>{slot.date}</TableCell>
-                <TableCell>{slot.startTime}</TableCell>
-                <TableCell>{slot.endTime}</TableCell>
-                <TableCell>
-                  <Button variant="contained" size="small">VIEW DETAILS</Button>
-                </TableCell>
-              </TableRow>
-            ))}
-        </TableBody>
+      <TableBody>
+  {loading
+    ? Array.from(new Array(rowsPerPage)).map((_, index) => (
+        <TableRow key={index}>
+          <TableCell><Skeleton /></TableCell>
+          <TableCell><Skeleton /></TableCell>
+          <TableCell><Skeleton /></TableCell>
+          <TableCell><Skeleton /></TableCell>
+          <TableCell><Skeleton /></TableCell>
+        </TableRow>
+      ))
+    : appointments.length === 0
+      ? (
+        <TableRow>
+          <TableCell colSpan={5} align="center">
+            No future appointments
+          </TableCell>
+        </TableRow>
+      )
+      : appointments
+          .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+          .map((slot, index) => (
+            <TableRow key={index}>
+              <TableCell>{slot.userName || '-'}</TableCell>
+              <TableCell>{slot.date}</TableCell>
+              <TableCell>{slot.startTime}</TableCell>
+              <TableCell>{slot.endTime}</TableCell>
+              <TableCell>
+                <Button variant="contained" size="small">VIEW DETAILS</Button>
+              </TableCell>
+            </TableRow>
+          ))
+  }
+</TableBody>
+
       </Table>
 
       <TablePagination

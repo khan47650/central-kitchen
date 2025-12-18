@@ -11,21 +11,31 @@ import {
   Button
 } from '@mui/material';
 import axios from 'axios';
+import { Skeleton } from "@mui/material";
+
 
 const AllUsers = () => {
   const [users, setUsers] = useState([]);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [loading, setLoading] = useState(true);
+
 
   const DEFAULT_API=process.env.REACT_APP_API_URL||"";
 
 
-const fetchAllUsers=()=>{
-  axios.get(`${DEFAULT_API}/api/users/all`)
-  .then(res=>setUsers(res.data))
-  .catch(err=>console.error('Error fetching users:', err))
-
+const fetchAllUsers = async () => {
+  setLoading(true);
+  try {
+    const res = await axios.get(`${DEFAULT_API}/api/users/all`);
+    setUsers(res.data);
+  } catch (err) {
+    console.error('Error fetching users:', err);
+  } finally {
+    setLoading(false);
+  }
 };
+
 
   useEffect(() => {
    fetchAllUsers();
@@ -67,25 +77,50 @@ const fetchAllUsers=()=>{
             <TableCell>Action</TableCell>
           </TableRow>
         </TableHead>
-        <TableBody>
-          {users
-            .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-            .map((user, index) => (
-              <TableRow key={index}>
-                <TableCell>{user.fullName}</TableCell>
-                <TableCell>{user.email}</TableCell>
-                <TableCell>{user.role}</TableCell>
-                <TableCell>{user.status}</TableCell>
-                <TableCell>
-                  <Box display="flex" gap={1}>
-                      <Button variant="outlined" size="small">VIEW</Button>
-                      <Button variant="outlined" size="small" onClick={
-                        ()=>user.status==="freezed"?unfreezUser(user._id):freezUser(user._id)}>{user.status==="freezed"?"UNFREEZE":"FREEZE"}</Button>
-                     </Box>
-                </TableCell>
-              </TableRow>
-            ))}
-        </TableBody>
+    <TableBody>
+  {loading
+    ? Array.from({ length: rowsPerPage }).map((_, index) => (
+        <TableRow key={index}>
+          <TableCell><Skeleton width="80%" /></TableCell>
+          <TableCell><Skeleton width="90%" /></TableCell>
+          <TableCell><Skeleton width="60%" /></TableCell>
+          <TableCell><Skeleton width="50%" /></TableCell>
+          <TableCell>
+            <Box display="flex" gap={1}>
+              <Skeleton variant="rounded" width={60} height={30} />
+              <Skeleton variant="rounded" width={80} height={30} />
+            </Box>
+          </TableCell>
+        </TableRow>
+      ))
+    : users
+        .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+        .map((user, index) => (
+          <TableRow key={index}>
+            <TableCell>{user.fullName}</TableCell>
+            <TableCell>{user.email}</TableCell>
+            <TableCell>{user.role}</TableCell>
+            <TableCell>{user.status}</TableCell>
+            <TableCell>
+              <Box display="flex" gap={1}>
+                <Button variant="outlined" size="small">VIEW</Button>
+                <Button
+                  variant="outlined"
+                  size="small"
+                  onClick={() =>
+                    user.status === "freezed"
+                      ? unfreezUser(user._id)
+                      : freezUser(user._id)
+                  }
+                >
+                  {user.status === "freezed" ? "UNFREEZE" : "FREEZE"}
+                </Button>
+              </Box>
+            </TableCell>
+          </TableRow>
+        ))}
+</TableBody>
+
       </Table>
 
       <TablePagination

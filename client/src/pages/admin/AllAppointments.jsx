@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import {
-  Table, TableHead, TableRow, TableCell, TableBody, TablePagination, Button
+  Table, TableHead, TableRow, TableCell, TableBody, TablePagination, Button,Skeleton
 } from '@mui/material';
 import moment from 'moment-timezone';
 
@@ -14,6 +14,7 @@ const AllAppointments = () => {
   const [appointments, setAppointments] = useState([]);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchUsersAndAppointments = async () => {
@@ -60,8 +61,10 @@ const AllAppointments = () => {
         });
 
         setAppointments(data);
+        setLoading(false);
       } catch (err) {
         console.error('Failed to fetch users or appointments:', err);
+        setLoading(false);
       }
     };
 
@@ -87,21 +90,41 @@ const AllAppointments = () => {
             <TableCell>Action</TableCell>
           </TableRow>
         </TableHead>
-        <TableBody>
-          {appointments
-            .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-            .map(row => (
-              <TableRow key={row.id}>
-                <TableCell>{row.userName}</TableCell>
-                <TableCell>{row.bookedOn}</TableCell>
-                <TableCell>{row.bookingStart}</TableCell>
-                <TableCell>{row.bookingEnd}</TableCell>
-                <TableCell>
-                  <Button variant="contained" size="small">VIEW DETAILS</Button>
-                </TableCell>
-              </TableRow>
-            ))}
-        </TableBody>
+       <TableBody>
+  {loading
+    ? Array.from(new Array(rowsPerPage)).map((_, index) => (
+        <TableRow key={index}>
+          <TableCell><Skeleton /></TableCell>
+          <TableCell><Skeleton /></TableCell>
+          <TableCell><Skeleton /></TableCell>
+          <TableCell><Skeleton /></TableCell>
+          <TableCell><Skeleton /></TableCell>
+        </TableRow>
+      ))
+    : appointments.length === 0
+      ? (
+        <TableRow>
+          <TableCell colSpan={5} align="center">
+            No appointments found
+          </TableCell>
+        </TableRow>
+      )
+      : appointments
+          .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+          .map(row => (
+            <TableRow key={row.id}>
+              <TableCell>{row.userName}</TableCell>
+              <TableCell>{row.bookedOn}</TableCell>
+              <TableCell>{row.bookingStart}</TableCell>
+              <TableCell>{row.bookingEnd}</TableCell>
+              <TableCell>
+                <Button variant="contained" size="small">VIEW DETAILS</Button>
+              </TableCell>
+            </TableRow>
+          ))
+  }
+</TableBody>
+
       </Table>
 
       <TablePagination

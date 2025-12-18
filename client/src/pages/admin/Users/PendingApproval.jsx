@@ -5,6 +5,8 @@ import {
 } from '@mui/material';
 import axios from 'axios';
 import { CircularProgress } from "@mui/material";
+import { Skeleton } from "@mui/material";
+
 
 
 const DEFAULT_API = process.env.REACT_APP_API_URL || "";
@@ -14,13 +16,22 @@ const PendingApproval = () => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [loadingId, setLoadingId] = useState(null);
+  const [loading, setLoading] = useState(true);
 
 
-  const fetchPendingUsers = () => {
-    axios.get(`${DEFAULT_API}/api/users/pending`)
-      .then(res => setUsers(res.data))
-      .catch(err => console.error('Error fetching users:', err));
+
+  const fetchPendingUsers = async () => {
+    setLoading(true);
+    try {
+      const res = await axios.get(`${DEFAULT_API}/api/users/pending`);
+      setUsers(res.data);
+    } catch (err) {
+      console.error('Error fetching users:', err);
+    } finally {
+      setLoading(false);
+    }
   };
+
 
   useEffect(() => {
     console.log('PendingApproval mounted');
@@ -59,31 +70,68 @@ const PendingApproval = () => {
           </TableRow>
         </TableHead>
         <TableBody>
-          {users.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((user, index) => (
-            <TableRow key={index}>
-              <TableCell>{user.fullName}</TableCell>
-              <TableCell>{user.email}</TableCell>
-              <TableCell>{user.role}</TableCell>
-              <TableCell>{user.status}</TableCell>
-              <TableCell>
-                <Button
-                  style={{ marginRight: 8 }}
-                  variant="outlined"
-                  size="small"
-                  onClick={() => approveUser(user._id)}
-                  disabled={loadingId === user._id}
-                >
-                  {loadingId === user._id ? (
-                    <CircularProgress size={18} />
-                  ) : (
-                    "APPROVE"
-                  )}
-                </Button>
-                <Button onClick={() => rejectUser(user._id)} style={{ marginLeft: 2 }} variant="outlined" size="small" >REJECT</Button>
-              </TableCell>
+          {/*LOADING STATE */}
+          {loading && (
+            Array.from({ length: rowsPerPage }).map((_, index) => (
+              <TableRow key={index}>
+                <TableCell><Skeleton width="80%" /></TableCell>
+                <TableCell><Skeleton width="90%" /></TableCell>
+                <TableCell><Skeleton width="60%" /></TableCell>
+                <TableCell><Skeleton width="50%" /></TableCell>
+                <TableCell>
+                  <Box display="flex" gap={1}>
+                    <Skeleton variant="rounded" width={80} height={30} />
+                    <Skeleton variant="rounded" width={70} height={30} />
+                  </Box>
+                </TableCell>
+              </TableRow>
+            ))
+          )}
 
+          {/*EMPTY STATE */}
+          {!loading && users.length === 0 && (
+            <TableRow>
+              <TableCell colSpan={5} align="center">
+                <Typography color="text.secondary" sx={{ py: 3 }}>
+                  No pending users
+                </Typography>
+              </TableCell>
             </TableRow>
-          ))}
+          )}
+
+          {/*DATA STATE */}
+          {!loading && users
+            .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+            .map((user, index) => (
+              <TableRow key={index}>
+                <TableCell>{user.fullName}</TableCell>
+                <TableCell>{user.email}</TableCell>
+                <TableCell>{user.role}</TableCell>
+                <TableCell>{user.status}</TableCell>
+                <TableCell>
+                  <Button
+                    sx={{ mr: 1 }}
+                    variant="outlined"
+                    size="small"
+                    onClick={() => approveUser(user._id)}
+                    disabled={loadingId === user._id}
+                  >
+                    {loadingId === user._id ? (
+                      <CircularProgress size={18} />
+                    ) : (
+                      "APPROVE"
+                    )}
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    size="small"
+                    onClick={() => rejectUser(user._id)}
+                  >
+                    REJECT
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))}
         </TableBody>
       </Table>
       <TablePagination
