@@ -15,6 +15,7 @@ import {
   TablePagination,
   Button,
   Toolbar,
+  Skeleton
 } from '@mui/material';
 import { AuthContext } from '../../context/AuthContext';
 import moment from 'moment-timezone';
@@ -25,6 +26,8 @@ const ClientAppointments = () => {
   const { logout } = useContext(AuthContext);
   const navigate = useNavigate();
   const { user } = useContext(AuthContext);
+  const [loading, setLoading] = useState(true);
+
 
   const [appointments, setAppointments] = useState([]);
   const [users, setUsers] = useState([]);
@@ -35,6 +38,7 @@ const ClientAppointments = () => {
 
   useEffect(() => {
     const fetchUsersAndAppointments = async () => {
+        setLoading(true);
       try {
         // Fetch all users
         const usersRes = await axios.get(`${DEFAULT_API}/api/users/all`);
@@ -70,6 +74,7 @@ const ClientAppointments = () => {
       } catch (err) {
         console.error('Failed to fetch appointments or users:', err);
       }
+        setLoading(false);
     };
 
     fetchUsersAndAppointments();
@@ -101,31 +106,42 @@ const ClientAppointments = () => {
                 <TableCell>Action</TableCell>
               </TableRow>
             </TableHead>
-            <TableBody>
-              {appointments.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={5} align="center">
-                    No appointments found.
-                  </TableCell>
-                </TableRow>
-              ) : (
-                appointments
-                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                  .map((appt) => (
-                    <TableRow key={appt.id}>
-                      <TableCell>{appt.userName}</TableCell>
-                      <TableCell>{appt.bookedOn}</TableCell>
-                      <TableCell>{appt.startTime}</TableCell>
-                      <TableCell>{appt.endTime}</TableCell>
-                      <TableCell>
-                        <Button variant="outlined" size="small">
-                          View
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))
-              )}
-            </TableBody>
+       <TableBody>
+  {loading ? (
+    Array.from(new Array(5)).map((_, index) => (
+      <TableRow key={index}>
+        <TableCell><Skeleton /></TableCell>
+        <TableCell><Skeleton /></TableCell>
+        <TableCell><Skeleton /></TableCell>
+        <TableCell><Skeleton /></TableCell>
+        <TableCell><Skeleton /></TableCell>
+      </TableRow>
+    ))
+  ) : appointments.length === 0 ? (
+    <TableRow>
+      <TableCell colSpan={5} align="center">
+        No appointments found.
+      </TableCell>
+    </TableRow>
+  ) : (
+    appointments
+      .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+      .map((appt) => (
+        <TableRow key={appt.id}>
+          <TableCell>{appt.userName}</TableCell>
+          <TableCell>{appt.bookedOn}</TableCell>
+          <TableCell>{appt.startTime}</TableCell>
+          <TableCell>{appt.endTime}</TableCell>
+          <TableCell>
+            <Button variant="outlined" size="small">
+              View
+            </Button>
+          </TableCell>
+        </TableRow>
+      ))
+  )}
+</TableBody>
+
           </Table>
 
           <TablePagination

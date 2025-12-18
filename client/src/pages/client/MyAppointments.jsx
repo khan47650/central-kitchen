@@ -13,7 +13,8 @@ import {
   TableContainer,
   TablePagination,
   Toolbar,
-  Button
+  Button,
+  Skeleton
 } from '@mui/material';
 import axios from 'axios';
 import moment from 'moment-timezone';
@@ -26,12 +27,15 @@ const MyAppointments = () => {
   const [appointments, setAppointments] = useState([]);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(30);
+  const [loading, setLoading] = useState(true);
+
 
   const { user } = useContext(AuthContext); 
   const DEFAULT_API = process.env.REACT_APP_API_URL || "";
 
   useEffect(() => {
     const fetchMyAppointments = async () => {
+        setLoading(true);
       try {
         if (!user?._id) return;
 
@@ -48,6 +52,7 @@ const MyAppointments = () => {
       } catch (err) {
         console.error('Failed to fetch my appointments:', err);
       }
+        setLoading(false);
     };
 
     fetchMyAppointments();
@@ -90,30 +95,40 @@ const MyAppointments = () => {
               <TableCell>Action</TableCell>
             </TableRow>
           </TableHead>
-          <TableBody>
-            {appointments.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={4} align="center">
-                  No appointments found.
-                </TableCell>
-              </TableRow>
-            ) : (
-              appointments
-                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                .map((appt) => (
-                  <TableRow key={appt.id}>
-                    <TableCell>{appt.bookedOn}</TableCell>
-                    <TableCell>{appt.startTime}</TableCell>
-                    <TableCell>{appt.endTime}</TableCell>
-                    <TableCell>
-                      <Button variant="outlined" size="small" onClick={()=>handleCancel(appt.id)}>
-                        Cancel
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))
-            )}
-          </TableBody>
+        <TableBody>
+  {loading ? (
+    Array.from(new Array(5)).map((_, index) => (
+      <TableRow key={index}>
+        <TableCell><Skeleton /></TableCell>
+        <TableCell><Skeleton /></TableCell>
+        <TableCell><Skeleton /></TableCell>
+        <TableCell><Skeleton /></TableCell>
+      </TableRow>
+    ))
+  ) : appointments.length === 0 ? (
+    <TableRow>
+      <TableCell colSpan={4} align="center">
+        No appointments found.
+      </TableCell>
+    </TableRow>
+  ) : (
+    appointments
+      .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+      .map((appt) => (
+        <TableRow key={appt.id}>
+          <TableCell>{appt.bookedOn}</TableCell>
+          <TableCell>{appt.startTime}</TableCell>
+          <TableCell>{appt.endTime}</TableCell>
+          <TableCell>
+            <Button variant="outlined" size="small" onClick={()=>handleCancel(appt.id)}>
+              Cancel
+            </Button>
+          </TableCell>
+        </TableRow>
+      ))
+  )}
+</TableBody>
+
         </Table>
 
         <TablePagination
