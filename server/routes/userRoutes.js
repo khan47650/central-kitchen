@@ -52,6 +52,19 @@ router.put('/awaiting/:id', async (req, res) => {
 
 });
 
+
+//get awaiting users
+router.get('/awaiting', async (req, res) => {
+  try {
+
+    const users = await User.find({ status: 'awaiting' }).select('-password');
+    res.json(users);
+  } catch (err) {
+    res.status(500).json({ message: 'Server error' });
+  }
+
+});
+
 //Approve user
 router.put('/approved/:id', async (req, res) => {
   try {
