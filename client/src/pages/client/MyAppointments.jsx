@@ -14,10 +14,13 @@ import {
   TablePagination,
   Toolbar,
   Button,
-  Skeleton
+  Skeleton,
+  useMediaQuery
 } from '@mui/material';
 import axios from 'axios';
 import moment from 'moment-timezone';
+import { useTheme } from '@mui/material/styles';
+
 
 
 const AZ_TIMEZONE = 'America/Phoenix';
@@ -28,14 +31,16 @@ const MyAppointments = () => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(30);
   const [loading, setLoading] = useState(true);
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
 
-  const { user } = useContext(AuthContext); 
+  const { user } = useContext(AuthContext);
   const DEFAULT_API = process.env.REACT_APP_API_URL || "";
 
   useEffect(() => {
     const fetchMyAppointments = async () => {
-        setLoading(true);
+      setLoading(true);
       try {
         if (!user?._id) return;
 
@@ -43,7 +48,7 @@ const MyAppointments = () => {
 
         const formatted = res.data.map(slot => ({
           id: slot._id,
-          bookedOn: slot.date? moment.tz(slot.date, AZ_TIMEZONE).format('YYYY-MM-DD') : '-',
+          bookedOn: slot.date ? moment.tz(slot.date, AZ_TIMEZONE).format('YYYY-MM-DD') : '-',
           startTime: slot.startTime,
           endTime: slot.endTime || '-',
         }));
@@ -52,25 +57,25 @@ const MyAppointments = () => {
       } catch (err) {
         console.error('Failed to fetch my appointments:', err);
       }
-        setLoading(false);
+      setLoading(false);
     };
 
     fetchMyAppointments();
   }, [user]);
 
   const handleCancel = async (slotId) => {
-  try {
-    // const confirmCancel = window.confirm("Are you sure you want to cancel this appointment?");
-    // if (!confirmCancel) return;
+    try {
+      // const confirmCancel = window.confirm("Are you sure you want to cancel this appointment?");
+      // if (!confirmCancel) return;
 
-    await axios.delete(`${DEFAULT_API}/api/slots/delete/${slotId}`);
+      await axios.delete(`${DEFAULT_API}/api/slots/delete/${slotId}`);
 
-    setAppointments(prev => prev.filter(appt => appt.id !== slotId));
-  } catch (err) {
-    console.error('Failed to cancel appointment:', err);
-    alert('Failed to cancel appointment');
-  }
-};
+      setAppointments(prev => prev.filter(appt => appt.id !== slotId));
+    } catch (err) {
+      console.error('Failed to cancel appointment:', err);
+      alert('Failed to cancel appointment');
+    }
+  };
 
 
   const handleChangePage = (event, newPage) => setPage(newPage);
@@ -80,13 +85,13 @@ const MyAppointments = () => {
   };
 
   return (
-    <Box p={3}>
+    <Box p={isMobile ? 1 : 3}>
       <Toolbar>
-        <Typography variant="h6">My Appointments</Typography>
+        <Typography variant={isMobile ? 'h6' : 'h5'}>My Appointments</Typography>
       </Toolbar>
 
-      <TableContainer component={Paper} sx={{ mt: 2 }}>
-        <Table>
+      <TableContainer component={Paper} sx={{ mt: 2, overflowX: 'auto' }}>
+        <Table size={isMobile ? 'small' : 'medium'}>
           <TableHead>
             <TableRow>
               <TableCell>Booked On</TableCell>
@@ -95,52 +100,56 @@ const MyAppointments = () => {
               <TableCell>Action</TableCell>
             </TableRow>
           </TableHead>
-        <TableBody>
-  {loading ? (
-    Array.from(new Array(5)).map((_, index) => (
-      <TableRow key={index}>
-        <TableCell><Skeleton /></TableCell>
-        <TableCell><Skeleton /></TableCell>
-        <TableCell><Skeleton /></TableCell>
-        <TableCell><Skeleton /></TableCell>
-      </TableRow>
-    ))
-  ) : appointments.length === 0 ? (
-    <TableRow>
-      <TableCell colSpan={4} align="center">
-        No appointments found.
-      </TableCell>
-    </TableRow>
-  ) : (
-    appointments
-      .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-      .map((appt) => (
-        <TableRow key={appt.id}>
-          <TableCell>{appt.bookedOn}</TableCell>
-          <TableCell>{appt.startTime}</TableCell>
-          <TableCell>{appt.endTime}</TableCell>
-          <TableCell>
-            <Button variant="outlined" size="small" onClick={()=>handleCancel(appt.id)}>
-              Cancel
-            </Button>
-          </TableCell>
-        </TableRow>
-      ))
-  )}
-</TableBody>
+          <TableBody>
+            {loading ? (
+              Array.from(new Array(5)).map((_, index) => (
+                <TableRow key={index}>
+                  <TableCell><Skeleton /></TableCell>
+                  <TableCell><Skeleton /></TableCell>
+                  <TableCell><Skeleton /></TableCell>
+                  <TableCell><Skeleton /></TableCell>
+                </TableRow>
+              ))
+            ) : appointments.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={4} align="center">
+                  No appointments found.
+                </TableCell>
+              </TableRow>
+            ) : (
+              appointments
+                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                .map((appt) => (
+                  <TableRow key={appt.id}>
+                    <TableCell>{appt.bookedOn}</TableCell>
+                    <TableCell>{appt.startTime}</TableCell>
+                    <TableCell>{appt.endTime}</TableCell>
+                    <TableCell>
+                      <Button
+                        variant="outlined"
+                        size="small"
+                        sx={{ minWidth: isMobile ? 60 : 100 }}
+                        onClick={() => handleCancel(appt.id)}
+                      >
+                        {isMobile ? 'Cancel' : 'Cancel'}
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))
+            )}
+          </TableBody>
 
         </Table>
-
-        <TablePagination
-          rowsPerPageOptions={[10, 30, 50]}
-          component="div"
-          count={appointments.length}
-          rowsPerPage={rowsPerPage}
-          page={page}
-          onPageChange={handleChangePage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-        />
       </TableContainer>
+      <TablePagination
+        rowsPerPageOptions={[10, 30, 50]}
+        component="div"
+        count={appointments.length}
+        rowsPerPage={rowsPerPage}
+        page={page}
+        onPageChange={handleChangePage}
+        onRowsPerPageChange={handleChangeRowsPerPage}
+      />
     </Box>
   );
 };

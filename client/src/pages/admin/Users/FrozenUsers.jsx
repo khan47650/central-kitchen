@@ -5,6 +5,8 @@ import {
 } from '@mui/material';
 import axios from 'axios';
 import { Skeleton } from "@mui/material";
+import { useTheme, useMediaQuery, TableContainer } from '@mui/material';
+
 
 
 const FrozenUsers = () => {
@@ -12,6 +14,8 @@ const FrozenUsers = () => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [loading, setLoading] = useState(true);
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
 
   const DEFAULT_API=process.env.REACT_APP_API_URL||"";
@@ -41,8 +45,11 @@ const FrozenUsers = () => {
 
   return (
     <Box p={3}>
-      <Typography variant="h5" gutterBottom>Frozen Users</Typography>
-      <Table>
+       <Typography variant={isMobile ? 'h6' : 'h5'} gutterBottom>
+             Frozen Users
+            </Typography>
+  <TableContainer sx={{ maxWidth: '100%', overflowX: 'auto' }}>
+         <Table size={isMobile ? 'small' : 'medium'}>
         <TableHead>
           <TableRow>
             <TableCell>Name</TableCell>
@@ -93,9 +100,10 @@ const FrozenUsers = () => {
               variant="outlined"
               size="small"
               color="error"
+               sx={{ minWidth: isMobile ? 60 : 90 }}
               onClick={() => unfreezUser(user._id)}
             >
-              UNFREEZE
+               {isMobile ? "UNFREEZE" : "UNFREEZE"}
             </Button>
           </TableCell>
         </TableRow>
@@ -103,6 +111,7 @@ const FrozenUsers = () => {
 </TableBody>
 
       </Table>
+      </TableContainer>
       <TablePagination
         component="div"
         count={users.length}

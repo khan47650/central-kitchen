@@ -2,6 +2,8 @@
 .signup-page {
   background: linear-gradient(180deg, #fbfbfc 0%, #f6f8fa 100%);
   min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+  padding: 40px 0;
 }
 
 /* Card */
@@ -9,6 +11,8 @@
   background: #fff;
   border-radius: 12px;
   overflow: hidden;
+  padding: 2rem;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.06);
 }
 
 /* Logo + heading */
@@ -22,6 +26,7 @@
   color: #f97316;
   font-weight: 700;
   margin: 0;
+  font-size: 1.8rem;
 }
 
 /* Stepper (top-right desktop) */
@@ -42,6 +47,7 @@
   align-items: center;
   font-weight: 600;
   border: 2px solid rgba(0,0,0,0.04);
+  transition: all 0.3s ease;
 }
 
 .step.active {
@@ -55,6 +61,7 @@
   height: 3px;
   background: #e9ecef;
   border-radius: 2px;
+  transition: all 0.3s ease;
 }
 
 .stepline.active {
@@ -66,19 +73,20 @@
   border-radius: 8px;
   background: transparent;
   border: 2px solid rgba(249,115,22,0.06);
+  padding: 1.2rem;
 }
 
 /* section title */
 .section-title {
-  font-size: 1.05rem;
+  font-size: 1.1rem;
   font-weight: 700;
-  margin-bottom: .75rem;
+  margin-bottom: 1rem;
 }
 
-/* accent border on the top-left of the inner-card like screenshot */
+/* accent border label on the top-left */
 .border-accent {
   position: relative;
-  padding-top: .75rem;
+  padding-top: 1.2rem;
 }
 
 .border-accent::before {
@@ -101,6 +109,7 @@ textarea.form-control {
   border: 1px solid #e6e6e6;
   padding: .75rem .9rem;
   box-shadow: none;
+  transition: all 0.3s ease;
 }
 
 .form-control:focus,
@@ -115,6 +124,8 @@ textarea.form-control:focus {
 .btn-next, .btn-prev, .btn-submit {
   border-radius: 999px;
   padding: .55rem 1.1rem;
+  font-weight: 600;
+  transition: all 0.25s ease;
 }
 
 .btn-next {
@@ -135,11 +146,20 @@ textarea.form-control:focus {
   color: #333;
 }
 
+.btn-prev:hover {
+  background: #f1f1f1;
+}
+
 .btn-submit {
   background: linear-gradient(90deg,#f97316,#fb923c);
   border: none;
   color: #fff;
   box-shadow: 0 10px 30px rgba(249,115,22,0.18);
+}
+
+.btn-submit:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
 }
 
 /* small helper text */
@@ -168,8 +188,8 @@ textarea.form-control:focus {
 @media (max-width: 992px) {
   .stepper { display: none; }
   .border-accent::before { left: 12px; top: -10px; font-size: .8rem; }
-  .inner-card { padding: .9rem; }
-  .signup-card { padding: 1.1rem; }
+  .inner-card { padding: 1rem; }
+  .signup-card { padding: 1rem; }
 }
 
 @media (max-width: 576px) {
@@ -177,7 +197,7 @@ textarea.form-control:focus {
   .signup-logo { width: 48px; height: 48px; }
   .section-title { font-size: 1rem; }
   .btn-next, .btn-prev, .btn-submit {
-    padding: .6rem 1rem;
+    padding: .55rem .95rem;
     font-size: .95rem;
   }
 }

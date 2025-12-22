@@ -200,3 +200,67 @@
 @media (min-width: 1400px) {
   .about-page { padding: 100px 20px; }
 }
+
+/* ===============================
+   MOBILE FIX: About Cards
+   =============================== */
+@media (max-width: 576px) {
+  .about-container {
+    gap: 20px;
+    padding: 0;
+  }
+
+  .about-card h3 {
+    font-size: 1.25rem;
+  }
+
+  .about-card p {
+    font-size: 0.95rem;
+    line-height: 1.6;
+  }
+}
+/* ===============================
+   CTA Banner Responsive
+   =============================== */
+@media (max-width: 768px) {
+  .cta-banner {
+    height: auto;
+    padding: 40px 16px;
+  }
+
+  .cta-overlay {
+    padding: 1.8rem 1.4rem;
+  }
+
+  .cta-overlay h2 {
+    font-size: 1.6rem;
+  }
+
+  .cta-overlay p {
+    font-size: 0.95rem;
+  }
+}
+/* ===============================
+   TABLET FIX
+   =============================== */
+@media (min-width: 577px) and (max-width: 991px) {
+  .about-container {
+    gap: 28px;
+  }
+
+  .about-card {
+    padding: 28px;
+  }
+
+  .cta-overlay h2 {
+    font-size: 2rem;
+  }
+}
+/* ===============================
+   Section Title Mobile Spacing
+   =============================== */
+@media (max-width: 576px) {
+  .section-title h2 {
+    margin-bottom: 32px;
+  }
+}

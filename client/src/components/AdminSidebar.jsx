@@ -1,23 +1,21 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   Drawer, List, ListItemButton, ListItemText, ListItemIcon,
   Collapse, Toolbar, Typography, Divider
 } from '@mui/material';
 import {
   ExpandLess, ExpandMore, Event, Person, Settings,
-  CalendarMonth, Group, PendingActions, LockClock, HowToReg, Block
+  CalendarMonth, Group, PendingActions, LockClock, HowToReg, Block, LockReset
 } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { LockReset } from '@mui/icons-material';
-
 const drawerWidth = 240;
 
-const AdminSidebar = () => {
+const AdminSidebar = ({ mobileOpen, setMobileOpen }) => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const [openAppointment, setOpenAppointment] = useState(true);
-  const [openUser, setOpenUser] = useState(true);
+  const [openAppointment, setOpenAppointment] = React.useState(true);
+  const [openUser, setOpenUser] = React.useState(true);
 
   const isActive = (path) => location.pathname === path;
 
@@ -44,35 +42,25 @@ const AdminSidebar = () => {
     },
   };
 
-  return (
-    <Drawer
-      variant="permanent"
-      sx={{
-        width: drawerWidth,
-        flexShrink: 0,
-        '& .MuiDrawer-paper': {
-          width: drawerWidth,
-          boxSizing: 'border-box',
-          backgroundColor: '#006232',
-          color: 'white',
-          minHeight: '100vh',
-        },
-      }}
-    >
+  // **Helper function**: navigate + close mobile drawer
+  const handleNavigate = (path) => {
+    navigate(path);
+    if (mobileOpen) setMobileOpen(false); // close only on mobile
+  };
+
+  const drawerContent = (
+    <>
       <Toolbar>
         <Typography variant="h6" sx={{ paddingLeft: 2 }}>
           Central Kitchen
         </Typography>
       </Toolbar>
-
       <Divider />
-
-      <List aria-label="Main navigation">
-        {/* Schedule */}
+      <List>
         <ListItemButton
           sx={itemStyle}
           selected={isActive('/admin/schedule')}
-          onClick={() => navigate('/admin/schedule')}
+          onClick={() => handleNavigate('/admin/schedule')}
         >
           <ListItemIcon sx={{ color: 'white' }}>
             <CalendarMonth />
@@ -80,7 +68,6 @@ const AdminSidebar = () => {
           <ListItemText primary="Schedule" />
         </ListItemButton>
 
-        {/* Appointments */}
         <ListItemButton sx={itemStyle} onClick={() => setOpenAppointment((prev) => !prev)}>
           <ListItemIcon sx={{ color: 'white' }}>
             <Event />
@@ -93,7 +80,7 @@ const AdminSidebar = () => {
             <ListItemButton
               sx={subItemStyle}
               selected={isActive('/admin/appointments')}
-              onClick={() => navigate('/admin/appointments')}
+              onClick={() => handleNavigate('/admin/appointments')}
             >
               <ListItemIcon sx={{ color: 'white' }}>
                 <Group />
@@ -103,7 +90,7 @@ const AdminSidebar = () => {
             <ListItemButton
               sx={subItemStyle}
               selected={isActive('/admin/appointments/future')}
-              onClick={() => navigate('/admin/appointments/future')}
+              onClick={() => handleNavigate('/admin/appointments/future')}
             >
               <ListItemIcon sx={{ color: 'white' }}>
                 <LockClock />
@@ -113,7 +100,6 @@ const AdminSidebar = () => {
           </List>
         </Collapse>
 
-        {/* Users */}
         <ListItemButton sx={itemStyle} onClick={() => setOpenUser((prev) => !prev)}>
           <ListItemIcon sx={{ color: 'white' }}>
             <Person />
@@ -126,7 +112,7 @@ const AdminSidebar = () => {
             <ListItemButton
               sx={subItemStyle}
               selected={isActive('/admin/users')}
-              onClick={() => navigate('/admin/users')}
+              onClick={() => handleNavigate('/admin/users')}
             >
               <ListItemIcon sx={{ color: 'white' }}>
                 <Group />
@@ -136,7 +122,7 @@ const AdminSidebar = () => {
             <ListItemButton
               sx={subItemStyle}
               selected={isActive('/admin/users/pending')}
-              onClick={() => navigate('/admin/users/pending')}
+              onClick={() => handleNavigate('/admin/users/pending')}
             >
               <ListItemIcon sx={{ color: 'white' }}>
                 <PendingActions />
@@ -146,7 +132,7 @@ const AdminSidebar = () => {
             <ListItemButton
               sx={subItemStyle}
               selected={isActive('/admin/users/awaiting')}
-              onClick={() => navigate('/admin/users/awaiting')}
+              onClick={() => handleNavigate('/admin/users/awaiting')}
             >
               <ListItemIcon sx={{ color: 'white' }}>
                 <HowToReg />
@@ -156,7 +142,7 @@ const AdminSidebar = () => {
             <ListItemButton
               sx={subItemStyle}
               selected={isActive('/admin/users/frozen')}
-              onClick={() => navigate('/admin/users/frozen')}
+              onClick={() => handleNavigate('/admin/users/frozen')}
             >
               <ListItemIcon sx={{ color: 'white' }}>
                 <Block />
@@ -166,11 +152,10 @@ const AdminSidebar = () => {
           </List>
         </Collapse>
 
-        {/* Settings */}
         <ListItemButton
           sx={itemStyle}
           selected={isActive('/admin/dashboard')}
-          onClick={() => navigate('/admin/dashboard')}
+          onClick={() => handleNavigate('/admin/dashboard')}
         >
           <ListItemIcon sx={{ color: 'white' }}>
             <Settings />
@@ -178,22 +163,48 @@ const AdminSidebar = () => {
           <ListItemText primary="Settings" />
         </ListItemButton>
 
-        {/* Reset Password */}
         <ListItemButton
           sx={itemStyle}
-          selected={isActive('/admin/reset-password')} 
-          onClick={() => navigate('/admin/reset-password')}
+          selected={isActive('/admin/reset-password')}
+          onClick={() => handleNavigate('/admin/reset-password')}
         >
           <ListItemIcon sx={{ color: 'white' }}>
             <LockReset />
           </ListItemIcon>
           <ListItemText primary="Reset Password" />
         </ListItemButton>
-
-
-
       </List>
-    </Drawer>
+    </>
+  );
+
+  return (
+    <>
+      {/* Desktop Permanent Drawer */}
+      <Drawer
+        variant="permanent"
+        sx={{
+          display: { xs: 'none', md: 'block' },
+          '& .MuiDrawer-paper': { width: drawerWidth, boxSizing: 'border-box', backgroundColor: '#006232', color: 'white', minHeight: '100vh' },
+        }}
+        open
+      >
+        {drawerContent}
+      </Drawer>
+
+      {/* Mobile Temporary Drawer */}
+      <Drawer
+        variant="temporary"
+        open={mobileOpen}
+        onClose={() => setMobileOpen(false)}
+        ModalProps={{ keepMounted: true }}
+        sx={{
+          display: { xs: 'block', md: 'none' },
+          '& .MuiDrawer-paper': { width: drawerWidth, boxSizing: 'border-box', backgroundColor: '#006232', color: 'white' },
+        }}
+      >
+        {drawerContent}
+      </Drawer>
+    </>
   );
 };
 

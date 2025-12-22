@@ -1,16 +1,17 @@
 import React, { useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { AppBar, Toolbar, Typography, Box } from '@mui/material';
+import { AppBar, Toolbar, Typography, Box, IconButton } from '@mui/material';
 import { AuthContext } from '../context/AuthContext';
+import MenuIcon from '@mui/icons-material/Menu';
 import '../Styles/topbar.css'; 
 
-const Topbar = () => {
+const Topbar = ({ mobileOpen, setMobileOpen }) => {
   const { user, logout } = useContext(AuthContext);
+  const drawerWidth = 240;
+
   const handleLogout = () => {
     logout(); 
   };
-
-  const drawerWidth = 240;
 
   return (
     <AppBar
@@ -28,9 +29,21 @@ const Topbar = () => {
       className="topbar"
     >
       <Toolbar className="topbar" sx={{ minHeight: { xs: 56, sm: 64, md: 64 } }}>
+        {/* Hamburger icon for mobile */}
+        <IconButton
+          color="inherit"
+          edge="start"
+          sx={{ display: { xs: 'inline-flex', md: 'none' }, mr: 2 }}
+          onClick={() => setMobileOpen(prev => !prev)} // toggle sidebar
+        >
+          <MenuIcon />
+        </IconButton>
+
         <Typography className="topbar-title">
           Central Kitchen Dashboard
         </Typography>
+
+        <Box sx={{ flexGrow: 1 }} />
 
         <Box className="topbar-right">
           <Typography className="topbar-greeting">

@@ -84,3 +84,46 @@
   visibility: hidden;
   pointer-events: none;
 }
+
+
+@media (max-width: 576px) {
+  .footer {
+    padding: 20px 10px;
+    text-align: center;
+  }
+
+  .footer .sitename {
+    display: block;
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+  }
+
+  .footer .credits {
+    font-size: 0.85rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .scroll-top {
+    width: 35px;
+    height: 35px;
+    font-size: 1.2rem;
+    right: 15px;
+    bottom: 15px;
+  }
+}
+
+@media (min-width: 577px) and (max-width: 991px) {
+  .footer {
+    padding: 25px 15px;
+    text-align: center;
+  }
+
+  .footer .sitename {
+    font-size: 1.4rem;
+  }
+
+  .footer .credits {
+    font-size: 0.9rem;
+  }
+}

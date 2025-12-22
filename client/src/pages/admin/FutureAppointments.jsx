@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import {
   Table, TableHead, TableRow, TableCell, TableBody, TablePagination, Typography, Box,
-  Button,Skeleton
+  Button, Skeleton
 } from '@mui/material';
 import moment from 'moment-timezone';
 import axios from 'axios';
+import { useMediaQuery, TableContainer } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
+
 
 const DEFAULT_API = process.env.REACT_APP_API_URL || "";
 
@@ -17,6 +20,9 @@ const FutureAppointments = () => {
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+
 
 
   useEffect(() => {
@@ -80,56 +86,66 @@ const FutureAppointments = () => {
 
   return (
     <Box p={3}>
-      <Typography variant="h5" gutterBottom>
+      <Typography variant={isMobile ? 'h6' : 'h5'} gutterBottom>
         Future Appointments
       </Typography>
 
-      <Table>
-        <TableHead>
-          <TableRow>
-            <TableCell>User Name</TableCell>
-            <TableCell>Date</TableCell>
-            <TableCell>Start Time</TableCell>
-            <TableCell>End Time</TableCell>
-            <TableCell>Action</TableCell>
-          </TableRow>
-        </TableHead>
-      <TableBody>
-  {loading
-    ? Array.from(new Array(rowsPerPage)).map((_, index) => (
-        <TableRow key={index}>
-          <TableCell><Skeleton /></TableCell>
-          <TableCell><Skeleton /></TableCell>
-          <TableCell><Skeleton /></TableCell>
-          <TableCell><Skeleton /></TableCell>
-          <TableCell><Skeleton /></TableCell>
-        </TableRow>
-      ))
-    : appointments.length === 0
-      ? (
-        <TableRow>
-          <TableCell colSpan={5} align="center">
-            No future appointments
-          </TableCell>
-        </TableRow>
-      )
-      : appointments
-          .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-          .map((slot, index) => (
-            <TableRow key={index}>
-              <TableCell>{slot.userName || '-'}</TableCell>
-              <TableCell>{slot.date}</TableCell>
-              <TableCell>{slot.startTime}</TableCell>
-              <TableCell>{slot.endTime}</TableCell>
-              <TableCell>
-                <Button variant="contained" size="small">VIEW DETAILS</Button>
-              </TableCell>
-            </TableRow>
-          ))
-  }
-</TableBody>
 
-      </Table>
+      <TableContainer sx={{ maxWidth: '100%', overflowX: 'auto' }}>
+        <Table size={isMobile ? 'small' : 'medium'}>
+          <TableHead>
+            <TableRow>
+              <TableCell>User Name</TableCell>
+              <TableCell>Date</TableCell>
+              <TableCell>Start Time</TableCell>
+              <TableCell>End Time</TableCell>
+              <TableCell>Action</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {loading
+              ? Array.from(new Array(rowsPerPage)).map((_, index) => (
+                <TableRow key={index}>
+                  <TableCell><Skeleton /></TableCell>
+                  <TableCell><Skeleton /></TableCell>
+                  <TableCell><Skeleton /></TableCell>
+                  <TableCell><Skeleton /></TableCell>
+                  <TableCell><Skeleton /></TableCell>
+                </TableRow>
+              ))
+              : appointments.length === 0
+                ? (
+                  <TableRow>
+                    <TableCell colSpan={5} align="center">
+                      No future appointments
+                    </TableCell>
+                  </TableRow>
+                )
+                : appointments
+                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                  .map((slot, index) => (
+                    <TableRow key={index}>
+                      <TableCell>{slot.userName || '-'}</TableCell>
+                      <TableCell>{slot.date}</TableCell>
+                      <TableCell>{slot.startTime}</TableCell>
+                      <TableCell>{slot.endTime}</TableCell>
+                      <TableCell>
+                        <Button
+                          variant="contained"
+                          size="small"
+                          sx={{ minWidth: isMobile ? 60 : 120 }}
+                        >
+                          {isMobile ? 'VIEW' : 'VIEW DETAILS'}
+                        </Button>
+
+                      </TableCell>
+                    </TableRow>
+                  ))
+            }
+          </TableBody>
+
+        </Table>
+      </TableContainer>
 
       <TablePagination
         component="div"

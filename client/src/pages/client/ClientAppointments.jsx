@@ -19,6 +19,8 @@ import {
 } from '@mui/material';
 import { AuthContext } from '../../context/AuthContext';
 import moment from 'moment-timezone';
+import { useMediaQuery,} from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 
 const AZ_TIMEZONE = 'America/Phoenix';
 
@@ -27,18 +29,21 @@ const ClientAppointments = () => {
   const navigate = useNavigate();
   const { user } = useContext(AuthContext);
   const [loading, setLoading] = useState(true);
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
 
   const [appointments, setAppointments] = useState([]);
   const [users, setUsers] = useState([]);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(30);
+  
 
   const DEFAULT_API = process.env.REACT_APP_API_URL || "";
 
   useEffect(() => {
     const fetchUsersAndAppointments = async () => {
-        setLoading(true);
+      setLoading(true);
       try {
         // Fetch all users
         const usersRes = await axios.get(`${DEFAULT_API}/api/users/all`);
@@ -74,7 +79,7 @@ const ClientAppointments = () => {
       } catch (err) {
         console.error('Failed to fetch appointments or users:', err);
       }
-        setLoading(false);
+      setLoading(false);
     };
 
     fetchUsersAndAppointments();
@@ -87,62 +92,65 @@ const ClientAppointments = () => {
   };
 
   return (
-    <Box sx={{ flexGrow: 1 }}>
-      <Toolbar>
-        <Typography variant="h6" sx={{ fontWeight: 600 }}>
-          All Appointments
-        </Typography>
-      </Toolbar>
+    <Box p={isMobile ? 1 : 3}>
+      <Typography variant={isMobile ? 'h6' : 'h5'} sx={{ mb: 2 }} noWrap>
+        All Appointments
+      </Typography>
 
-      <Box p={3}>
-        <TableContainer component={Paper}>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>User Name</TableCell>
-                <TableCell>Booked On</TableCell>
-                <TableCell>Booking Start</TableCell>
-                <TableCell>Booking End</TableCell>
-                <TableCell>Action</TableCell>
-              </TableRow>
-            </TableHead>
-       <TableBody>
-  {loading ? (
-    Array.from(new Array(5)).map((_, index) => (
-      <TableRow key={index}>
-        <TableCell><Skeleton /></TableCell>
-        <TableCell><Skeleton /></TableCell>
-        <TableCell><Skeleton /></TableCell>
-        <TableCell><Skeleton /></TableCell>
-        <TableCell><Skeleton /></TableCell>
-      </TableRow>
-    ))
-  ) : appointments.length === 0 ? (
-    <TableRow>
-      <TableCell colSpan={5} align="center">
-        No appointments found.
-      </TableCell>
-    </TableRow>
-  ) : (
-    appointments
-      .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-      .map((appt) => (
-        <TableRow key={appt.id}>
-          <TableCell>{appt.userName}</TableCell>
-          <TableCell>{appt.bookedOn}</TableCell>
-          <TableCell>{appt.startTime}</TableCell>
-          <TableCell>{appt.endTime}</TableCell>
-          <TableCell>
-            <Button variant="outlined" size="small">
-              View
-            </Button>
-          </TableCell>
-        </TableRow>
-      ))
-  )}
-</TableBody>
+     
+          <TableContainer sx={{ maxWidth: '100%', overflowX: 'auto' }}>
+            <Table size={isMobile ? 'small' : 'medium'}>
+              <TableHead>
+                <TableRow>
+                  <TableCell>User Name</TableCell>
+                  <TableCell>Booked On</TableCell>
+                  <TableCell>Booking Start</TableCell>
+                  <TableCell>Booking End</TableCell>
+                  <TableCell>Action</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {loading ? (
+                  Array.from(new Array(5)).map((_, index) => (
+                    <TableRow key={index}>
+                      <TableCell><Skeleton /></TableCell>
+                      <TableCell><Skeleton /></TableCell>
+                      <TableCell><Skeleton /></TableCell>
+                      <TableCell><Skeleton /></TableCell>
+                      <TableCell><Skeleton /></TableCell>
+                    </TableRow>
+                  ))
+                ) : appointments.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={5} align="center">
+                      No appointments found.
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  appointments
+                    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                    .map((appt) => (
+                      <TableRow key={appt.id}>
+                        <TableCell>{appt.userName}</TableCell>
+                        <TableCell>{appt.bookedOn}</TableCell>
+                        <TableCell>{appt.startTime}</TableCell>
+                        <TableCell>{appt.endTime}</TableCell>
+                        <TableCell>
+                          <Button
+                            variant="contained"
+                            size="small"
+                            sx={{ minWidth: isMobile ? 60 : 120 }}
+                          >
+                            {isMobile ? 'VIEW' : 'VIEW DETAILS'}
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                )}
+              </TableBody>
 
-          </Table>
+            </Table>
+          </TableContainer>
 
           <TablePagination
             rowsPerPageOptions={[10, 30, 50]}
@@ -153,9 +161,8 @@ const ClientAppointments = () => {
             onPageChange={handleChangePage}
             onRowsPerPageChange={handleChangeRowsPerPage}
           />
-        </TableContainer>
       </Box>
-    </Box>
+  
   );
 };
 

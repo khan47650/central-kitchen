@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import {
-  Table, TableHead, TableRow, TableCell, TableBody, TablePagination, Button,Skeleton
+  Table, TableHead, TableRow, TableCell, TableBody, TablePagination, Button, Skeleton
 } from '@mui/material';
 import moment from 'moment-timezone';
+import { useMediaQuery, Paper, TableContainer, Typography } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
+
 
 const AZ_TIMEZONE = 'America/Phoenix';
 
@@ -15,6 +18,9 @@ const AllAppointments = () => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [loading, setLoading] = useState(true);
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+
 
   useEffect(() => {
     const fetchUsersAndAppointments = async () => {
@@ -79,53 +85,65 @@ const AllAppointments = () => {
 
   return (
     <>
-      <h2 style={{ marginTop: 8, marginBottom: 16 }}>All Appointments</h2>
-      <Table>
-        <TableHead>
-          <TableRow>
-            <TableCell>User Name</TableCell>
-            <TableCell>Booked On</TableCell>
-            <TableCell>Booking Start</TableCell>
-            <TableCell>Booking End</TableCell>
-            <TableCell>Action</TableCell>
-          </TableRow>
-        </TableHead>
-       <TableBody>
-  {loading
-    ? Array.from(new Array(rowsPerPage)).map((_, index) => (
-        <TableRow key={index}>
-          <TableCell><Skeleton /></TableCell>
-          <TableCell><Skeleton /></TableCell>
-          <TableCell><Skeleton /></TableCell>
-          <TableCell><Skeleton /></TableCell>
-          <TableCell><Skeleton /></TableCell>
-        </TableRow>
-      ))
-    : appointments.length === 0
-      ? (
-        <TableRow>
-          <TableCell colSpan={5} align="center">
-            No appointments found
-          </TableCell>
-        </TableRow>
-      )
-      : appointments
-          .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-          .map(row => (
-            <TableRow key={row.id}>
-              <TableCell>{row.userName}</TableCell>
-              <TableCell>{row.bookedOn}</TableCell>
-              <TableCell>{row.bookingStart}</TableCell>
-              <TableCell>{row.bookingEnd}</TableCell>
-              <TableCell>
-                <Button variant="contained" size="small">VIEW DETAILS</Button>
-              </TableCell>
-            </TableRow>
-          ))
-  }
-</TableBody>
+      <Typography variant={isMobile ? 'h6' : 'h5'} sx={{ mb: 2 }} noWrap>
+        All Appointments
+      </Typography>
 
-      </Table>
+      <TableContainer sx={{ maxWidth: '100%', overflowX: 'auto' }}>
+        <Table size={isMobile ? 'small' : 'medium'}>
+          <TableHead>
+            <TableRow>
+              <TableCell>User Name</TableCell>
+              <TableCell>Booked On</TableCell>
+              <TableCell>Booking Start</TableCell>
+              <TableCell>Booking End</TableCell>
+              <TableCell>Action</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {loading
+              ? Array.from(new Array(rowsPerPage)).map((_, index) => (
+                <TableRow key={index}>
+                  <TableCell><Skeleton /></TableCell>
+                  <TableCell><Skeleton /></TableCell>
+                  <TableCell><Skeleton /></TableCell>
+                  <TableCell><Skeleton /></TableCell>
+                  <TableCell><Skeleton /></TableCell>
+                </TableRow>
+              ))
+              : appointments.length === 0
+                ? (
+                  <TableRow>
+                    <TableCell colSpan={5} align="center">
+                      No appointments found
+                    </TableCell>
+                  </TableRow>
+                )
+                : appointments
+                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                  .map(row => (
+                    <TableRow key={row.id}>
+                      <TableCell>{row.userName}</TableCell>
+                      <TableCell>{row.bookedOn}</TableCell>
+                      <TableCell>{row.bookingStart}</TableCell>
+                      <TableCell>{row.bookingEnd}</TableCell>
+                      <TableCell>
+                        <Button
+                          variant="contained"
+                          size="small"
+                          sx={{ minWidth: isMobile ? 60 : 120 }}
+                        >
+                          {isMobile ? 'VIEW' : 'VIEW DETAILS'}
+                        </Button>
+
+                      </TableCell>
+                    </TableRow>
+                  ))
+            }
+          </TableBody>
+
+        </Table>
+      </TableContainer>
 
       <TablePagination
         component="div"

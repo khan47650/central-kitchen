@@ -96,3 +96,68 @@
   background-color: #e89e00;
   transform: translateY(-2px);
 }
+
+/* ===============================
+   Contact Header – Mobile
+   =============================== */
+@media (max-width: 576px) {
+  .contact-header h1 {
+    font-size: 1.8rem;
+  }
+
+  .contact-header p {
+    font-size: 0.95rem;
+  }
+}
+
+/* ===============================
+   Contact Info Cards – Mobile
+   =============================== */
+@media (max-width: 576px) {
+  .contact-info {
+    gap: 20px;
+  }
+
+  .info-card {
+    width: 100%;
+    max-width: 360px;
+  }
+}
+
+/* ===============================
+   Contact Form – Mobile
+   =============================== */
+@media (max-width: 576px) {
+  .contact-form {
+    padding: 0 5px;
+  }
+
+  .contact-form input,
+  .contact-form textarea {
+    font-size: 0.95rem;
+  }
+}
+
+/* ===============================
+   Contact Page – Tablet
+   =============================== */
+@media (min-width: 577px) and (max-width: 991px) {
+  .contact-header h1 {
+    font-size: 2.1rem;
+  }
+
+  .info-card {
+    width: 240px;
+  }
+}
+
+/* ===============================
+   Send Button – Mobile
+   =============================== */
+@media (max-width: 576px) {
+  .send-btn {
+    width: 100%;
+    font-size: 1rem;
+    padding: 0.8rem;
+  }
+}

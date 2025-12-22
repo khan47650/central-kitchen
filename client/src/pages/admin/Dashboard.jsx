@@ -43,7 +43,7 @@ const AdminDashboard = () => {
 
   useEffect(() => {
 
-   const fetchStats = async () => {
+    const fetchStats = async () => {
       try {
         const resStats = await axios.get(`${DEFAULT_API}/api/stats/adminStats`);
         setStats(resStats.data);
@@ -61,37 +61,40 @@ const AdminDashboard = () => {
 
   }, []);
 
-if (loading) {
-  return (
-    <Box sx={{ width: "100%" }}>
-      {/* Header */}
-      <Skeleton variant="text" width={200} height={40} />
-      <Skeleton variant="text" width={300} height={20} />
+  if (loading) {
+    return (
+      <Box sx={{
+        p: 2,
+        boxSizing: 'border-box',
+      }}>
+        {/* Header */}
+        <Skeleton variant="text" width={200} height={40} />
+        <Skeleton variant="text" width={300} height={20} />
 
-      {/* Stat cards */}
-      <Grid container spacing={2} sx={{ mt: 2 }}>
-        {[1, 2, 3, 4].map((i) => (
-          <Grid item xs={12} sm={6} md={3} key={i}>
-            <Skeleton variant="rounded" height={150} />
+        {/* Stat cards */}
+        <Grid container spacing={2} sx={{ mt: 2 }}>
+          {[1, 2, 3, 4].map((i) => (
+            <Grid item xs={12} sm={6} md={3} key={i}>
+              <Skeleton variant="rounded" height={150} />
+            </Grid>
+          ))}
+        </Grid>
+
+        {/* Content */}
+        <Grid container spacing={2} sx={{ mt: 2 }}>
+          <Grid item xs={12} md={8}>
+            <Skeleton variant="rounded" height={350} />
           </Grid>
-        ))}
-      </Grid>
-
-      {/* Content */}
-      <Grid container spacing={2} sx={{ mt: 2 }}>
-        <Grid item xs={12} md={8}>
-          <Skeleton variant="rounded" height={350} />
+          <Grid item xs={12} md={4}>
+            <Skeleton variant="rounded" height={350} />
+          </Grid>
         </Grid>
-        <Grid item xs={12} md={4}>
-          <Skeleton variant="rounded" height={350} />
-        </Grid>
-      </Grid>
-    </Box>
-  );
-}
+      </Box>
+    );
+  }
 
 
-   const statCards = [
+  const statCards = [
     {
       id: 1,
       label: "Today's Appointments",
@@ -133,10 +136,13 @@ if (loading) {
   // ];
 
   return (
-    <Box sx={{ width: '100%' }}>
+    <Box sx={{
+      p: 2,
+      boxSizing: 'border-box',
+    }}>
       {/* Header */}
-      <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Box>
+      <Box sx={{ mb: 3, display: 'flex', flexDirection: { xs: 'column', md: 'row' }, justifyContent: 'space-between', alignItems: { xs: 'flex-start', md: 'center' }, gap: 2, flexWrap: 'wrap', }}>
+        <Box sx={{ minWidth: 0 }}>
           <Typography variant="h5" fontWeight={700}>
             Welcome Admin
           </Typography>
@@ -145,50 +151,70 @@ if (loading) {
           </Typography>
         </Box>
 
-        <Stack direction="row" spacing={2}>
-          <Button variant="contained">Create Slot</Button>
-          <Button variant="outlined">Export Report</Button>
+        <Stack
+          direction={{ xs: 'column', sm: 'row' }}
+          spacing={2}
+          sx={{ mt: { xs: 2, sm: 0 }, width: { xs: '100%', sm: 'auto' }, flexWrap: 'wrap' }}
+        >
+          <Button variant="contained" sx={{
+            width: { xs: '100%', sm: 'auto' },
+            fontSize: { xs: 14, sm: 16 },
+            minWidth: 120,
+          }}>
+            Create Slot
+          </Button>
+          <Button variant="outlined" sx={{
+            width: { xs: '100%', sm: 'auto' },
+            fontSize: { xs: 14, sm: 16 },
+            minWidth: 120,
+          }}>
+            Export Report
+          </Button>
         </Stack>
+
       </Box>
 
       {/* Stat cards */}
       <Grid container spacing={2} sx={{ mb: 2 }}>
         {statCards.map((c) => (
-       <Grid item xs={12} sm={6} md={3} key={c.id}>
-  <Paper
-    elevation={2}
-    sx={{
-      p: 2,
-      display: 'flex',
-      alignItems: 'center',
-      gap: 2,
-      height: '150px', // fixed height for all cards
-      minHeight: '150px',
-    }}
-  >
-    <Avatar sx={{ bgcolor: c.color, width: 56, height: 56 }}>
-      {c.icon}
-    </Avatar>
-    <Box sx={{ flex: 1 }}>
-      <Typography variant="subtitle2" color="text.secondary">
-        {c.label}
-      </Typography>
-      <Typography variant="h5" fontWeight={700} sx={{ mt: 0.5 }}>
-        {c.value}
-      </Typography>
-      <Typography variant="body2" color="text.secondary">
-        {c.sub}
-      </Typography>
-    </Box>
-  </Paper>
-</Grid>
+          <Grid item xs={12} sm={6} md={3} key={c.id}>
+            <Paper
+              elevation={2}
+              sx={{
+                p: 2,
+                display: 'flex',
+                alignItems: 'center',
+                gap: 2,
+                flexDirection: { xs: 'row', md: 'row' },
+                minHeight: 150,
+                overflow: 'hidden',
+                wordBreak: 'break-word', // prevent text overflow
+              }}
+
+            >
+              <Avatar sx={{ bgcolor: c.color, width: 56, height: 56 }}>
+                {c.icon}
+              </Avatar>
+              <Box sx={{ flex: 1, minWidth: 0 }}>
+                <Typography variant="subtitle2" color="text.secondary" noWrap>
+                  {c.label}
+                </Typography>
+                <Typography variant="h5" fontWeight={700} sx={{ mt: 0.5 }} noWrap>
+                  {c.value}
+                </Typography>
+                <Typography variant="body2" color="text.secondary" noWrap>
+                  {c.sub}
+                </Typography>
+              </Box>
+            </Paper>
+          </Grid>
 
         ))}
       </Grid>
 
       <Grid container spacing={2}>
         <Grid item xs={12} md={8}>
-          <Paper elevation={2} sx={{ p: 2 }}>
+          <Paper elevation={2} sx={{ p: { xs: 2, md: 3 } }}>
             <Typography variant="h6" fontWeight={600} sx={{ mb: 1 }}>
               System Utilization
             </Typography>
@@ -214,25 +240,28 @@ if (loading) {
               Recent Activity
             </Typography>
 
-            <Table size="small">
-              <TableHead>
-                <TableRow>
-                  <TableCell>User</TableCell>
-                  <TableCell>Action</TableCell>
-                  <TableCell>Date</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {recentActivities.map((r, index) => (
-                  <TableRow key={index} hover>
-                    <TableCell>{r.user}</TableCell>
-                    <TableCell>{r.action}</TableCell>
-                    <TableCell>{moment.tz(r.date, AZ_TIMEZONE).format('YYYY-MM-DD HH:mm')}</TableCell>
+            <Box sx={{ overflowX: 'auto', width: '100%' }}>
 
+              <Table size="small">
+                <TableHead>
+                  <TableRow>
+                    <TableCell>User</TableCell>
+                    <TableCell>Action</TableCell>
+                    <TableCell>Date</TableCell>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHead>
+                <TableBody>
+                  {recentActivities.map((r, index) => (
+                    <TableRow key={index} hover>
+                      <TableCell>{r.user}</TableCell>
+                      <TableCell>{r.action}</TableCell>
+                      <TableCell>{moment.tz(r.date, AZ_TIMEZONE).format('YYYY-MM-DD HH:mm')}</TableCell>
+
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </Box>
           </Paper>
         </Grid>
 
@@ -246,11 +275,11 @@ if (loading) {
               <Box>
                 <Typography variant="subtitle2" color="text.secondary">Today</Typography>
                 <Typography variant="h5" fontWeight={700}> {stats?.todayAppointments?.total ? `${stats?.todayAppointments?.total} bookings`
-      : "0 bookings"}</Typography>
+                  : "0 bookings"}</Typography>
               </Box>
               <Box>
                 <Typography variant="subtitle2" color="text.secondary">This Week</Typography>
-                <Typography variant="h5" fontWeight={700}>  {stats?.currentWeekBookedSlots  ? `${stats?.currentWeekBookedSlots} bookings` : "0 bookings"}</Typography>
+                <Typography variant="h5" fontWeight={700}>  {stats?.currentWeekBookedSlots ? `${stats?.currentWeekBookedSlots} bookings` : "0 bookings"}</Typography>
               </Box>
               <Box>
                 <Typography variant="subtitle2" color="text.secondary">Active Users</Typography>

@@ -4,6 +4,8 @@ import "react-toastify/dist/ReactToastify.css";
 import { Link, replace, useNavigate } from "react-router-dom";
 import logo from "../assets/img/logo3.png";
 import { AuthContext } from "../context/AuthContext";
+import { Box, useTheme, useMediaQuery } from "@mui/material";
+
 
 const DEFAULT_API = process.env.REACT_APP_API_URL || "";
 
@@ -11,6 +13,9 @@ const ResetPassword = () => {
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
   const { user } = useContext(AuthContext);
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();

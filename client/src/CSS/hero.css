@@ -18,6 +18,7 @@
   color: #fff;
   padding: 2rem;
   z-index: 10;
+  
 }
 
 .carousel-container h2 {
@@ -41,4 +42,37 @@
 .btn-get-started:hover {
   background-color: #e89e00;
   transform: translateY(-2px);
+}
+
+
+/* MOBILE FIXES */
+/* ========================= */
+@media (max-width: 768px) {
+  .carousel-item img {
+    height: 85vh; 
+  }
+
+  .carousel-container {
+    padding: 1rem;
+  }
+
+  .carousel-container h2 {
+    font-size: 1.9rem;
+  }
+
+  .btn-get-started {
+    padding: 0.6rem 1.4rem;
+    font-size: 1rem;
+  }
+}
+
+/* SMALL PHONES */
+@media (max-width: 480px) {
+  .carousel-container h2 {
+    font-size: 1.6rem;
+  }
+
+  .btn-get-started {
+    font-size: 0.95rem;
+  }
 }

@@ -7,30 +7,35 @@ import WeekNavigator from '../../components/WeekNavigator';
 import axios from 'axios';
 
 const DEFAULT_API = process.env.REACT_APP_API_URL || "";
+const TOPBAR_HEIGHT = 64; // MUI AppBar default
 
 const Calendar = () => {
   const { user } = useContext(AuthContext);
   const [selectedWeek, setSelectedWeek] = useState(new Date());
   const [slots, setSlots] = useState([]);
-  const [users, setUsers] = useState({}); // map userId -> fullName
+  const [users, setUsers] = useState({});
   const [openModal, setOpenModal] = useState(false);
 
-  // Fetch all slots
   const fetchSlots = async () => {
     try {
       const res = await axios.get(`${DEFAULT_API}/api/slots`);
       setSlots(res.data);
-    } catch (err) { console.error(err); }
+    } catch (err) {
+      console.error(err);
+    }
   };
 
-  // Fetch all users
   const fetchUsers = async () => {
     try {
       const res = await axios.get(`${DEFAULT_API}/api/users/all`);
-      const userMap = {};
-      res.data.forEach(u => { userMap[u._id] = u.fullName; });
-      setUsers(userMap);
-    } catch (err) { console.error('Error fetching users:', err); }
+      const map = {};
+      res.data.forEach(u => {
+        map[u._id] = u.fullName;
+      });
+      setUsers(map);
+    } catch (err) {
+      console.error('Error fetching users:', err);
+    }
   };
 
   useEffect(() => {
@@ -43,15 +48,30 @@ const Calendar = () => {
   };
 
   return (
-    <Box>
-      {/* Header */}
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-        <Typography variant="h5">Hello, {user?.role?.toUpperCase()}</Typography>
+    <Box
+      sx={{
+        width: '100%',
+        pt: { xs: `${TOPBAR_HEIGHT + 8}px`, md: 2 }, 
+      }}
+    >
+      {/* ===== HEADER ===== */}
+      <Box
+        sx={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: 2,
+          mb: 2,
+        }}
+      >
+        <Typography variant="h5" fontWeight={700}>
+          Hello, {user?.role?.toUpperCase()}
+        </Typography>
 
-        <Box display="flex" gap={2}>
-          <Button 
-            variant="contained" 
-            color="primary" 
+        <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+          <Button
+            variant="contained"
             onClick={() => setOpenModal(true)}
           >
             Book Slot
@@ -60,19 +80,37 @@ const Calendar = () => {
           <Button
             variant="outlined"
             color="error"
-            disabled={user.role !== 'admin'}
+            disabled={user?.role !== 'admin'}
           >
             Delete
           </Button>
         </Box>
       </Box>
 
-      {/* Week Navigator */}
-      <WeekNavigator selectedWeek={selectedWeek} setSelectedWeek={setSelectedWeek} />
-      {/* Calendar Grid */}
-      <CalendarGrid selectedWeek={selectedWeek} slots={slots} users={users} />
+      {/* ===== WEEK NAVIGATOR ===== */}
+      <Box sx={{ mb: 2 }}>
+        <WeekNavigator
+          selectedWeek={selectedWeek}
+          setSelectedWeek={setSelectedWeek}
+        />
+      </Box>
 
-      {/* Booking Modal */}
+      {/* ===== CALENDAR GRID ===== */}
+      <Box
+        sx={{
+          width: '100%',
+          overflowX: 'auto',
+          pb: 2,
+        }}
+      >
+        <CalendarGrid
+          selectedWeek={selectedWeek}
+          slots={slots}
+          users={users}
+        />
+      </Box>
+
+      {/* ===== BOOK SLOT MODAL ===== */}
       <BookSlotModal
         open={openModal}
         onClose={() => setOpenModal(false)}
