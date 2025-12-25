@@ -27,6 +27,10 @@ import MyAppointments from './pages/client/MyAppointments';
 import { AuthProvider, AuthContext } from './context/AuthContext';
 import PrivateRoute from './utils/PrivateRoute';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import ClientTimings from './pages/client/ClientTiming';
+import AdminTimings from './pages/admin/AdminTimings';
+import Shops from './pages/Shops';
+import ShopsDetail from './components/ShopsDetail';
 
 function App() {
   return (
@@ -60,6 +64,8 @@ function AppRoutes() {
       <Route path="/login" element={<Login />} />
       <Route path="/success" element={<SuccessPage />} />
       <Route path="/successPassword" element={<SuccessPassword />} />
+      <Route path="/shops" element={<Shops/>}/>
+      <Route path="/shops/:id" element={<ShopsDetail/>}/>
 
       {/* ADMIN PROTECTED */}
       <Route
@@ -135,6 +141,15 @@ function AppRoutes() {
         }
       />
 
+      <Route
+      path="/admin/timings"
+      element={
+        <PrivateRoute roles={['admin']}>
+          <AdminLayout><AdminTimings/></AdminLayout>
+        </PrivateRoute>
+      }
+      />
+
       {/* CLIENT PROTECTED */}
       <Route
         path="/client/dashboard"
@@ -173,6 +188,14 @@ function AppRoutes() {
         element={
           <PrivateRoute roles={['client']}>
             <ClientLayout><ResetPassword /></ClientLayout>
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/client/timings"
+        element={
+          <PrivateRoute roles={['client']}>
+            <ClientLayout><ClientTimings /></ClientLayout>
           </PrivateRoute>
         }
       />

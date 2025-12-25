@@ -5,7 +5,7 @@ import {
 } from '@mui/material';
 import {
   ExpandLess, ExpandMore, Event, Person, Settings,
-  CalendarMonth, Group, PendingActions, LockClock, HowToReg, Block, LockReset
+  CalendarMonth, Group, PendingActions, LockClock, HowToReg, Block, LockReset, AccessTime
 } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
 const drawerWidth = 240;
@@ -42,10 +42,9 @@ const AdminSidebar = ({ mobileOpen, setMobileOpen }) => {
     },
   };
 
-  // **Helper function**: navigate + close mobile drawer
   const handleNavigate = (path) => {
     navigate(path);
-    if (mobileOpen) setMobileOpen(false); // close only on mobile
+    if (mobileOpen) setMobileOpen(false); 
   };
 
   const drawerContent = (
@@ -172,6 +171,17 @@ const AdminSidebar = ({ mobileOpen, setMobileOpen }) => {
             <LockReset />
           </ListItemIcon>
           <ListItemText primary="Reset Password" />
+        </ListItemButton>
+
+          <ListItemButton
+          sx={itemStyle}
+          selected={isActive('/admin/timings')}
+          onClick={() => handleNavigate('/admin/timings')}
+        >
+          <ListItemIcon sx={{ color: 'white' }}>
+            <AccessTime />
+          </ListItemIcon>
+          <ListItemText primary="Timings" />
         </ListItemButton>
       </List>
     </>

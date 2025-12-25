@@ -108,6 +108,7 @@ const LandingPage = () => {
                 <li><a className="nav-link active" href="#hero">Home</a></li>
                 <li><a className="nav-link" href="#about">About</a></li>
                 <li><a className="nav-link" href="#contact">Contact</a></li>
+                <li><Link className='nav-link' to="/login" state={{from:"schedules"}}>Schedules</Link></li>
               </ul>
             </div>
           </div>

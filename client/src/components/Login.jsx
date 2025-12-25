@@ -1,5 +1,5 @@
 import React, { useState, useContext } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate,useLocation, replace } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "../CSS/Login.css";
@@ -14,6 +14,7 @@ function Login() {
   const { login } = useContext(AuthContext);
   const navigate = useNavigate();
   const [formData, setFormData] = useState({ email: "", password: "" });
+  const location=useLocation();
 
   function handleChange(e) {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -41,7 +42,7 @@ function Login() {
         },
       });
       toast.success("Admin Login Successful!");
-      navigate("/admin/dashboard", { replace: true });
+      redirectLogin("admin");
       return;
     } else {
       toast.error("Invalid admin password!");
@@ -71,7 +72,7 @@ function Login() {
       });
 
       toast.success("Login Successful!");
-      navigate("/client/dashboard",{replace:true});
+      redirectLogin("client");
       setFormData({ email: "", password: "" });
 
     } catch (err) {
@@ -79,6 +80,21 @@ function Login() {
       toast.error("Server error. Try again later.");
     }
   }
+
+  const redirectLogin=(role)=>{
+    const from=location.state?.from;
+
+    if(from=="schedules"){
+      navigate("/shops",{replace:true});
+    }else{
+      if(role=="admin"){
+        navigate("/admin/dashboard",{replace:true});
+      }else{
+        navigate("/client/dashboard",{replace:true});
+      }
+    }
+
+  };
 
   return (
     <div className="auth-wrapper">
