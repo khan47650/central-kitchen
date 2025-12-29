@@ -7,6 +7,7 @@ const userRoutes = require('./routes/userRoutes');
 const slotRoutes = require('./routes/slotRoutes');
 const contactRoutes = require('./routes/contactRoutes');
 const dashboardRoutes=require('./routes/dashboardRoutes');
+const shopRoutes=require('./routes/shopRoutes');
 
 const app = express();
 
@@ -26,6 +27,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/slots', slotRoutes);
 app.use('/api/contact', contactRoutes);
 app.use('/api/stats',dashboardRoutes);
+app.use('/api/shops',shopRoutes);
 
 // Health check route (optional)
 app.get('/', (req, res) => {
