@@ -26,7 +26,7 @@ const durations = [1, 2, 3];
 const BookSlotModal = ({ open, onClose, userId, isAdmin, onBooked }) => {
   
   const [loading,setLoading]=useState(false);
-  // 🔹 Arizona time
+  // Arizona time
   const today = moment.tz(AZ_TIMEZONE);
   const startOfWeek = moment.tz(AZ_TIMEZONE).startOf('week').add(1, 'day'); // Monday
   const endOfWeek = moment.tz(AZ_TIMEZONE).startOf('week').add(4, 'day');   // Thursday

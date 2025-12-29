@@ -1,346 +1,458 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import {
-    Box,
-    Typography,
-    Table,
-    TableHead,
-    TableRow,
-    TableCell,
-    TableBody,
-    Paper,
-    TableContainer,
-    Button,
-    Checkbox,
-    Select,
-    MenuItem,
-    useMediaQuery
+  Box,
+  Typography,
+  Table,
+  TableHead,
+  TableRow,
+  TableCell,
+  TableBody,
+  Paper,
+  TableContainer,
+  Button,
+  Checkbox,
+  Select,
+  MenuItem,
+  Skeleton,
+  useMediaQuery,
+  CircularProgress
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import EditIcon from '@mui/icons-material/Edit';
-import moment from 'moment-timezone';
+import AddIcon from "@mui/icons-material/Add";
 import AddShopDialog from '../../components/AddShopDialog';
+import { useAuth } from "../../context/AuthContext";
+import axios from 'axios';
+import moment from 'moment-timezone';
 
+const TIME_OPTIONS = Array.from({ length: 15 }, (_, i) => `${6 + i}:00`);
+const DEFAULT_API = process.env.REACT_APP_API_URL || "";
+const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 const AZ_TIMEZONE = 'America/Phoenix';
 
-const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-const TIME_OPTIONS = Array.from({ length: 15 }, (_, i) => `${6 + i}:00`);
+const unwrapTiming = (t) => (t?._doc ? t._doc : t);
 
-const INITIAL_SHOPS = [
-    {
-        id: 1,
-        createdBy: 'Admin',
-        shopName: 'Central Kitchen',
-        address: 'Phoenix, AZ',
-        shopImage: 'https://i.pravatar.cc/150?img=1',
-        timings: DAYS.map(d => ({
-            day: d,
-            open: false,
-            openTime: '',
-            closeTime: '',
-            break: false,
-            breakStart: '',
-            breakEnd: ''
-        })),
-        dirty: false
-    },
-    {
-        id: 2,
-        createdBy: 'Admin',
-        shopName: 'Desert Bites',
-        address: 'Tempe, AZ',
-        shopImage: 'https://i.pravatar.cc/150?img=2',
-        timings: DAYS.map(d => ({
-            day: d,
-            open: false,
-            openTime: '',
-            closeTime: '',
-            break: false,
-            breakStart: '',
-            breakEnd: ''
-        })),
-        dirty: false
-    }
-];
+const formatTime = (time) => {
+  if (!time) return '';
+  return time.replace(/^0/, '');
+};
 
 const ClientTimings = () => {
-    const theme = useTheme();
-    const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-    const [shops, setShops] = useState(INITIAL_SHOPS);
-    const [openDialog, setOpenDialog] = useState(false);
-    const [isLocked, setIsLocked] = useState(false);
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const { user } = useAuth();
 
-    const updateTiming = (shopIndex, dayIndex, field, value) => {
-        const copy = [...shops];
-        const row = copy[shopIndex].timings[dayIndex];
+  const [shops, setShops] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [openDialog, setOpenDialog] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState(false);
+  const [savingId, setSavingId] = useState(null);
 
-        if (field === 'break') {
-            row.break = value;
-            if (value) {
-                row.open = false;
-                row.openTime = '';
-                row.closeTime = '';
-            }
-        }
+  const fileInputRef = useRef(null);
+  const activeShopIndex = useRef(null);
 
-        if (field === 'open') {
-            row.open = value;
-            if (value) {
-                row.break = false;
-                row.breakStart = '';
-                row.breakEnd = '';
-            }
-        }
+  const isSameTime = (a, b) => a && b && a === b;
 
-        row[field] = value;
-        copy[shopIndex].dirty = true;
-        setShops(copy);
+  const fetchShops = async () => {
+    if (!user?._id) return;
+    try {
+      setLoading(true);
+      const res = await axios.get(`${DEFAULT_API}/api/shops/my/${user._id}`);
 
+      const formatted = res.data.map(shop => {
+        const normalizedTimings = DAYS.map(day => {
+          const foundRaw = shop.timings?.find(t => unwrapTiming(t).day === day);
+          const found = unwrapTiming(foundRaw);
+
+          if (!found) {
+            return {
+              day,
+              open: false,
+              openTime: '',
+              closeTime: '',
+              break: false,
+              breakStart: '',
+              breakEnd: ''
+            };
+          }
+
+          return {
+            day,
+            open: Boolean(found.open),
+            openTime: formatTime(found.openTime),
+            closeTime: formatTime(found.closeTime),
+            break: Boolean(found.break),
+            breakStart: formatTime(found.breakStart),
+            breakEnd: formatTime(found.breakEnd)
+          };
+        });
+
+        return { ...shop, timings: normalizedTimings, dirty: false };
+      });
+
+      setShops(formatted);
+    } catch (err) {
+      console.error("Fetch shops failed", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchShops();
+  }, [user]);
+
+  const updateTiming = (shopIndex, dayIndex, field, value) => {
+    const copy = [...shops];
+    copy[shopIndex].timings[dayIndex] = {
+      ...copy[shopIndex].timings[dayIndex],
+      [field]: value
+    };
+    copy[shopIndex].dirty = true;
+    setShops(copy);
+  };
+
+  const isEditLocked = (row) => {
+    //if no timings for current day -NO LOCK
+    if (!row.open || !row.openTime || !row.closeTime) return false;
+
+    const now = moment.tz(AZ_TIMEZONE);
+    const todayName = DAYS[now.day() === 0 ? 6 : now.day() - 1];
+
+    //current day lock
+    if (row.day !== todayName) return false;
+
+    const [h, m = 0] = row.openTime.split(':').map(Number);
+
+    const openMoment = moment
+      .tz(AZ_TIMEZONE)
+      .hour(h)
+      .minute(m)
+      .second(0);
+
+    // 2 hours before open time
+    const lockTime = openMoment.clone().subtract(2, 'hours');
+
+    return now.isSameOrAfter(lockTime);
+  };
+
+
+  const getShopStatus = (timings) => {
+    const now = moment.tz(AZ_TIMEZONE);
+    const todayName = DAYS[now.day() === 0 ? 6 : now.day() - 1];
+    const today = timings.find(t => t.day === todayName);
+    if (!today) return 'Closed';
+
+    const toMin = t => {
+      const [h, m] = t.split(':').map(Number);
+      return h * 60 + m;
     };
 
-    useEffect(() => {
-        const checkLock = () => {
-            const nowAZ = moment().tz(AZ_TIMEZONE);
+    const nowMin = now.hours() * 60 + now.minutes();
 
-            const updatedShops = shops.map(shop => {
-                const copyShop = { ...shop };
-                copyShop.timings = copyShop.timings.map(row => {
-                    const openHour = parseInt(row.openTime?.split(':')[0] || '0', 10);
-                    const lockTime = moment.tz(AZ_TIMEZONE)
-                        .hour(openHour)
-                        .minute(0)
-                        .subtract(2, 'hours'); 
+    if (
+      today.break &&
+      today.breakStart &&
+      today.breakEnd &&
+      nowMin >= toMin(today.breakStart) &&
+      nowMin <= toMin(today.breakEnd)
+    ) return 'Break';
 
-                    const locked = row.openTime && nowAZ.isAfter(lockTime);
-                    return { ...row, isLockedForEdit: locked };
-                });
-                return copyShop;
-            });
+    if (
+      today.open &&
+      today.openTime &&
+      today.closeTime &&
+      nowMin >= toMin(today.openTime) &&
+      nowMin <= toMin(today.closeTime)
+    ) return 'Open';
 
-            setShops(updatedShops);
-        };
+    return 'Closed';
+  };
 
-        checkLock();
-        const interval = setInterval(checkLock, 60000); // update every minute
-        return () => clearInterval(interval);
-    }, [shops]);
+  const triggerImagePicker = (index) => {
+    activeShopIndex.current = index;
+    fileInputRef.current.click();
+  };
 
-    return (
-        <Box p={isMobile ? 1 : 3}>
-            <Box display="flex" justifyContent="space-between" mb={2}>
-                <Typography variant={isMobile ? 'h6' : 'h5'}>Client Timings</Typography>
-                <Button
-                    onClick={() => setOpenDialog(true)}
-                    sx={{
-                        minWidth: isMobile ? 60 : 100,
-                        backgroundColor: '#1976d2',
-                        color: '#fff',
-                        '&:hover': {
-                            backgroundColor: '#1976d2',
-                        },
-                    }}
-                    variant="contained"
-                    size="small"
-                >
-                    ADD
-                </Button>
+ const handleImageChange = (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  const copy = [...shops];
+  copy[activeShopIndex.current].shopImage = URL.createObjectURL(file); // preview
+  copy[activeShopIndex.current].newFile = file; // actual file for backend
+  copy[activeShopIndex.current].dirty = true;
+  setShops(copy);
+};
+
+
+ const saveSettings = async (shop) => {
+  try {
+    setSavingId(shop._id);
+
+    const formData = new FormData();
+    formData.append('shopId', shop._id);
+    formData.append('timings', JSON.stringify(shop.timings));
+    if (shop.newFile) {
+      formData.append('shopImage', shop.newFile);
+    }
+
+    await axios.put(`${DEFAULT_API}/api/shops/update/${shop._id}`, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+
+    fetchShops();
+  } catch (err) {
+    console.error("Save failed", err);
+  } finally {
+    setSavingId(null);
+  }
+};
+
+
+  const deleteShop = async (id) => {
+    try {
+      setDeleteLoading(true);
+      await axios.delete(`${DEFAULT_API}/api/shops/delete/${id}`);
+      setShops(prev => prev.filter(s => s._id !== id));
+    } catch (err) {
+      console.error("Delete failed", err);
+    } finally {
+      setDeleteLoading(false);
+    }
+  };
+
+  return (
+    <Box p={isMobile ? 1 : 3}>
+      <input
+        type="file"
+        hidden
+        ref={fileInputRef}
+        accept="image/*"
+        onChange={handleImageChange}
+      />
+
+      <Box display="flex" justifyContent="space-between" mb={2}>
+        <Typography variant={isMobile ? 'h6' : 'h5'}>
+          Client Timings
+        </Typography>
+
+        <Button
+          onClick={() => setOpenDialog(true)}
+          variant="contained"
+          startIcon={<AddIcon />}
+          sx={{
+            color: "#fff",
+            px: { xs: 1.5, sm: 3 },
+            fontSize: { xs: "0.75rem", sm: "0.85rem" },
+            height: { xs: 32, sm: 36 }
+          }}
+        >
+          ADD
+        </Button>
+      </Box>
+
+      {loading && [...Array(2)].map((_, i) => (
+        <Skeleton key={i} height={200} sx={{ mb: 2, borderRadius: 2 }} />
+      ))}
+
+      {!loading && !shops.length && (
+        <Typography align="center">No shops found</Typography>
+      )}
+
+      {shops.map((shop, shopIndex) => (
+        <Paper key={shop._id} sx={{ p: 2, mb: 3, borderRadius: 3 }}>
+          <Box display="flex" gap={2} mb={2}>
+            <Box position="relative">
+              <Box
+                component="img"
+                src={shop.shopImage}
+                sx={{ width: 70, height: 70, borderRadius: '50%' }}
+              />
+              <EditIcon
+                onClick={() => triggerImagePicker(shopIndex)}
+                sx={{
+                  position: 'absolute',
+                  bottom: 0,
+                  right: 0,
+                  bgcolor: '#fff',
+                  borderRadius: '50%',
+                  p: 0.5,
+                  cursor: 'pointer'
+                }}
+              />
+            </Box>
+
+            <Box flexGrow={1}>
+              <Typography fontWeight={600}>{shop.shopName}</Typography>
+              <Typography variant="body2" color="text.secondary"> {shop.address} </Typography>
+              <Typography
+                variant="caption"
+                sx={{
+                  color: getShopStatus(shop.timings) === 'Open'
+                    ? 'green'
+                    : getShopStatus(shop.timings) === 'Break'
+                      ? 'orange'
+                      : 'red',
+                  fontWeight: 600
+                }}
+              >
+                {getShopStatus(shop.timings)}
+              </Typography>
 
             </Box>
 
+            <Button
+              variant="outlined"
+              size={isMobile ? "small" : "medium"}
+              onClick={() => deleteShop(shop._id)}
+              sx={{
+                minWidth: isMobile ? 70 : 100,
+                height: isMobile ? 32 : 36,
+                px: isMobile ? 1 : 2,
+                fontSize: isMobile ? "0.7rem" : "0.85rem",
+                whiteSpace: "nowrap",
+              }}
+            >
+              {deleteLoading ? (
+                <CircularProgress size={16} />
+              ) : (
+                "DELETE"
+              )}
+            </Button>
 
+          </Box>
 
-            {shops.map((shop, shopIndex) => (
-                <Paper key={shop.id} sx={{ p: 2, mb: 3, borderRadius: 3 }}>
-                    {/* HEADER */}
-                    <Box display="flex" alignItems="center" gap={2} mb={2}>
-                        <Box position="relative">
-                            <Box
-                                component="img"
-                                src={shop.shopImage}
-                                sx={{ width: 70, height: 70, borderRadius: '50%' }}
-                            />
+          <TableContainer>
+            <Table size="small">
+              <TableHead>
+                <TableRow>
+                  <TableCell>Day</TableCell>
+                  <TableCell>Open</TableCell>
+                  <TableCell>Open Time</TableCell>
+                  <TableCell>Close Time</TableCell>
+                  <TableCell>Break</TableCell>
+                  <TableCell>Break Start</TableCell>
+                  <TableCell>Break End</TableCell>
+                </TableRow>
+              </TableHead>
 
-                            <input
-                                type="file"
-                                accept="image/*"
-                                id={`upload-${shop.id}`}
-                                style={{ display: 'none' }}
-                                onChange={e => {
-                                    const file = e.target.files[0];
-                                    if (file) {
-                                        const reader = new FileReader();
-                                        reader.onload = () => {
-                                            // Update shop image in state
-                                            const copy = [...shops];
-                                            copy[shopIndex].shopImage = reader.result;
-                                            copy[shopIndex].dirty = true;
-                                            setShops(copy);
-                                        };
-                                        reader.readAsDataURL(file);
-                                    }
-                                }}
-                            />
+              <TableBody>
+                {shop.timings.map((row, dayIndex) => {
+                  const locked = isEditLocked(row);
 
-                            <label htmlFor={`upload-${shop.id}`}>
-                                <EditIcon
-                                    sx={{
-                                        position: 'absolute',
-                                        bottom: 0,
-                                        right: 0,
-                                        bgcolor: '#fff',
-                                        borderRadius: '50%',
-                                        p: 0.5,
-                                        fontSize: 18,
-                                        cursor: 'pointer'
-                                    }}
-                                />
-                            </label>
-                        </Box>
+                  return (
+                    <TableRow key={row.day}>
+                      <TableCell>{row.day}</TableCell>
 
+                      <TableCell>
+                        <Checkbox
+                          checked={row.open}
+                          disabled={locked}
+                          onChange={e =>
+                            updateTiming(shopIndex, dayIndex, 'open', e.target.checked)
+                          }
+                        />
+                      </TableCell>
 
-                        <Box display="flex" justifyContent="space-between" alignItems="center" flexGrow={1}>
-                            <Box>
-                                <Typography fontWeight={600}>{shop.shopName}</Typography>
-                                <Typography variant="body2" color="text.secondary">{shop.address}</Typography>
-                                <Typography variant="caption" color="green"> ● Open</Typography>
+                      <TableCell>
+                        <Select
+                          size="small"
+                          value={row.openTime}
+                          disabled={!row.open || locked}
+                          onChange={e => {
+                            if (isSameTime(e.target.value, row.closeTime)) return;
+                            updateTiming(shopIndex, dayIndex, 'openTime', e.target.value)
+                          }}
+                        >
+                          {TIME_OPTIONS.map(t => <MenuItem key={t} value={t}>{t}</MenuItem>)}
+                        </Select>
+                      </TableCell>
 
-                            </Box>
-                            <Button
-                                sx={{ minWidth: isMobile ? 40 : 80 }}
-                                variant="outlined" size="small">DELETE</Button>
+                      <TableCell>
+                        <Select
+                          size="small"
+                          value={row.closeTime}
+                          disabled={!row.open || locked}
+                          onChange={e => {
+                            if (isSameTime(e.target.value, row.openTime)) return;
+                            updateTiming(shopIndex, dayIndex, 'closeTime', e.target.value)
+                          }}
+                        >
+                          {TIME_OPTIONS.filter(t => !row.openTime || parseInt(t) > parseInt(row.openTime))
+                            .map(t => <MenuItem key={t} value={t}>{t}</MenuItem>)}
+                        </Select>
+                      </TableCell>
 
-                        </Box>
+                      <TableCell>
+                        <Checkbox
+                          checked={row.break}
+                          disabled={locked}
+                          onChange={e =>
+                            updateTiming(shopIndex, dayIndex, 'break', e.target.checked)
+                          }
+                        />
+                      </TableCell>
 
-                    </Box>
+                      <TableCell>
+                        <Select
+                          size="small"
+                          value={row.breakStart}
+                          disabled={!row.break || locked}
+                          onChange={e => {
+                            if (isSameTime(e.target.value, row.breakEnd)) return;
+                            updateTiming(shopIndex, dayIndex, 'breakStart', e.target.value)
+                          }}
+                        >
+                          {TIME_OPTIONS.map(t => <MenuItem key={t} value={t}>{t}</MenuItem>)}
+                        </Select>
+                      </TableCell>
 
-                    {/* TIMINGS */}
-                    <Typography fontWeight={600} mb={1}>Timings</Typography>
+                      <TableCell>
+                        <Select
+                          size="small"
+                          value={row.breakEnd}
+                          disabled={!row.break || locked}
+                          onChange={e => {
+                            if (isSameTime(e.target.value, row.breakStart)) return;
+                            updateTiming(shopIndex, dayIndex, 'breakEnd', e.target.value)
+                          }}
+                        >
+                          {TIME_OPTIONS.filter(t => !row.breakStart || parseInt(t) > parseInt(row.breakStart))
+                            .map(t => <MenuItem key={t} value={t}>{t}</MenuItem>)}
+                        </Select>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          </TableContainer>
 
-                    <TableContainer sx={{ overflowX: 'auto' }}>
-                        <Table size="small">
-                            <TableHead>
-                                <TableRow>
-                                    <TableCell>Day</TableCell>
-                                    <TableCell>Open</TableCell>
-                                    <TableCell>Open Time</TableCell>
-                                    <TableCell>Close Time</TableCell>
-                                    <TableCell>Break</TableCell>
-                                    <TableCell>Break Start</TableCell>
-                                    <TableCell>Break End</TableCell>
-                                </TableRow>
-                            </TableHead>
+          <Button
+            variant="contained"
+            color="warning"
+            sx={{ mt: 2 }}
+            disabled={!shop.dirty || savingId === shop._id}
+            onClick={() => saveSettings(shop)}
+          >
+            {savingId === shop._id ? <CircularProgress size={18} /> : 'Save Settings'}
+          </Button>
+        </Paper>
+      ))}
 
-                            <TableBody>
-                                {shop.timings.map((row, dayIndex) => (
-                                    <TableRow key={row.day}>
-                                        <TableCell>{row.day}</TableCell>
-
-                                        <TableCell>
-                                            <Checkbox
-                                                checked={row.open}
-                                                disabled={row.break || row.isLockedForEdit}
-                                                onChange={e =>
-                                                    updateTiming(shopIndex, dayIndex, 'open', e.target.checked)
-                                                }
-                                            />
-                                        </TableCell>
-
-                                        <TableCell>
-                                            <Select
-                                                size="small"
-                                                value={row.openTime}
-                                                disabled={!row.open || row.isLockedForEdit}
-                                                onChange={e =>
-                                                    updateTiming(shopIndex, dayIndex, 'openTime', e.target.value)
-                                                }
-                                            >
-                                                {TIME_OPTIONS.map(t => (
-                                                    <MenuItem key={t} value={t}>{t}</MenuItem>
-                                                ))}
-                                            </Select>
-                                        </TableCell>
-
-                                        <TableCell>
-                                            <Select
-                                                size="small"
-                                                value={row.closeTime}
-                                                disabled={!row.open || row.isLockedForEdit}
-                                                onChange={e =>
-                                                    updateTiming(shopIndex, dayIndex, 'closeTime', e.target.value)
-                                                }
-                                            >
-                                                {TIME_OPTIONS.map(t => (
-                                                    <MenuItem key={t} value={t}>{t}</MenuItem>
-                                                ))}
-                                            </Select>
-                                        </TableCell>
-
-                                        <TableCell>
-                                            <Checkbox
-                                                checked={row.break}
-                                                disabled={isLocked ||  row.isLockedForEdit}
-                                                onChange={e =>
-                                                    updateTiming(shopIndex, dayIndex, 'break', e.target.checked)
-                                                }
-                                            />
-                                        </TableCell>
-
-                                        <TableCell>
-                                            <Select
-                                                size="small"
-                                                value={row.breakStart}
-                                                disabled={!row.break || row.isLockedForEdit}
-                                                onChange={e =>
-                                                    updateTiming(shopIndex, dayIndex, 'breakStart', e.target.value)
-                                                }
-                                            >
-                                                {TIME_OPTIONS.map(t => (
-                                                    <MenuItem key={t} value={t}>{t}</MenuItem>
-                                                ))}
-                                            </Select>
-                                        </TableCell>
-
-                                        <TableCell>
-                                            <Select
-                                                size="small"
-                                                value={row.breakEnd}
-                                                disabled={!row.break || row.isLockedForEdit}
-                                                onChange={e =>
-                                                    updateTiming(shopIndex, dayIndex, 'breakEnd', e.target.value)
-                                                }
-                                            >
-                                                {TIME_OPTIONS.map(t => (
-                                                    <MenuItem key={t} value={t}>{t}</MenuItem>
-                                                ))}
-                                            </Select>
-                                        </TableCell>
-                                    </TableRow>
-                                ))}
-                            </TableBody>
-                        </Table>
-                    </TableContainer>
-
-                    <Button
-                        variant="contained"
-                        color="warning"
-                        sx={{ mt: 2 }}
-                        disabled={!shop.dirty || isLocked}
-                    >
-                        Save Settings
-                    </Button>
-
-                    {isLocked && (
-                        <Typography variant="caption" color="error" display="block" mt={1}>
-                            Changes are not allowed after 6:00 PM
-                        </Typography>
-                    )}
-                </Paper>
-            ))}
-
-            <AddShopDialog
-                open={openDialog}
-                onClose={() => setOpenDialog(false)} />
-        </Box>
-    );
+      <AddShopDialog
+        open={openDialog}
+        onClose={() => setOpenDialog(false)}
+        onSuccess={() => {
+          setOpenDialog(false);
+          fetchShops();
+        }}
+      />
+    </Box>
+  );
 };
 
 export default ClientTimings;

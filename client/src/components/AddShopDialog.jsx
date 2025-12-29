@@ -9,27 +9,82 @@ import {
   TextField,
   Button,
   Stack,
-  useMediaQuery
+  useMediaQuery,
+  CircularProgress
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { AddAPhoto, Store, LocationOn, Image as ImageIcon } from '@mui/icons-material';
 import { Description } from '@mui/icons-material';
+import axios from 'axios';
+import { useAuth } from "../context/AuthContext";
 
-const AddShopDialog = ({ open, onClose }) => {
+const DEFAULT_API = process.env.REACT_APP_API_URL || "";
+
+const AddShopDialog = ({ open, onSuccess, onClose }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const isTablet = useMediaQuery(theme.breakpoints.between('sm', 'md'));
 
-  const [image, setImage] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
+  const [imageFile, setImageFile] = useState(null);
   const [shopName, setShopName] = useState('');
   const [address, setAddress] = useState('');
   const [description, setDescription] = useState('');
+  const [loading, setLoading] = useState(false);
 
+  const { user } = useAuth();
 
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
-    if (file) setImage(URL.createObjectURL(file));
+    if (!file) return;
+
+    setImageFile(file);                       // actual file
+    setImagePreview(URL.createObjectURL(file)); // preview
   };
+
+
+  const handleSave = async () => {
+    if (!shopName || !address || !description || !imageFile) return;
+
+    try {
+      setLoading(true);
+
+      const formData = new FormData();
+      formData.append("shopImage", imageFile);
+      formData.append("shopName", shopName);
+      formData.append("description", description);
+      formData.append("address", address);
+      formData.append("userId", user?._id);
+
+      const res = await axios.post(`${DEFAULT_API}/api/shops/add/${user._id}`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data"
+        }
+      });
+
+      setLoading(false);
+      onClose(true);
+      onSuccess?.();
+
+      setShopName('');
+      setAddress('');
+      setDescription('');
+      setImagePreview(null);
+      setImageFile(null);
+
+    } catch (error) {
+      setLoading(false);
+      console.error("Error in adding shop", error);
+    }
+  };
+
+
+
+  const isDisabled =
+    loading ||
+    !shopName.trim() ||
+    !address.trim() ||
+    !description.trim() || !imageFile;
 
   return (
     <Dialog
@@ -57,14 +112,14 @@ const AddShopDialog = ({ open, onClose }) => {
           {/* Image Section */}
           <Box position="relative">
             <Avatar
-              src={image}
+              src={imagePreview}
               sx={{
                 width: isMobile ? 90 : 120,
                 height: isMobile ? 90 : 120,
                 bgcolor: '#f5f5f5'
               }}
             >
-              {!image && (
+              {!imagePreview && (
                 <ImageIcon
                   sx={{
                     fontSize: isMobile ? 32 : 40,
@@ -105,18 +160,18 @@ const AddShopDialog = ({ open, onClose }) => {
               )
             }}
           />
-      
+
           <TextField
             fullWidth
             size={isMobile ? 'small' : 'medium'}
             label="Description"
             placeholder="Enter shop description"
-            value={description}  
+            value={description}
             onChange={(e) => setDescription(e.target.value)}
             rows={isMobile ? 2 : 4}
             InputProps={{
               startAdornment: (
-                <Description  sx={{ mr: 1, color: 'text.secondary' }} />
+                <Description sx={{ mr: 1, color: 'text.secondary' }} />
               )
             }}
           />
@@ -146,9 +201,10 @@ const AddShopDialog = ({ open, onClose }) => {
               borderRadius: 2,
               color: "#fff"
             }}
-            onClick={onClose}
+            disabled={isDisabled}
+            onClick={() => handleSave()}
           >
-            Save
+            {loading ? <CircularProgress size={22} sx={{ color: "#fff" }} /> : "Save"}
           </Button>
 
         </Stack>
