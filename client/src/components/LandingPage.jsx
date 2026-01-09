@@ -173,12 +173,12 @@ const LandingPage = () => {
               <div className="info-card" data-aos="fade-up" data-aos-delay="300">
                 <div className="icon-circle"><i className="bi bi-telephone"></i></div>
                 <h4>Call Us</h4>
-                <p><a href="tel:+6494461709">520-494-6417</a></p>
+                <p><a href="tel:+6494461709">5204946414</a></p>
               </div>
               <div className="info-card" data-aos="fade-up" data-aos-delay="400">
                 <div className="icon-circle"><i className="bi bi-envelope"></i></div>
                 <h4>Email Us</h4>
-                <p><a href="mailto:Megan.Purvis@centralaz.edu">Megan.Purvis@centralaz.edu</a></p>
+                <p><a href="mailto:commissary@centralaz.edu">commissary@centralaz.edu</a></p>
               </div>
             </div>
 

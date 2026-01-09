@@ -22,13 +22,20 @@ import EditIcon from '@mui/icons-material/Edit';
 import axios from 'axios';
 import moment from 'moment-timezone';
 
-const TIME_OPTIONS = Array.from({ length: 15 }, (_, i) => `${6 + i}:00`);
+const TIME_OPTIONS = Array.from({ length: 15 }, (_, i) => {
+    const hour = 6 + i;
+    return {
+        value: `${hour.toString().padStart(2, "0")}:00`, // 24h (DB)
+        label: moment(`${hour}:00`, "H:mm").format("hh:mm A") // UI
+    };
+});
+
 const DEFAULT_API = process.env.REACT_APP_API_URL || "";
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 const AZ_TIMEZONE = 'America/Phoenix';
 
 const unwrapTiming = (t) => (t?._doc ? t._doc : t);
-const formatTime = (time) => time ? time.replace(/^0/, '') : '';
+const formatTime = (time) => time || '';
 const isSameTime = (a, b) => a && b && a === b;
 
 const AdminTimings = () => {
@@ -207,7 +214,11 @@ const AdminTimings = () => {
                                                     if (isSameTime(e.target.value, row.closeTime)) return;
                                                     updateTiming(shopIndex, dayIndex, 'openTime', e.target.value)
                                                 }}>
-                                                {TIME_OPTIONS.map(t => <MenuItem key={t} value={t}>{t}</MenuItem>)}
+                                                {TIME_OPTIONS.map(t =>
+                                                    <MenuItem key={t.value} value={t.value}>
+                                                        {t.label}
+                                                    </MenuItem>
+                                                )}
                                             </Select>
                                         </TableCell>
                                         <TableCell>
@@ -216,8 +227,18 @@ const AdminTimings = () => {
                                                     if (isSameTime(e.target.value, row.openTime)) return;
                                                     updateTiming(shopIndex, dayIndex, 'closeTime', e.target.value)
                                                 }}>
-                                                {TIME_OPTIONS.filter(t => !row.openTime || parseInt(t) > parseInt(row.openTime))
-                                                    .map(t => <MenuItem key={t} value={t}>{t}</MenuItem>)}
+                                                {TIME_OPTIONS
+                                                    .filter(t =>
+                                                        !row.openTime ||
+                                                        parseInt(t.value.split(':')[0]) >
+                                                        parseInt(row.openTime.split(':')[0])
+                                                    )
+                                                    .map(t => (
+                                                        <MenuItem key={t.value} value={t.value}>
+                                                            {t.label}
+                                                        </MenuItem>
+                                                    ))
+                                                }
                                             </Select>
                                         </TableCell>
                                         <TableCell>
@@ -230,7 +251,11 @@ const AdminTimings = () => {
                                                     if (isSameTime(e.target.value, row.breakEnd)) return;
                                                     updateTiming(shopIndex, dayIndex, 'breakStart', e.target.value)
                                                 }}>
-                                                {TIME_OPTIONS.map(t => <MenuItem key={t} value={t}>{t}</MenuItem>)}
+                                                {TIME_OPTIONS.map(t =>
+                                                    <MenuItem key={t.value} value={t.value}>
+                                                        {t.label}
+                                                    </MenuItem>
+                                                )}
                                             </Select>
                                         </TableCell>
                                         <TableCell>
@@ -239,8 +264,18 @@ const AdminTimings = () => {
                                                     if (isSameTime(e.target.value, row.breakStart)) return;
                                                     updateTiming(shopIndex, dayIndex, 'breakEnd', e.target.value)
                                                 }}>
-                                                {TIME_OPTIONS.filter(t => !row.breakStart || parseInt(t) > parseInt(row.breakStart))
-                                                    .map(t => <MenuItem key={t} value={t}>{t}</MenuItem>)}
+                                                {TIME_OPTIONS
+                                                    .filter(t =>
+                                                        !row.breakStart ||
+                                                        parseInt(t.value.split(':')[0]) >
+                                                        parseInt(row.breakStart.split(':')[0])
+                                                    )
+                                                    .map(t => (
+                                                        <MenuItem key={t.value} value={t.value}>
+                                                            {t.label}
+                                                        </MenuItem>
+                                                    ))
+                                                }
                                             </Select>
                                         </TableCell>
                                     </TableRow>

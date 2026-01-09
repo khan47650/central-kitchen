@@ -7,6 +7,7 @@ import moment from 'moment-timezone';
 import axios from 'axios';
 import { useMediaQuery, TableContainer } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
+import SlotDetailsDialog from '../../components/SlotDetailsDialog';
 
 
 const DEFAULT_API = process.env.REACT_APP_API_URL || "";
@@ -22,6 +23,8 @@ const FutureAppointments = () => {
   const [loading, setLoading] = useState(true);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const [selectedSlot, setSelectedSlot] = useState(null);
+  const [dialogOpen, setDialogOpen] = useState(false);
 
 
 
@@ -54,7 +57,7 @@ const FutureAppointments = () => {
               userName = "Admin";
             } else if (typeof slot.bookedBy === "string" && /^[0-9a-fA-F]{24}$/.test(slot.bookedBy)) {
               const foundUser = allUsers.find(u => u._id === slot.bookedBy);
-              userName = foundUser ? foundUser.fullName : "User";
+              userName = foundUser ? foundUser.businessName : "Unknown User";
             } else if (typeof slot.bookedBy === "object") {
               userName = slot.bookedBy.fullName || "Unknown";
             }
@@ -77,6 +80,32 @@ const FutureAppointments = () => {
 
     fetchUsersAndAppointments();
   }, []);
+
+  const formatTime12Hour = (time24) => {
+    if (!time24) return '-';
+    const [hourStr, minute] = time24.split(':');
+    let hour = parseInt(hourStr, 10);
+    const ampm = hour >= 12 ? 'PM' : 'AM';
+    hour = hour % 12 || 12;
+    return `${hour}:${minute} ${ampm}`;
+  };
+
+  
+  const handleViewDetails = (slot) => {
+    const formattedSlot = {
+      ...slot,
+      startTime: formatTime12Hour(slot.startTime),
+      endTime: formatTime12Hour(slot.endTime)
+    };
+    setSelectedSlot(formattedSlot);
+    setDialogOpen(true);
+  };
+
+
+  const handleCloseDialog = () => {
+    setDialogOpen(false);
+    setSelectedSlot(null);
+  };
 
   const handleChangePage = (event, newPage) => setPage(newPage);
   const handleChangeRowsPerPage = (event) => {
@@ -127,17 +156,17 @@ const FutureAppointments = () => {
                     <TableRow key={index}>
                       <TableCell>{slot.userName || '-'}</TableCell>
                       <TableCell>{slot.date}</TableCell>
-                      <TableCell>{slot.startTime}</TableCell>
-                      <TableCell>{slot.endTime}</TableCell>
+                      <TableCell>{formatTime12Hour(slot.startTime)}</TableCell>
+                      <TableCell>{formatTime12Hour(slot.endTime)}</TableCell>
                       <TableCell>
                         <Button
                           variant="contained"
                           size="small"
-                          sx={{ minWidth: isMobile ? 60 : 120 }}
+                          sx={{ minWidth: isMobile ? 60 : 120, color: 'white' }}
+                          onClick={() => handleViewDetails(slot)}
                         >
                           {isMobile ? 'VIEW' : 'VIEW DETAILS'}
                         </Button>
-
                       </TableCell>
                     </TableRow>
                   ))
@@ -154,6 +183,11 @@ const FutureAppointments = () => {
         onPageChange={handleChangePage}
         rowsPerPage={rowsPerPage}
         onRowsPerPageChange={handleChangeRowsPerPage}
+      />
+      <SlotDetailsDialog
+        open={dialogOpen}
+        onClose={handleCloseDialog}
+        slot={selectedSlot}
       />
     </Box>
   );

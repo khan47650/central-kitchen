@@ -9,6 +9,12 @@ const DEFAULT_API = process.env.REACT_APP_API_URL || "";
 const AZ_TIMEZONE = "America/Phoenix";
 const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
+const formatTo12Hour = (time) => {
+    if (!time) return "";
+    return moment(time, "HH:mm").format("hh:mm A");
+};
+
+
 const Shops = () => {
     const [shops, setShops] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -30,47 +36,47 @@ const Shops = () => {
     }, []);
 
     const getTodayStatus = (timings) => {
-  const now = moment.tz(AZ_TIMEZONE);
-  const today = DAYS[now.day()];
-  const todayTiming = timings?.find(t => t.day === today);
+        const now = moment.tz(AZ_TIMEZONE);
+        const today = DAYS[now.day()];
+        const todayTiming = timings?.find(t => t.day === today);
 
-  if (!todayTiming || !todayTiming.open) {
-    return { status: "closed" };
-  }
+        if (!todayTiming || !todayTiming.open) {
+            return { status: "closed" };
+        }
 
-  const toMinutes = (t) => {
-    const [h, m] = t.split(":").map(Number);
-    return h * 60 + m;
-  };
+        const toMinutes = (t) => {
+            const [h, m] = t.split(":").map(Number);
+            return h * 60 + m;
+        };
 
-  const nowMin = now.hours() * 60 + now.minutes();
+        const nowMin = now.hours() * 60 + now.minutes();
 
-  let status = "closed";
-  if (
-    todayTiming.break &&
-    todayTiming.breakStart &&
-    todayTiming.breakEnd &&
-    nowMin >= toMinutes(todayTiming.breakStart) &&
-    nowMin <= toMinutes(todayTiming.breakEnd)
-  ) {
-    status = "break";
-  }
-  else if (
-    todayTiming.openTime &&
-    todayTiming.closeTime &&
-    nowMin >= toMinutes(todayTiming.openTime) &&
-    nowMin <= toMinutes(todayTiming.closeTime)
-  ) {
-    status = "open";
-  }
-  return {
-    status,
-    openTime: todayTiming.openTime || "",
-    closeTime: todayTiming.closeTime || "",
-    breakStart: todayTiming.break ? todayTiming.breakStart : "",
-    breakEnd: todayTiming.break ? todayTiming.breakEnd : ""
-  };
-};
+        let status = "closed";
+        if (
+            todayTiming.break &&
+            todayTiming.breakStart &&
+            todayTiming.breakEnd &&
+            nowMin >= toMinutes(todayTiming.breakStart) &&
+            nowMin <= toMinutes(todayTiming.breakEnd)
+        ) {
+            status = "break";
+        }
+        else if (
+            todayTiming.openTime &&
+            todayTiming.closeTime &&
+            nowMin >= toMinutes(todayTiming.openTime) &&
+            nowMin <= toMinutes(todayTiming.closeTime)
+        ) {
+            status = "open";
+        }
+        return {
+            status,
+            openTime: todayTiming.openTime || "",
+            closeTime: todayTiming.closeTime || "",
+            breakStart: todayTiming.break ? todayTiming.breakStart : "",
+            breakEnd: todayTiming.break ? todayTiming.breakEnd : ""
+        };
+    };
 
 
     return (
@@ -107,7 +113,7 @@ const Shops = () => {
                                             <>
                                                 <p className="timing-label">Today Opening:</p>
                                                 <p className="timing">
-                                                    {todayInfo.openTime} - {todayInfo.closeTime}
+                                                    {formatTo12Hour(todayInfo.openTime)} - {formatTo12Hour(todayInfo.closeTime)}
                                                 </p>
                                             </>
                                         ) : (
@@ -116,7 +122,8 @@ const Shops = () => {
 
                                         {todayInfo.breakStart && todayInfo.breakEnd && (
                                             <p className="break-timing">
-                                                Break Time: {todayInfo.breakStart} - {todayInfo.breakEnd}
+                                                Break Time: {formatTo12Hour(todayInfo.breakStart)} - {formatTo12Hour(todayInfo.breakEnd)}
+
                                             </p>
                                         )}
 

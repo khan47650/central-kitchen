@@ -25,9 +25,10 @@ import {
 import { useState } from 'react';
 import { useEffect } from 'react';
 import axios from "axios";
-import { CircularProgress } from "@mui/material";
 import moment from 'moment-timezone';
 import { Skeleton } from "@mui/material";
+import { useNavigate } from 'react-router-dom';
+import "../../Styles/dashboard.css"
 
 
 
@@ -40,6 +41,7 @@ const AdminDashboard = () => {
   const [stats, setStats] = useState(null);
   const [recentActivities, setRecentActivities] = useState([]);
   const [loading, setLoading] = useState(true);
+  const navigate=useNavigate();
 
   useEffect(() => {
 
@@ -102,6 +104,7 @@ const AdminDashboard = () => {
       sub: `${stats?.todayAppointments?.completed ?? 0} completed • ${stats?.todayAppointments?.upcoming ?? 0} upcoming`,
       icon: <EventAvailable />,
       color: "#1976d2",
+      path:"/admin/appointments"
     },
     {
       id: 2,
@@ -110,6 +113,7 @@ const AdminDashboard = () => {
       sub: `${stats?.pendingApprovals?.pendingThisWeek ?? 0} pending • ${stats?.pendingApprovals?.awaitingThisWeek ?? 0} awaiting`,
       icon: <PendingActions />,
       color: "#f57c00",
+      path:"/admin/users/pending"
     },
     {
       id: 3,
@@ -118,6 +122,7 @@ const AdminDashboard = () => {
       sub: `${stats?.activeUsers?.newThisWeek ?? 0} new today`,
       icon: <People />,
       color: "#2e7d32",
+      path:"/admin/users"
     },
     {
       id: 4,
@@ -126,6 +131,7 @@ const AdminDashboard = () => {
       sub: "Slots available this week",
       icon: <Today />,
       color: "#9c27b0",
+      path:"/admin/schedule"
     },
   ];
 
@@ -160,7 +166,9 @@ const AdminDashboard = () => {
             width: { xs: '100%', sm: 'auto' },
             fontSize: { xs: 14, sm: 16 },
             minWidth: 120,
-          }}>
+            color:"white"
+          }}  
+          onClick={()=>navigate("/admin/schedule")}>
             Create Slot
           </Button>
           <Button variant="outlined" sx={{
@@ -180,6 +188,8 @@ const AdminDashboard = () => {
           <Grid item xs={12} sm={6} md={3} key={c.id}>
             <Paper
               elevation={2}
+              onClick={()=>navigate(c.path)}
+               className='dashboard-card'
               sx={{
                 p: 2,
                 display: 'flex',
@@ -188,7 +198,8 @@ const AdminDashboard = () => {
                 flexDirection: { xs: 'row', md: 'row' },
                 minHeight: 150,
                 overflow: 'hidden',
-                wordBreak: 'break-word', // prevent text overflow
+                wordBreak: 'break-word',
+                cursor:'pointer'
               }}
 
             >

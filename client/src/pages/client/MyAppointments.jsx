@@ -1,5 +1,4 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
 import {
   Box,
@@ -20,6 +19,8 @@ import {
 import axios from 'axios';
 import moment from 'moment-timezone';
 import { useTheme } from '@mui/material/styles';
+import { useSearchParams } from 'react-router-dom';
+
 
 
 
@@ -31,8 +32,12 @@ const MyAppointments = () => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(30);
   const [loading, setLoading] = useState(true);
+  const [searchParams] = useSearchParams();
+  const type = searchParams.get('type'); // null | upcoming | completed
+
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+
 
 
   const { user } = useContext(AuthContext);
@@ -44,7 +49,18 @@ const MyAppointments = () => {
       try {
         if (!user?._id) return;
 
-        const res = await axios.get(`${DEFAULT_API}/api/slots/my/${user._id}`);
+
+        let endpoint = `/api/slots/my/${user._id}`;
+
+        if (type === 'upcoming') {
+          endpoint = `/api/stats/client/upcoming/${user._id}`;
+        }
+        if (type === 'completed') {
+          endpoint = `/api/stats/client/completed/${user._id}`;
+        }
+
+        const res = await axios.get(DEFAULT_API + endpoint);
+
 
         const formatted = res.data.map(slot => ({
           id: slot._id,
@@ -63,6 +79,15 @@ const MyAppointments = () => {
     fetchMyAppointments();
   }, [user]);
 
+  const formatTime12Hour = (time24) => {
+    if (!time24 || time24 === '-') return '-';
+    const [hourStr, minute] = time24.split(':');
+    let hour = parseInt(hourStr, 10);
+    const ampm = hour >= 12 ? 'PM' : 'AM';
+    hour = hour % 12 || 12;
+    return `${hour}:${minute} ${ampm}`;
+  };
+
   const handleCancel = async (slotId) => {
     try {
       // const confirmCancel = window.confirm("Are you sure you want to cancel this appointment?");
@@ -77,6 +102,12 @@ const MyAppointments = () => {
     }
   };
 
+  const heading =
+    type === 'upcoming'
+      ? 'Upcoming Appointments'
+      : type === 'completed'
+        ? 'Completed Appointments'
+        : 'My Appointments';
 
   const handleChangePage = (event, newPage) => setPage(newPage);
   const handleChangeRowsPerPage = (event) => {
@@ -87,7 +118,10 @@ const MyAppointments = () => {
   return (
     <Box p={isMobile ? 1 : 3}>
       <Toolbar>
-        <Typography variant={isMobile ? 'h6' : 'h5'}>My Appointments</Typography>
+        <Typography variant={isMobile ? 'h6' : 'h5'}>
+          {heading}
+        </Typography>
+
       </Toolbar>
 
       <TableContainer component={Paper} sx={{ mt: 2, overflowX: 'auto' }}>
@@ -97,7 +131,9 @@ const MyAppointments = () => {
               <TableCell>Booked On</TableCell>
               <TableCell>Booking Start</TableCell>
               <TableCell>Booking End</TableCell>
-              <TableCell>Action</TableCell>
+              {type !== 'completed' && (
+                <TableCell>Action</TableCell>
+              )}
             </TableRow>
           </TableHead>
           <TableBody>
@@ -122,18 +158,21 @@ const MyAppointments = () => {
                 .map((appt) => (
                   <TableRow key={appt.id}>
                     <TableCell>{appt.bookedOn}</TableCell>
-                    <TableCell>{appt.startTime}</TableCell>
-                    <TableCell>{appt.endTime}</TableCell>
-                    <TableCell>
-                      <Button
-                        variant="outlined"
-                        size="small"
-                        sx={{ minWidth: isMobile ? 60 : 100 }}
-                        onClick={() => handleCancel(appt.id)}
-                      >
-                        {isMobile ? 'Cancel' : 'Cancel'}
-                      </Button>
-                    </TableCell>
+                    <TableCell>{formatTime12Hour(appt.startTime)}</TableCell>
+                    <TableCell>{formatTime12Hour(appt.endTime)}</TableCell>
+                    {type !== 'completed' && (
+                      <TableCell>
+                        <Button
+                          variant="outlined"
+                          size="small"
+                          sx={{ minWidth: isMobile ? 60 : 100 }}
+                          onClick={() => handleCancel(appt.id)}
+                        >
+                          Cancel
+                        </Button>
+                      </TableCell>
+                    )}
+
                   </TableRow>
                 ))
             )}

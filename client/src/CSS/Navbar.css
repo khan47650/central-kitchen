@@ -77,8 +77,8 @@
 }
 
 .curved-navbar {
-  width: 95%;
-  max-width: 1200px;
+  width: 100% !important;
+  max-width: none;
   border-radius: 50px;
   background: #ffffff !important;
   backdrop-filter: blur(10px);
@@ -172,6 +172,7 @@
   }
 
   .curved-navbar {
+    width: 100%;
     border-radius: 25px;
     padding: 0.7rem 1rem;
     

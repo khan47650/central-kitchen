@@ -7,6 +7,7 @@ import axios from 'axios';
 import { CircularProgress } from "@mui/material";
 import { Skeleton } from "@mui/material";
 import { useTheme, useMediaQuery, TableContainer } from '@mui/material';
+import UserDetailsDialog from '../../../components/UserDetailsDialog';
 
 
 
@@ -19,6 +20,8 @@ const PendingApproval = () => {
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [loadingId, setLoadingId] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [openDialog, setOpenDialog] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
@@ -59,7 +62,16 @@ const PendingApproval = () => {
   const rejectUser = async (id) => {
     await axios.put(`${DEFAULT_API}/api/users/reject/${id}`);
     fetchPendingUsers();
-  }
+  };
+
+  const handleViewUser = (user) => {
+    setSelectedUser(user);
+    setOpenDialog(true);
+  };
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
+    setSelectedUser(null);
+  };
 
   return (
     <Box p={3}>
@@ -142,6 +154,15 @@ const PendingApproval = () => {
                       >
                         {isMobile ? "REJECT" : "REJECT"}
                       </Button>
+
+                      <Button
+                        variant="outlined"
+                        size="small"
+                        sx={{ minWidth: isMobile ? 50 : 80 }}
+                        onClick={() => handleViewUser(user)}
+                      >
+                        VIEW
+                      </Button>
                     </Box>
                   </TableCell>
 
@@ -160,6 +181,12 @@ const PendingApproval = () => {
           setRowsPerPage(parseInt(e.target.value, 10));
           setPage(0);
         }}
+      />
+
+      <UserDetailsDialog
+        open={openDialog}
+        onClose={handleCloseDialog}
+        user={selectedUser}
       />
     </Box>
   );

@@ -1,5 +1,5 @@
 import React, { useState, useContext } from "react";
-import { Link, useNavigate,useLocation, replace } from "react-router-dom";
+import { Link, useNavigate,useLocation } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "../CSS/Login.css";
@@ -84,10 +84,10 @@ function Login() {
   const redirectLogin=(role)=>{
     const from=location.state?.from;
 
-    if(from=="schedules"){
+    if(from==="schedules"){
       navigate("/shops",{replace:true});
     }else{
-      if(role=="admin"){
+      if(role==="admin"){
         navigate("/admin/dashboard",{replace:true});
       }else{
         navigate("/client/dashboard",{replace:true});
@@ -129,7 +129,10 @@ function Login() {
 
           <button type="submit" className="btn auth-btn w-100">Login</button>
         </form>
-
+          
+         <p className="auth-bottom-text text-center">
+          Forgot Password? <Link to="/forgotPassword">Click</Link>
+        </p>
         <p className="auth-bottom-text text-center">
           Do not have an account? <Link to="/signup">Create one</Link>
         </p>

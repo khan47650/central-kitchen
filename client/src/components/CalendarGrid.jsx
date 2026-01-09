@@ -4,13 +4,19 @@ import moment from 'moment-timezone';
 
 const AZ_TIMEZONE = 'America/Phoenix';
 
-const timeSlots = [
-  '6:00','7:00','8:00','9:00',
-  '10:00','11:00','12:00','13:00','14:00',
-  '15:00','16:00','17:00','18:00','19:00','20:00'
-];
+// Time slots in 24-hour for logic, but displayed as 12-hour
+const timeSlots = Array.from({ length: 15 }, (_, i) => `${6 + i}:00`);
 
-const CalendarGrid = ({ selectedWeek, slots = [], users = {} }) => {
+// Convert 24-hour time to 12-hour AM/PM
+const formatTime12Hour = (time24) => {
+  const [hourStr, minute] = time24.split(':');
+  let hour = parseInt(hourStr);
+  const ampm = hour >= 12 ? 'PM' : 'AM';
+  hour = hour % 12 || 12; // convert 0 to 12
+  return `${hour}:${minute} ${ampm}`;
+};
+
+const CalendarGrid = ({ selectedWeek, slots = [], users = {}, onEmptyCellClick, onBookedCellClick }) => {
   const startOfWeek = moment
     .tz(selectedWeek, AZ_TIMEZONE)
     .startOf('week')
@@ -55,7 +61,6 @@ const CalendarGrid = ({ selectedWeek, slots = [], users = {} }) => {
           gap: '4px',
         }}
       >
-        {/* ===== HEADER ===== */}
         <Typography
           fontWeight="bold"
           sx={{
@@ -74,10 +79,8 @@ const CalendarGrid = ({ selectedWeek, slots = [], users = {} }) => {
           </Typography>
         ))}
 
-        {/* ===== BODY ===== */}
         {timeSlots.map((slot, i) => (
           <React.Fragment key={i}>
-            {/* Time column (sticky) */}
             <Typography
               sx={{
                 position: 'sticky',
@@ -87,38 +90,51 @@ const CalendarGrid = ({ selectedWeek, slots = [], users = {} }) => {
                 fontSize: 14,
               }}
             >
-              {slot}
+              {formatTime12Hour(slot)} {/* <-- Changed to 12-hour display */}
             </Typography>
 
             {days.map((day, j) => {
               const bookedSlot = getSlotForCell(day, slot);
               const pastSlot = isPastSlot(day, slot);
-              const showName = bookedSlot && slot === bookedSlot.startTime;
 
               return (
                 <Box
                   key={j}
+                  onClick={() => {
+                    if (bookedSlot) {
+                      onBookedCellClick?.(bookedSlot);
+                      return;
+                    }
+                    if (!bookedSlot && !pastSlot) {
+                      onEmptyCellClick({
+                        date: day.format('YYYY-MM-DD'),
+                        startTime: slot, // keep 24-hour for backend
+                      });
+                    }
+                  }}
                   sx={{
                     height: 40,
                     border: '1px solid #ccc',
                     backgroundColor: bookedSlot
                       ? '#fde613'
                       : pastSlot
-                      ? '#e0e0e0'
-                      : '#fff',
+                        ? '#e0e0e0'
+                        : '#fff',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     fontSize: 13,
-                    cursor: bookedSlot || pastSlot ? 'not-allowed' : 'pointer',
+                    cursor: pastSlot && !bookedSlot ? 'not-allowed' : 'pointer',
                     color: pastSlot ? '#999' : '#000',
+                    '&:hover': {
+                      backgroundColor: !bookedSlot && !pastSlot ? '#e3f2fd' : undefined,
+                    },
                   }}
                 >
-                  {showName
-                    ? bookedSlot.bookedBy === 'Admin'
+                  {bookedSlot &&
+                    (bookedSlot.bookedBy === 'Admin'
                       ? 'Admin'
-                      : users[bookedSlot.bookedBy] || 'User'
-                    : ''}
+                      : users[bookedSlot.bookedBy]?.businessName || 'User')}
                 </Box>
               );
             })}

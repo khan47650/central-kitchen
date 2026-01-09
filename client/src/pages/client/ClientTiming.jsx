@@ -25,18 +25,21 @@ import { useAuth } from "../../context/AuthContext";
 import axios from 'axios';
 import moment from 'moment-timezone';
 
-const TIME_OPTIONS = Array.from({ length: 15 }, (_, i) => `${6 + i}:00`);
+const TIME_OPTIONS = Array.from({ length: 15 }, (_, i) => {
+  const hour = 6 + i;
+  return {
+    value: `${hour.toString().padStart(2, "0")}:00`, // 24h (DB)
+    label: moment(`${hour}:00`, "H:mm").format("hh:mm A") // UI
+  };
+});
+
 const DEFAULT_API = process.env.REACT_APP_API_URL || "";
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 const AZ_TIMEZONE = 'America/Phoenix';
 
 const unwrapTiming = (t) => (t?._doc ? t._doc : t);
 
-const formatTime = (time) => {
-  if (!time) return '';
-  return time.replace(/^0/, '');
-};
-
+const formatTime = (time) => time || '';
 const ClientTimings = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
@@ -174,42 +177,42 @@ const ClientTimings = () => {
     fileInputRef.current.click();
   };
 
- const handleImageChange = (e) => {
-  const file = e.target.files[0];
-  if (!file) return;
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
 
-  const copy = [...shops];
-  copy[activeShopIndex.current].shopImage = URL.createObjectURL(file); // preview
-  copy[activeShopIndex.current].newFile = file; // actual file for backend
-  copy[activeShopIndex.current].dirty = true;
-  setShops(copy);
-};
+    const copy = [...shops];
+    copy[activeShopIndex.current].shopImage = URL.createObjectURL(file); // preview
+    copy[activeShopIndex.current].newFile = file; // actual file for backend
+    copy[activeShopIndex.current].dirty = true;
+    setShops(copy);
+  };
 
 
- const saveSettings = async (shop) => {
-  try {
-    setSavingId(shop._id);
+  const saveSettings = async (shop) => {
+    try {
+      setSavingId(shop._id);
 
-    const formData = new FormData();
-    formData.append('shopId', shop._id);
-    formData.append('timings', JSON.stringify(shop.timings));
-    if (shop.newFile) {
-      formData.append('shopImage', shop.newFile);
+      const formData = new FormData();
+      formData.append('shopId', shop._id);
+      formData.append('timings', JSON.stringify(shop.timings));
+      if (shop.newFile) {
+        formData.append('shopImage', shop.newFile);
+      }
+
+      await axios.put(`${DEFAULT_API}/api/shops/update/${shop._id}`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      fetchShops();
+    } catch (err) {
+      console.error("Save failed", err);
+    } finally {
+      setSavingId(null);
     }
-
-    await axios.put(`${DEFAULT_API}/api/shops/update/${shop._id}`, formData, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    });
-
-    fetchShops();
-  } catch (err) {
-    console.error("Save failed", err);
-  } finally {
-    setSavingId(null);
-  }
-};
+  };
 
 
   const deleteShop = async (id) => {
@@ -239,19 +242,21 @@ const ClientTimings = () => {
           Client Timings
         </Typography>
 
-        <Button
-          onClick={() => setOpenDialog(true)}
-          variant="contained"
-          startIcon={<AddIcon />}
-          sx={{
-            color: "#fff",
-            px: { xs: 1.5, sm: 3 },
-            fontSize: { xs: "0.75rem", sm: "0.85rem" },
-            height: { xs: 32, sm: 36 }
-          }}
-        >
-          ADD
-        </Button>
+        {shops.length === 0 && (
+          <Button
+            onClick={() => setOpenDialog(true)}
+            variant="contained"
+            startIcon={<AddIcon />}
+            sx={{
+              color: "#fff",
+              px: { xs: 1.5, sm: 3 },
+              fontSize: { xs: "0.75rem", sm: "0.85rem" },
+              height: { xs: 32, sm: 36 }
+            }}
+          >
+            ADD
+          </Button>
+        )}
       </Box>
 
       {loading && [...Array(2)].map((_, i) => (
@@ -367,7 +372,12 @@ const ClientTimings = () => {
                             updateTiming(shopIndex, dayIndex, 'openTime', e.target.value)
                           }}
                         >
-                          {TIME_OPTIONS.map(t => <MenuItem key={t} value={t}>{t}</MenuItem>)}
+                          {TIME_OPTIONS.map(t =>
+                            <MenuItem key={t.value} value={t.value}>
+                              {t.label}
+                            </MenuItem>
+                          )}
+
                         </Select>
                       </TableCell>
 
@@ -381,8 +391,19 @@ const ClientTimings = () => {
                             updateTiming(shopIndex, dayIndex, 'closeTime', e.target.value)
                           }}
                         >
-                          {TIME_OPTIONS.filter(t => !row.openTime || parseInt(t) > parseInt(row.openTime))
-                            .map(t => <MenuItem key={t} value={t}>{t}</MenuItem>)}
+                          {TIME_OPTIONS
+                            .filter(t =>
+                              !row.openTime ||
+                              parseInt(t.value.split(':')[0]) >
+                              parseInt(row.openTime.split(':')[0])
+                            )
+                            .map(t => (
+                              <MenuItem key={t.value} value={t.value}>
+                                {t.label}
+                              </MenuItem>
+                            ))
+                          }
+
                         </Select>
                       </TableCell>
 
@@ -406,7 +427,11 @@ const ClientTimings = () => {
                             updateTiming(shopIndex, dayIndex, 'breakStart', e.target.value)
                           }}
                         >
-                          {TIME_OPTIONS.map(t => <MenuItem key={t} value={t}>{t}</MenuItem>)}
+                          {TIME_OPTIONS.map(t =>
+                            <MenuItem key={t.value} value={t.value}>
+                              {t.label}
+                            </MenuItem>
+                          )}
                         </Select>
                       </TableCell>
 
@@ -420,8 +445,19 @@ const ClientTimings = () => {
                             updateTiming(shopIndex, dayIndex, 'breakEnd', e.target.value)
                           }}
                         >
-                          {TIME_OPTIONS.filter(t => !row.breakStart || parseInt(t) > parseInt(row.breakStart))
-                            .map(t => <MenuItem key={t} value={t}>{t}</MenuItem>)}
+                          {TIME_OPTIONS
+                            .filter(t =>
+                              !row.breakStart ||
+                              parseInt(t.value.split(':')[0]) >
+                              parseInt(row.breakStart.split(':')[0])
+                            )
+                            .map(t => (
+                              <MenuItem key={t.value} value={t.value}>
+                                {t.label}
+                              </MenuItem>
+                            ))
+                          }
+
                         </Select>
                       </TableCell>
                     </TableRow>

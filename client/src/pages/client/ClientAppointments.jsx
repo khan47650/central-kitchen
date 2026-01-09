@@ -19,8 +19,9 @@ import {
 } from '@mui/material';
 import { AuthContext } from '../../context/AuthContext';
 import moment from 'moment-timezone';
-import { useMediaQuery,} from '@mui/material';
+import { useMediaQuery, } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
+import SlotDetailsDialog from '../../components/SlotDetailsDialog';
 
 const AZ_TIMEZONE = 'America/Phoenix';
 
@@ -37,7 +38,10 @@ const ClientAppointments = () => {
   const [users, setUsers] = useState([]);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(30);
-  
+  const [selectedSlot, setSelectedSlot] = useState(null);
+  const [dialogOpen, setDialogOpen] = useState(false);
+
+
 
   const DEFAULT_API = process.env.REACT_APP_API_URL || "";
 
@@ -49,7 +53,7 @@ const ClientAppointments = () => {
         const usersRes = await axios.get(`${DEFAULT_API}/api/users/all`);
         setUsers(usersRes.data);
 
-        // Fetch all slots
+        // Fetch all slots  
         const slotsRes = await axios.get(`${DEFAULT_API}/api/slots`);
         const formatted = slotsRes.data.map(slot => {
           let userName = "Not booked";
@@ -59,7 +63,7 @@ const ClientAppointments = () => {
               userName = "Admin";
             } else if (typeof slot.bookedBy === "string" && /^[0-9a-fA-F]{24}$/.test(slot.bookedBy)) {
               const foundUser = usersRes.data.find(u => u._id === slot.bookedBy);
-              userName = foundUser ? foundUser.fullName : "User";
+              userName = foundUser ? foundUser.businessName : "User";
             } else if (typeof slot.bookedBy === "object") {
               userName = slot.bookedBy.fullName || "Unknown";
             }
@@ -85,6 +89,31 @@ const ClientAppointments = () => {
     fetchUsersAndAppointments();
   }, []);
 
+  
+  const formatTime12Hour = (time24) => {
+    if (!time24 || time24 === '-') return '-';
+    const [hourStr, minute] = time24.split(':');
+    let hour = parseInt(hourStr, 10);
+    const ampm = hour >= 12 ? 'PM' : 'AM';
+    hour = hour % 12 || 12;
+    return `${hour}:${minute} ${ampm}`;
+  };
+
+  const handleViewDetails = (slot) => {
+    const formattedSlot = {
+      ...slot,
+      startTime: formatTime12Hour(slot.startTime),
+      endTime: formatTime12Hour(slot.endTime)
+    };
+    setSelectedSlot(formattedSlot);
+    setDialogOpen(true);
+  };
+
+  const handleCloseDialog = () => {
+    setDialogOpen(false);
+    setSelectedSlot(null);
+  };
+
   const handleChangePage = (event, newPage) => setPage(newPage);
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(parseInt(event.target.value, 10));
@@ -97,72 +126,82 @@ const ClientAppointments = () => {
         All Appointments
       </Typography>
 
-     
-          <TableContainer sx={{ maxWidth: '100%', overflowX: 'auto' }}>
-            <Table size={isMobile ? 'small' : 'medium'}>
-              <TableHead>
-                <TableRow>
-                  <TableCell>User Name</TableCell>
-                  <TableCell>Booked On</TableCell>
-                  <TableCell>Booking Start</TableCell>
-                  <TableCell>Booking End</TableCell>
-                  <TableCell>Action</TableCell>
+
+      <TableContainer sx={{ maxWidth: '100%', overflowX: 'auto' }}>
+        <Table size={isMobile ? 'small' : 'medium'}>
+          <TableHead>
+            <TableRow>
+              <TableCell>User Name</TableCell>
+              <TableCell>Booked On</TableCell>
+              <TableCell>Booking Start</TableCell>
+              <TableCell>Booking End</TableCell>
+              <TableCell>Action</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {loading ? (
+              Array.from(new Array(5)).map((_, index) => (
+                <TableRow key={index}>
+                  <TableCell><Skeleton /></TableCell>
+                  <TableCell><Skeleton /></TableCell>
+                  <TableCell><Skeleton /></TableCell>
+                  <TableCell><Skeleton /></TableCell>
+                  <TableCell><Skeleton /></TableCell>
                 </TableRow>
-              </TableHead>
-              <TableBody>
-                {loading ? (
-                  Array.from(new Array(5)).map((_, index) => (
-                    <TableRow key={index}>
-                      <TableCell><Skeleton /></TableCell>
-                      <TableCell><Skeleton /></TableCell>
-                      <TableCell><Skeleton /></TableCell>
-                      <TableCell><Skeleton /></TableCell>
-                      <TableCell><Skeleton /></TableCell>
-                    </TableRow>
-                  ))
-                ) : appointments.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={5} align="center">
-                      No appointments found.
+              ))
+            ) : appointments.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={5} align="center">
+                  No appointments found.
+                </TableCell>
+              </TableRow>
+            ) : (
+              appointments
+                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                .map((appt) => (
+                  <TableRow key={appt.id}>
+                    <TableCell>{appt.userName}</TableCell>
+                    <TableCell>{appt.bookedOn}</TableCell>
+                    <TableCell>{formatTime12Hour(appt.startTime)}</TableCell>
+                    <TableCell>{formatTime12Hour(appt.endTime)}</TableCell>
+
+                    <TableCell>
+                      <Button
+                        variant="contained"
+                        size="small"
+                        sx={{ minWidth: isMobile ? 60 : 120 ,color:'white'}}
+                        onClick={() => handleViewDetails(appt)}
+                      >
+                        {isMobile ? 'VIEW' : 'VIEW DETAILS'}
+                      </Button>
+
                     </TableCell>
                   </TableRow>
-                ) : (
-                  appointments
-                    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                    .map((appt) => (
-                      <TableRow key={appt.id}>
-                        <TableCell>{appt.userName}</TableCell>
-                        <TableCell>{appt.bookedOn}</TableCell>
-                        <TableCell>{appt.startTime}</TableCell>
-                        <TableCell>{appt.endTime}</TableCell>
-                        <TableCell>
-                          <Button
-                            variant="contained"
-                            size="small"
-                            sx={{ minWidth: isMobile ? 60 : 120 }}
-                          >
-                            {isMobile ? 'VIEW' : 'VIEW DETAILS'}
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                    ))
-                )}
-              </TableBody>
+                ))
+            )}
+          </TableBody>
 
-            </Table>
-          </TableContainer>
+        </Table>
+      </TableContainer>
 
-          <TablePagination
-            rowsPerPageOptions={[10, 30, 50]}
-            component="div"
-            count={appointments.length}
-            rowsPerPage={rowsPerPage}
-            page={page}
-            onPageChange={handleChangePage}
-            onRowsPerPageChange={handleChangeRowsPerPage}
-          />
-      </Box>
-  
+      <TablePagination
+        rowsPerPageOptions={[10, 30, 50]}
+        component="div"
+        count={appointments.length}
+        rowsPerPage={rowsPerPage}
+        page={page}
+        onPageChange={handleChangePage}
+        onRowsPerPageChange={handleChangeRowsPerPage}
+      />
+
+      <SlotDetailsDialog
+        open={dialogOpen}
+        onClose={handleCloseDialog}
+        slot={selectedSlot}
+      />
+
+    </Box>
+
   );
 };
 

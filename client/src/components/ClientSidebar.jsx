@@ -35,7 +35,7 @@ const ClientSidebar = ({ mobileOpen, setMobileOpen }) => {
     { label: 'My Appointments', path: '/client/my-appointments', icon: <AssignmentTurnedIn /> },
     { label: 'Settings', path: '/client/dashboard', icon: <Settings /> },
     { label: 'Reset Password', path: '/client/reset-password', icon: <LockReset /> },
-    { label: 'Timings',path:'/client/timings',icon:<AccessTime/>},
+    { label: 'Timings', path: '/client/timings', icon: <AccessTime /> },
   ];
 
   const isActive = (path) => location.pathname === path;

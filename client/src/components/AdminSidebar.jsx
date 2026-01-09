@@ -1,7 +1,8 @@
 import React from 'react';
 import {
   Drawer, List, ListItemButton, ListItemText, ListItemIcon,
-  Collapse, Toolbar, Typography, Divider
+  Collapse, Toolbar, Typography, Divider,
+  Box
 } from '@mui/material';
 import {
   ExpandLess, ExpandMore, Event, Person, Settings,
@@ -44,16 +45,32 @@ const AdminSidebar = ({ mobileOpen, setMobileOpen }) => {
 
   const handleNavigate = (path) => {
     navigate(path);
-    if (mobileOpen) setMobileOpen(false); 
+    if (mobileOpen) setMobileOpen(false);
   };
 
   const drawerContent = (
     <>
-      <Toolbar>
-        <Typography variant="h6" sx={{ paddingLeft: 2 }}>
+      <Toolbar
+        sx={{
+          minHeight: { xs: 56, sm: 64 },
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+      >
+        <Typography
+          variant="h6"
+          noWrap
+          sx={{
+            fontWeight: 700,
+            fontSize: { xs: '1rem', sm: '1.25rem' },
+            textAlign: 'center',
+          }}
+        >
           Central Kitchen
         </Typography>
       </Toolbar>
+
       <Divider />
       <List>
         <ListItemButton
@@ -173,7 +190,7 @@ const AdminSidebar = ({ mobileOpen, setMobileOpen }) => {
           <ListItemText primary="Reset Password" />
         </ListItemButton>
 
-          <ListItemButton
+        <ListItemButton
           sx={itemStyle}
           selected={isActive('/admin/timings')}
           onClick={() => handleNavigate('/admin/timings')}
@@ -209,11 +226,22 @@ const AdminSidebar = ({ mobileOpen, setMobileOpen }) => {
         ModalProps={{ keepMounted: true }}
         sx={{
           display: { xs: 'block', md: 'none' },
-          '& .MuiDrawer-paper': { width: drawerWidth, boxSizing: 'border-box', backgroundColor: '#006232', color: 'white' },
+          '& .MuiDrawer-paper': {
+            width: drawerWidth,
+            boxSizing: 'border-box',
+            backgroundColor: '#006232',
+            color: 'white',
+          },
         }}
       >
+       
+        {/* <Toolbar /> */}
+        <Box sx={{height:"20px"}}>
+        </Box>
+
         {drawerContent}
       </Drawer>
+
     </>
   );
 };

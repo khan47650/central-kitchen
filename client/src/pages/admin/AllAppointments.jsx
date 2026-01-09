@@ -6,6 +6,7 @@ import {
 import moment from 'moment-timezone';
 import { useMediaQuery, Paper, TableContainer, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
+import SlotDetailsDialog from '../../components/SlotDetailsDialog';
 
 
 const AZ_TIMEZONE = 'America/Phoenix';
@@ -20,7 +21,17 @@ const AllAppointments = () => {
   const [loading, setLoading] = useState(true);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const [selectedSlot, setSelectedSlot] = useState(null);
+  const [dialogOpen, setDialogOpen] = useState(false);
 
+  const formatTime12Hour = (time24) => {
+    if (!time24) return '-';
+    const [hourStr, minute] = time24.split(':');
+    let hour = parseInt(hourStr);
+    const ampm = hour >= 12 ? 'PM' : 'AM';
+    hour = hour % 12 || 12;
+    return `${hour}:${minute} ${ampm}`;
+  };
 
   useEffect(() => {
     const fetchUsersAndAppointments = async () => {
@@ -40,7 +51,7 @@ const AllAppointments = () => {
             } else if (typeof slot.bookedBy === "string") {
               // If it's a valid userId
               const foundUser = allUsers.find(u => u._id === slot.bookedBy);
-              userName = foundUser ? foundUser.fullName : "User";
+              userName = foundUser ? foundUser.businessName : "Unknown User";
             } else if (typeof slot.bookedBy === "object") {
               // If backend returns populated user object
               userName = slot.bookedBy.fullName || "Unknown";
@@ -52,8 +63,8 @@ const AllAppointments = () => {
             userName,
             bookedOn: slot.date ? moment.tz(slot.date, AZ_TIMEZONE).format('MM/DD/YYYY') : '-',
 
-            bookingStart: slot.startTime,
-            bookingEnd: slot.endTime || '-'
+            bookingStart: formatTime12Hour(slot.startTime),
+            bookingEnd: formatTime12Hour(slot.endTime) || '-'
           };
         });
 
@@ -76,6 +87,16 @@ const AllAppointments = () => {
 
     fetchUsersAndAppointments();
   }, []);
+
+  const handleViewDetails = (slot) => {
+    setSelectedSlot(slot);
+    setDialogOpen(true);
+  };
+
+  const handleCloseDialog = () => {
+    setDialogOpen(false);
+    setSelectedSlot(null);
+  };
 
   const handleChangePage = (event, newPage) => setPage(newPage);
   const handleChangeRowsPerPage = (event) => {
@@ -131,7 +152,8 @@ const AllAppointments = () => {
                         <Button
                           variant="contained"
                           size="small"
-                          sx={{ minWidth: isMobile ? 60 : 120 }}
+                          sx={{ minWidth: isMobile ? 60 : 120,color:'white' }}
+                          onClick={() => handleViewDetails(row)}
                         >
                           {isMobile ? 'VIEW' : 'VIEW DETAILS'}
                         </Button>
@@ -152,6 +174,11 @@ const AllAppointments = () => {
         onPageChange={handleChangePage}
         rowsPerPage={rowsPerPage}
         onRowsPerPageChange={handleChangeRowsPerPage}
+      />
+      <SlotDetailsDialog
+        open={dialogOpen}
+        onClose={handleCloseDialog}
+        slot={selectedSlot}
       />
     </>
   );

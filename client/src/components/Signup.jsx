@@ -5,7 +5,6 @@ import "react-toastify/dist/ReactToastify.css";
 import "../CSS/Signup.css";
 import logo from "../assets/img/logo3.png";
 
-// Use CRA env var naming convention. REACT_APP_API_URL is read from process.env
 const DEFAULT_API = process.env.REACT_APP_API_URL || "";
 console.log("Backend URL:", DEFAULT_API);
 
@@ -247,9 +246,6 @@ export default function Signup() {
                         onChange={updateField}
                       >
                         <option>Maricopa</option>
-                        <option>Phoenix</option>
-                        <option>Tucson</option>
-                        <option>Other</option>
                       </select>
                     </div>
 

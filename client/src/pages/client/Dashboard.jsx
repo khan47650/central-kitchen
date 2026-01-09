@@ -22,6 +22,8 @@ import axios from 'axios';
 import moment from 'moment';
 import '../../Styles/clientDashboard.css';
 import { Skeleton } from "@mui/material";
+import { useNavigate } from 'react-router-dom';
+import { Cursor } from 'mongoose';
 
 const DEFAULT_API = process.env.REACT_APP_API_URL || '';
 
@@ -30,9 +32,10 @@ const ClientDashboard = () => {
   const [stats, setStats] = useState(null);
   const [recentBookings, setRecentBookings] = useState([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    if (!user?._id ) return;
+    if (!user?._id) return;
 
     const fetchClientData = async () => {
       try {
@@ -52,34 +55,34 @@ const ClientDashboard = () => {
     fetchClientData();
   }, [user, accessToken]);
 
- if (loading) {
-  return (
-    <Box sx={{ width: "100%" }}>
-      {/* Header */}
-      <Skeleton variant="text" width={200} height={40} />
-      <Skeleton variant="text" width={300} height={20} />
+  if (loading) {
+    return (
+      <Box sx={{ width: "100%" }}>
+        {/* Header */}
+        <Skeleton variant="text" width={200} height={40} />
+        <Skeleton variant="text" width={300} height={20} />
 
-      {/* Stat cards */}
-      <Grid container spacing={2} sx={{ mt: 2 }}>
-        {[1, 2, 3, 4].map((i) => (
-          <Grid item xs={12} sm={6} md={3} key={i}>
-            <Skeleton variant="rounded" height={150} />
+        {/* Stat cards */}
+        <Grid container spacing={2} sx={{ mt: 2 }}>
+          {[1, 2, 3, 4].map((i) => (
+            <Grid item xs={12} sm={6} md={3} key={i}>
+              <Skeleton variant="rounded" height={150} />
+            </Grid>
+          ))}
+        </Grid>
+
+        {/* Content */}
+        <Grid container spacing={2} sx={{ mt: 2 }}>
+          <Grid item xs={12} md={8}>
+            <Skeleton variant="rounded" height={350} />
           </Grid>
-        ))}
-      </Grid>
-
-      {/* Content */}
-      <Grid container spacing={2} sx={{ mt: 2 }}>
-        <Grid item xs={12} md={8}>
-          <Skeleton variant="rounded" height={350} />
+          <Grid item xs={12} md={4}>
+            <Skeleton variant="rounded" height={350} />
+          </Grid>
         </Grid>
-        <Grid item xs={12} md={4}>
-          <Skeleton variant="rounded" height={350} />
-        </Grid>
-      </Grid>
-    </Box>
-  );
-}
+      </Box>
+    );
+  }
 
   const statCards = [
     {
@@ -88,6 +91,7 @@ const ClientDashboard = () => {
       value: stats?.upcoming ?? 0,
       icon: <EventAvailable />,
       color: '#1976d2',
+
     },
     {
       id: 2,
@@ -117,7 +121,14 @@ const ClientDashboard = () => {
           <Grid item xs={12} sm={6} md={4} key={card.id}>
             <Paper
               className="stat-card"
-              sx={{ display: 'flex', alignItems: 'center', gap: 2, p: 2 }}
+              onClick={() => {
+                if (card.label === 'Upcoming Bookings')
+                  navigate('/client/my-appointments?type=upcoming');
+
+                if (card.label === 'Completed')
+                  navigate('/client/my-appointments?type=completed');
+              }}
+              sx={{ display: 'flex', alignItems: 'center', gap: 2, p: 2,cursor:'pointer' }}
             >
               <Avatar sx={{ bgcolor: card.color, width: 50, height: 50 }}>{card.icon}</Avatar>
               <Box>
@@ -157,27 +168,27 @@ const ClientDashboard = () => {
           </Paper>
         </Grid>
 
-       <Grid item xs={12} md={4}>
-  <Paper className="section" sx={{ p: 2 }}>
-    <Typography variant="h6" className="section-title">
-      Activity Summary
-    </Typography>
-    <Stack spacing={2}>
-      <Box>
-        <Typography variant="body2">Booking Completion</Typography>
-        <LinearProgress variant="determinate" value={80} />
-      </Box>
-      <Box>
-        <Typography variant="body2">Cancellation Rate</Typography>
-        <LinearProgress variant="determinate" value={20} />
-      </Box>
-    </Stack>
-    <Divider sx={{ my: 2 }} />
-    <Button variant="contained" fullWidth>
-      View Insights
-    </Button>
-  </Paper>
-</Grid>
+        <Grid item xs={12} md={4}>
+          <Paper className="section" sx={{ p: 2 }}>
+            <Typography variant="h6" className="section-title">
+              Activity Summary
+            </Typography>
+            <Stack spacing={2}>
+              <Box>
+                <Typography variant="body2">Booking Completion</Typography>
+                <LinearProgress variant="determinate" value={80} />
+              </Box>
+              <Box>
+                <Typography variant="body2">Cancellation Rate</Typography>
+                <LinearProgress variant="determinate" value={20} />
+              </Box>
+            </Stack>
+            <Divider sx={{ my: 2 }} />
+            <Button variant="contained" fullWidth>
+              View Insights
+            </Button>
+          </Paper>
+        </Grid>
 
       </Grid>
     </Box>

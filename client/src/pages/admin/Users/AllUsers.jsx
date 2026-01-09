@@ -13,6 +13,7 @@ import {
 import axios from 'axios';
 import { Skeleton } from "@mui/material";
 import { useTheme, useMediaQuery, TableContainer } from '@mui/material';
+import UserDetailsDialog from '../../../components/UserDetailsDialog';
 
 
 
@@ -21,6 +22,8 @@ const AllUsers = () => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [loading, setLoading] = useState(true);
+  const [openDialog, setOpenDialog] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
@@ -57,6 +60,14 @@ const AllUsers = () => {
     fetchAllUsers();
   };
 
+  const handleViewUser = (user) => {
+    setSelectedUser(user);
+    setOpenDialog(true);
+  };
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
+    setSelectedUser(null);
+  };
 
 
 
@@ -114,9 +125,11 @@ const AllUsers = () => {
                           variant="outlined"
                           size="small"
                           sx={{ minWidth: isMobile ? 50 : 80 }}
+                          onClick={() => handleViewUser(user)}
                         >
-                          {isMobile ? 'VIEW' : 'VIEW'}
+                          VIEW
                         </Button>
+
 
                         <Button
                           variant="outlined"
@@ -146,6 +159,13 @@ const AllUsers = () => {
         rowsPerPage={rowsPerPage}
         onRowsPerPageChange={handleChangeRowsPerPage}
       />
+
+      <UserDetailsDialog
+        open={openDialog}
+        onClose={handleCloseDialog}
+        user={selectedUser}
+      />
+
     </Box>
   );
 };

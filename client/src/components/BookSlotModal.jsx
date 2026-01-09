@@ -14,19 +14,26 @@ import moment from 'moment-timezone';
 import axios from 'axios';
 
 const AZ_TIMEZONE = 'America/Phoenix';
+const DEFAULT_API = process.env.REACT_APP_API_URL || "";
+const durations = [1, 2, 3];
 
+// 24-hour format for logic
 const workingHours = [];
 for (let hour = 6; hour <= 20; hour++) {
   workingHours.push(`${hour}:00`);
 }
 
-const DEFAULT_API = process.env.REACT_APP_API_URL || "";
-const durations = [1, 2, 3];
+// 12-hour AM/PM conversion
+const formatTime12Hour = (time24) => {
+  const [hourStr, minute] = time24.split(':');
+  let hour = parseInt(hourStr);
+  const ampm = hour >= 12 ? 'PM' : 'AM';
+  hour = hour % 12 || 12; // convert 0 to 12
+  return `${hour}:${minute} ${ampm}`;
+};
 
 const BookSlotModal = ({ open, onClose, userId, isAdmin, onBooked }) => {
-  
   const [loading,setLoading]=useState(false);
-  // Arizona time
   const today = moment.tz(AZ_TIMEZONE);
   const startOfWeek = moment.tz(AZ_TIMEZONE).startOf('week').add(1, 'day'); // Monday
   const endOfWeek = moment.tz(AZ_TIMEZONE).startOf('week').add(4, 'day');   // Thursday
@@ -44,10 +51,9 @@ const BookSlotModal = ({ open, onClose, userId, isAdmin, onBooked }) => {
     }
     const [hour] = startTime.split(':');
     const endHour = parseInt(hour) + duration;
-    setEndTime(`${endHour}:00`);
+    setEndTime(formatTime12Hour(`${endHour}:00`)); // <-- display as 12-hour
   }, [startTime, duration]);
 
-  //Arizona based day check
   const isValidBookingDay = (dateStr) => {
     const date = moment.tz(dateStr, 'YYYY-MM-DD', AZ_TIMEZONE);
     const day = date.day();
@@ -88,7 +94,7 @@ const BookSlotModal = ({ open, onClose, userId, isAdmin, onBooked }) => {
     try {
       const res = await axios.post(`${DEFAULT_API}/api/slots/create`, {
         date: startDate,
-        startTime,
+        startTime, // still 24-hour for backend
         duration
       });
 
@@ -140,7 +146,7 @@ const BookSlotModal = ({ open, onClose, userId, isAdmin, onBooked }) => {
             <MenuItem value="" disabled>Select a time</MenuItem>
             {getAvailableTimes().map(({ time, disabled }) => (
               <MenuItem key={time} value={time} disabled={disabled}>
-                {time}
+                {formatTime12Hour(time)} {/* <-- display in 12-hour */}
               </MenuItem>
             ))}
           </TextField>
@@ -161,7 +167,7 @@ const BookSlotModal = ({ open, onClose, userId, isAdmin, onBooked }) => {
 
           <TextField
             label="End Time"
-            value={endTime}
+            value={endTime} // <-- already converted to 12-hour
             InputProps={{ readOnly: true }}
             fullWidth
           />

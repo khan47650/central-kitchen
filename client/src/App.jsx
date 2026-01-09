@@ -31,6 +31,7 @@ import ClientTimings from './pages/client/ClientTiming';
 import AdminTimings from './pages/admin/AdminTimings';
 import Shops from './pages/Shops';
 import ShopsDetail from './components/ShopsDetail';
+import ForgotPassword from './components/ForgotPassword';
 
 function App() {
   return (
@@ -64,8 +65,9 @@ function AppRoutes() {
       <Route path="/login" element={<Login />} />
       <Route path="/success" element={<SuccessPage />} />
       <Route path="/successPassword" element={<SuccessPassword />} />
-      <Route path="/shops" element={<Shops/>}/>
-      <Route path="/shops/:id" element={<ShopsDetail/>}/>
+      <Route path="/shops" element={<Shops />} />
+      <Route path="/shops/:id" element={<ShopsDetail />} />
+      <Route path="/forgotPassword" element={<ForgotPassword />} />
 
       {/* ADMIN PROTECTED */}
       <Route
@@ -142,12 +144,12 @@ function AppRoutes() {
       />
 
       <Route
-      path="/admin/timings"
-      element={
-        <PrivateRoute roles={['admin']}>
-          <AdminLayout><AdminTimings/></AdminLayout>
-        </PrivateRoute>
-      }
+        path="/admin/timings"
+        element={
+          <PrivateRoute roles={['admin']}>
+            <AdminLayout><AdminTimings /></AdminLayout>
+          </PrivateRoute>
+        }
       />
 
       {/* CLIENT PROTECTED */}
@@ -183,6 +185,7 @@ function AppRoutes() {
           </PrivateRoute>
         }
       />
+
       <Route
         path="/client/reset-password"
         element={
