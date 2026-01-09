@@ -4,6 +4,7 @@ const User = require('../models/User');
 const router = express.Router();
 const sendEmail = require('../utils/sendEmail');
 const bcrypt = require('bcryptjs');
+const crypto=require('crypto');
 
 // Example route
 router.get('/', (req, res) => {
@@ -196,6 +197,56 @@ router.put('/reject/:id', async (req, res) => {
   }
 });
 
+
+//generate randomPassword
+
+const generatePassword=()=>{
+  return crypto.randomBytes(4).toString('hex');
+};
+
+//forgot password
+router.post('/forgot-password',async(req,res)=>{
+  try{
+
+    const {email}=req.body;
+
+    if(!email){
+      return res.status(404).json({message:"email is required"});
+    }
+
+    const user=await User.findOne({email});
+
+    if(!user){
+      return res.status(404).json({message:"Email not registered"});
+    }
+
+    const newPassword=generatePassword();
+
+    user.password=newPassword;
+    await user.save();
+
+    const html = `
+      <h2>Central Kitchen - Password Reset</h2>
+      <p>Your password has been reset successfully.</p>
+      <p><b>Email:</b> ${user.email}</p>
+      <p><b>New Password:</b> ${newPassword}</p>
+      <p>Please login and change your password immediately.</p>
+    `;
+
+     await sendEmail(
+      user.email,
+      "Central Kitchen - New Password",
+      html
+    );
+
+    res.json({ message: "New password sent to your email" });
+
+  }catch(error){
+  console.error(error);
+    res.status(500).json({ message: "Server error" });
+  }
+  
+});
 
 
 

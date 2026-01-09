@@ -230,4 +230,67 @@ router.get('/clientDashboard/:userId', async (req, res) => {
   }
 });
 
+// GET client upcoming slots
+router.get('/client/upcoming/:userId', async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const now = moment.tz(AZ_TIMEZONE);
+
+    const slots = await Slot.find({
+      booked: true,
+      bookedBy: userId,
+    });
+
+    const upcoming = slots.filter(slot => {
+      const start = moment.tz(
+        `${slot.date} ${slot.startTime}`,
+        'YYYY-MM-DD HH:mm',
+        AZ_TIMEZONE
+      );
+      return start.isAfter(now);
+    });
+
+    res.json(upcoming);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+// GET client completed slots
+router.get('/client/completed/:userId', async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const now = moment.tz(AZ_TIMEZONE);
+
+    const startOfWeek = moment.tz(AZ_TIMEZONE).startOf('week');
+    const endOfWeek = moment.tz(AZ_TIMEZONE).endOf('week');
+
+    const slots = await Slot.find({
+      booked: true,
+      bookedBy: userId,
+      date: {
+        $gte: startOfWeek.format('YYYY-MM-DD'),
+        $lte: endOfWeek.format('YYYY-MM-DD'),
+      }
+    });
+
+    const completedThisWeek = slots.filter(slot => {
+      const end = moment.tz(
+        `${slot.date} ${slot.endTime}`,
+        'YYYY-MM-DD HH:mm',
+        AZ_TIMEZONE
+      );
+      return end.isBefore(now);
+    });
+
+    res.json(completedThisWeek);
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+
+
 module.exports = router;
