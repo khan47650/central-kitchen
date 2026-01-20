@@ -2,6 +2,7 @@ const Shop =require("../models/Shop");
 const cloudinary=require("../utils/cloudinary");
 const { calculateShopStatus } = require("../utils/shopStatus");
 const { applyEditLock } = require("../utils/lockRule");
+const Category=require("../models/Category");
 
 
 const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
@@ -146,6 +147,9 @@ try{
     return res.status(400).json({ message: "Shop ID is required" });
   }
   const shop=await Shop.findByIdAndDelete(id);
+
+  await Category.deleteMany({ shopId: id });
+
   res.status(201).json({message:"Shop deleted successfully"});
 
 }catch(err){

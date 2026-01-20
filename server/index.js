@@ -8,6 +8,7 @@ const slotRoutes = require('./routes/slotRoutes');
 const contactRoutes = require('./routes/contactRoutes');
 const dashboardRoutes=require('./routes/dashboardRoutes');
 const shopRoutes=require('./routes/shopRoutes');
+const categoryRoutes=require('./routes/categoryRoutes');
 
 const app = express();
 
@@ -28,6 +29,7 @@ app.use('/api/slots', slotRoutes);
 app.use('/api/contact', contactRoutes);
 app.use('/api/stats',dashboardRoutes);
 app.use('/api/shops',shopRoutes);
+app.use('/api/categories',categoryRoutes);
 
 // Health check route (optional)
 app.get('/', (req, res) => {
