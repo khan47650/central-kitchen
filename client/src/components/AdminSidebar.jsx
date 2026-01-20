@@ -6,7 +6,7 @@ import {
 } from '@mui/material';
 import {
   ExpandLess, ExpandMore, Event, Person, Settings,
-  CalendarMonth, Group, PendingActions, LockClock, HowToReg, Block, LockReset, AccessTime
+  CalendarMonth, Group, PendingActions, LockClock, HowToReg, Block, LockReset, AccessTime,Apps
 } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
 const drawerWidth = 240;
@@ -199,6 +199,17 @@ const AdminSidebar = ({ mobileOpen, setMobileOpen }) => {
             <AccessTime />
           </ListItemIcon>
           <ListItemText primary="Timings" />
+        </ListItemButton>
+
+         <ListItemButton
+          sx={itemStyle}
+          selected={isActive('/admin/shops')}
+          onClick={() => handleNavigate('/admin/shops')}
+        >
+          <ListItemIcon sx={{ color: 'white' }}>
+            <Apps />
+          </ListItemIcon>
+          <ListItemText primary="Categories" />
         </ListItemButton>
       </List>
     </>

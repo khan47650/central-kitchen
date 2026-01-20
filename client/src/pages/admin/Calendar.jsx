@@ -112,7 +112,7 @@ const Calendar = () => {
         }}
       >
         <Typography variant="h5" fontWeight={700}>
-          Hello, {user?.role?.toUpperCase()}
+           Hello, {user?.role === 'admin' ? 'Admin' : user?.name || 'Client'}
         </Typography>
 
         <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>

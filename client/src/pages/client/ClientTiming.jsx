@@ -56,10 +56,14 @@ const ClientTimings = () => {
 
   const isSameTime = (a, b) => a && b && a === b;
 
-  const fetchShops = async () => {
+  const fetchShops = async (isAfterSave = false) => {
     if (!user?._id) return;
     try {
-      setLoading(true);
+      if (isAfterSave) {
+        setLoading(false);
+      } else {
+        setLoading(true);
+      }
       const res = await axios.get(`${DEFAULT_API}/api/shops/my/${user._id}`);
 
       const formatted = res.data.map(shop => {
@@ -102,7 +106,7 @@ const ClientTimings = () => {
   };
 
   useEffect(() => {
-    fetchShops();
+    fetchShops(false);
   }, [user]);
 
   const updateTiming = (shopIndex, dayIndex, field, value) => {
@@ -206,7 +210,7 @@ const ClientTimings = () => {
         },
       });
 
-      fetchShops();
+      fetchShops(true);
     } catch (err) {
       console.error("Save failed", err);
     } finally {
@@ -242,7 +246,7 @@ const ClientTimings = () => {
           Client Timings
         </Typography>
 
-        {shops.length === 0 && (
+        {!loading && shops.length === 0 && (
           <Button
             onClick={() => setOpenDialog(true)}
             variant="contained"

@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
-import "../CSS/Shops.css";
-import ShopsTopbar from "../components/ShopsTopbar";
+import "../../CSS/Shops.css";
 import axios from "axios";
 import moment from "moment-timezone";
 import { Skeleton } from "@mui/material";
@@ -16,7 +15,7 @@ const formatTo12Hour = (time) => {
 };
 
 
-const Shops = () => {
+const AdminShops = () => {
     const [shops, setShops] = useState([]);
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
@@ -83,9 +82,12 @@ const Shops = () => {
 
     return (
         <div className="page-wrapper">
-            <ShopsTopbar />
-
             <div className="page-content">
+                <div style={{ marginTop: "24px", marginBottom: "5px" }}>
+                    <h4 style={{ fontWeight: 600 }}>
+                        Categories
+                    </h4>
+                </div>
                 <div className="shops-container">
                     {loading &&
                         Array.from({ length: 6 }).map((_, i) => (
@@ -102,10 +104,10 @@ const Shops = () => {
 
                             return (
                                 <div key={shop._id} className="shop-card"
-                                    onClick={() =>{
+                                    onClick={() => {
                                         console.log("Navigating to shopId:", shop._id);
-                                         navigate(`/shops/${shop._id}`)
-                                        }}>
+                                        navigate(`/admin/categories/${shop._id}`)
+                                    }}>
                                     <img src={shop.shopImage} alt={shop.shopName} />
 
                                     <h5 className="shop-name">{shop.shopName}</h5>
@@ -143,17 +145,8 @@ const Shops = () => {
                     )}
                 </div>
             </div>
-
-            <footer id="footer" className="footer dark-background">
-                <div className="container text-center mt-4">
-                    <p>© Central Kitchen — All Rights Reserved</p>
-                    <div className="credits">
-                        Designed by <a href="">LumenAi</a>
-                    </div>
-                </div>
-            </footer>
         </div>
     );
 };
 
-export default Shops;
+export default AdminShops;

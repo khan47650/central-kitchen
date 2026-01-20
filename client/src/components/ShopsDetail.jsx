@@ -1,76 +1,262 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import {
+  Box,
+  Typography,
+  Card,
+  CardContent,
+  IconButton,
+  Grid,
+  Avatar,
+  Divider,
+  Button,
+  CircularProgress,
+  useTheme,
+  useMediaQuery,
+  Skeleton,
+} from "@mui/material";
+import {
+  KeyboardArrowDown,
+  KeyboardArrowRight,
+  ArrowBack,
+} from "@mui/icons-material";
+import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import "../CSS/ShopDetail.css";
 
-const SHOP_DATA = {
-  1: {
-    name: "Central Kitchen",
-    address: "Phoenix, AZ",
-    description:
-      "Central Kitchen is a fully equipped commissary kitchen designed for food entrepreneurs and caterers.",
-    status: "Open",
-    timing: "13:00 - 18:00",
-    image: "https://i.pravatar.cc/300?img=11",
-  },
-  2: {
-    name: "Desert Bites",
-    address: "Tempe, AZ",
-    description:
-      "Desert Bites offers a modern kitchen space suitable for startups and cloud kitchens.",
-    status: "Closed",
-    timing: "—",
-    image: "https://i.pravatar.cc/300?img=12",
-  },
+const DEFAULT_API = process.env.REACT_APP_API_URL || "";
+
+const STATUS_OPTIONS = {
+  IN_STOCK: { label: "In Stock", color: "green" },
+  OUT_OF_STOCK: { label: "Out of Stock", color: "red" },
 };
 
 const ShopsDetail = () => {
-  const { id } = useParams();
+  const { shopId } = useParams();
   const navigate = useNavigate();
-  const shop = SHOP_DATA[id];
 
-  if (!shop)
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const isTablet = useMediaQuery(theme.breakpoints.between("sm", "md"));
+  const isDesktop = !isMobile && !isTablet;
+
+  const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [openCard, setOpenCard] = useState(null);
+  const [addingCart, setAddingCart] = useState(null);
+
+  const fetchCategories = async () => {
+    try {
+      setLoading(true);
+      const res = await axios.get(
+        `${DEFAULT_API}/api/categories/all/${shopId}`
+      );
+      setCategories(res.data.categories || []);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleAddToCart = (id) => {
+    setAddingCart(id);
+    setTimeout(() => setAddingCart(null), 800);
+  };
+
+  useEffect(() => {
+    if (shopId) fetchCategories();
+  }, [shopId]);
+
   return (
-    <div className="page-wrapper-details">
-      <div className="page-content-details">
-        <div className="shop-not-found-card">
-          <p>Shop not found</p>
-        </div>
-      </div>
-    </div>
-  );
+    <Box p={{ xs: 2, md: 3 }}>
+      {/* TOP BAR */}
+      <Box sx={{ mb: 3 }}>
+        <Grid container alignItems="center">
+          <Grid item xs={2}>
+            <IconButton onClick={() => navigate(-1)}>
+              <ArrowBack />
+            </IconButton>
+          </Grid>
+          <Grid item xs={8}>
+            <Typography textAlign="center" fontWeight="bold" variant="h6">
+              Categories
+            </Typography>
+          </Grid>
+        </Grid>
+      </Box>
+
+      {/* LOADING */}
+      {loading &&
+        [...Array(3)].map((_, i) => (
+          <Card key={i} sx={{ mb: 2 }}>
+            <CardContent>
+              <Skeleton width="40%" height={28} />
+              <Skeleton width="25%" height={20} />
+              <Divider sx={{ my: 1 }} />
+              <Skeleton variant="rectangular" height={40} />
+            </CardContent>
+          </Card>
+        ))}
+
+      {/* EMPTY */}
+      {!loading && categories.length === 0 && (
+        <Typography textAlign="center">No categories found</Typography>
+      )}
+
+  
+      {!loading &&
+        categories.map((category) => {
+          const isOpen = openCard === category._id;
+
+          return (
+            <Card key={category._id} sx={{ mb: 2 }}>
+              <CardContent>
+                <Grid container alignItems="center">
+                  <Grid item xs={8} sm={6}>
+                    <Typography fontWeight="bold">
+                      {category.categoryName}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      {category.items.length} items in this category
+                    </Typography>
+                  </Grid>
 
 
-  return (
-    <div className="page-wrapper-details">
-      <div className="page-content-details">
-        <div className="shop-detail-card">
-          {/* Back Arrow */}
-          <div className="back-arrow" onClick={() => navigate(-1)}>
-            <ArrowBackIcon fontSize="small" />
-          </div>
+                  {isDesktop && (
+                    <>
+                      <Grid item sm={2}>
+                        {isOpen && (
+                          <Typography fontWeight="bold" textAlign="right">
+                            Price
+                          </Typography>
+                        )}
+                      </Grid>
+                      <Grid item sm={2}>
+                        {isOpen && (
+                          <Typography fontWeight="bold" textAlign="right" sx={{pr:3}}>
+                            Status
+                          </Typography>
+                        )}
+                      </Grid>
+                    </>
+                  )}
 
-          {/* Image */}
-          <div className="shop-image-wrapper">
-            <img src={shop.image} alt={shop.name} />
-          </div>
+                  <Grid
+                    item
+                    xs={4}
+                    sm={2}
+                    display="flex"
+                    justifyContent="flex-end"
+                  >
+                    <IconButton
+                      onClick={() =>
+                        setOpenCard(isOpen ? null : category._id)
+                      }
+                    >
+                      {isOpen ? (
+                        <KeyboardArrowDown />
+                      ) : (
+                        <KeyboardArrowRight />
+                      )}
+                    </IconButton>
+                  </Grid>
+                </Grid>
 
-          {/* Content */}
-          <div className="shop-detail-content">
-            <h2>{shop.name}</h2>
-            <p className="address">{shop.address}</p>
-            <p className="description">{shop.description}</p>
+              
+                {isOpen && (
+                  <>
+                    <Divider sx={{ my: 1 }} />
 
-            <p className={`status ${shop.status.toLowerCase()}`}>
-              Status: {shop.status}
-            </p>
+                    {category.items.map((item, index) => (
+                      <React.Fragment key={item._id}>
+                        <Grid container spacing={2} alignItems="center" py={1}>
+                    
+                          <Grid item xs={12} sm={6}>
+                            <Box display="flex" alignItems="center" gap={1}>
+                              <Avatar
+                                variant="rounded"
+                                src={item.image || ""}
+                                sx={{ width: 36, height: 36 }}
+                              />
+                              <Typography>{item.name}</Typography>
+                            </Box>
+                          </Grid>
 
-            <h5>Today Opening Time</h5>
-            <p className="timing">{shop.timing}</p>
-          </div>
-        </div>
-      </div>
-    </div>
+                      
+                          <Grid item xs={6} sm={2}>
+                            <Typography
+                              textAlign={isDesktop ? "right" : "left"}
+                            >
+                              ${item.price}
+                            </Typography>
+                          </Grid>
+
+                      
+                          <Grid item xs={6} sm={2}>
+                            <Box
+                              display="flex"
+                              alignItems="center"
+                              gap={1}
+                              justifyContent={
+                                isDesktop ? "flex-end" : "flex-start"
+                              }
+                            >
+                              <Box
+                                sx={{
+                                  width: 8,
+                                  height: 8,
+                                  borderRadius: "50%",
+                                  bgcolor:
+                                    STATUS_OPTIONS[item.itemStatus]?.color ||
+                                    "gray",
+                                }}
+                              />
+                              <Typography variant="body2">
+                                {
+                                  STATUS_OPTIONS[item.itemStatus]?.label ||
+                                  "Unknown"
+                                }
+                              </Typography>
+                            </Box>
+                          </Grid>
+
+                      
+                          {/* <Grid item xs={12} sm={2}>
+                            <Box
+                              display="flex"
+                              justifyContent={
+                                isDesktop ? "flex-end" : "stretch"
+                              }
+                            >
+                              <Button
+                                fullWidth={!isDesktop}
+                                size="small"
+                                variant="outlined"
+                                disabled={addingCart === item._id}
+                                onClick={() => handleAddToCart(item._id)}
+                                sx={{
+                                  minWidth: isDesktop ? 130 : "100%",
+                                }}
+                              >
+                                {addingCart === item._id ? (
+                                  <CircularProgress size={16} />
+                                ) : (
+                                  "Add to Cart"
+                                )}
+                              </Button>
+                            </Box>
+                          </Grid> */}
+                        </Grid>
+
+                        {index !== category.items.length - 1 && <Divider />}
+                      </React.Fragment>
+                    ))}
+                  </>
+                )}
+              </CardContent>
+            </Card>
+          );
+        })}
+    </Box>
   );
 };
 

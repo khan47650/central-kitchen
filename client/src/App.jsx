@@ -32,6 +32,9 @@ import AdminTimings from './pages/admin/AdminTimings';
 import Shops from './pages/Shops';
 import ShopsDetail from './components/ShopsDetail';
 import ForgotPassword from './components/ForgotPassword';
+import MyCategories from './pages/client/MyCategories';
+import AdminCategories from './pages/admin/AdminCategories';
+import AdminShops from './pages/admin/AdminShops';
 
 function App() {
   return (
@@ -66,7 +69,7 @@ function AppRoutes() {
       <Route path="/success" element={<SuccessPage />} />
       <Route path="/successPassword" element={<SuccessPassword />} />
       <Route path="/shops" element={<Shops />} />
-      <Route path="/shops/:id" element={<ShopsDetail />} />
+      <Route path="/shops/:shopId" element={<ShopsDetail/>} />
       <Route path="/forgotPassword" element={<ForgotPassword />} />
 
       {/* ADMIN PROTECTED */}
@@ -151,6 +154,22 @@ function AppRoutes() {
           </PrivateRoute>
         }
       />
+      <Route
+        path="/admin/categories/:shopId"
+        element={
+          <PrivateRoute roles={['admin']}>
+            <AdminLayout><AdminCategories /></AdminLayout>
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/admin/shops"
+        element={
+          <PrivateRoute roles={['admin']}>
+            <AdminLayout><AdminShops /></AdminLayout>
+          </PrivateRoute>
+        }
+      />
 
       {/* CLIENT PROTECTED */}
       <Route
@@ -199,6 +218,15 @@ function AppRoutes() {
         element={
           <PrivateRoute roles={['client']}>
             <ClientLayout><ClientTimings /></ClientLayout>
+          </PrivateRoute>
+        }
+      />
+
+       <Route
+        path="/client/my-categories"
+        element={
+          <PrivateRoute roles={['client']}>
+            <ClientLayout><MyCategories /></ClientLayout>
           </PrivateRoute>
         }
       />

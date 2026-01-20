@@ -17,7 +17,8 @@ import {
   AssignmentTurnedIn,
   LockReset,
   Settings,
-  AccessTime
+  AccessTime,
+  Apps
 } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
 
@@ -36,6 +37,7 @@ const ClientSidebar = ({ mobileOpen, setMobileOpen }) => {
     { label: 'Settings', path: '/client/dashboard', icon: <Settings /> },
     { label: 'Reset Password', path: '/client/reset-password', icon: <LockReset /> },
     { label: 'Timings', path: '/client/timings', icon: <AccessTime /> },
+    { label: 'My Categories', path: '/client/my-categories', icon: <Apps /> },
   ];
 
   const isActive = (path) => location.pathname === path;

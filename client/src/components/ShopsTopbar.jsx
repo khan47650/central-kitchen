@@ -26,7 +26,6 @@ const ShopsTopbar = () => {
         mb: 3,
       }}
     >
-      {/* Left Title */}
       <Typography
         variant="h5"
         sx={{
@@ -34,10 +33,9 @@ const ShopsTopbar = () => {
           color: "text.primary",
         }}
       >
-        Shops
+        Food Trucks
       </Typography>
 
-      {/* Right Side */}
       <Box display="flex" alignItems="center" gap={2.5}>
         <Typography
           variant="body1"

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Box, Toolbar, useTheme, useMediaQuery } from '@mui/material';
+import { Box, Toolbar} from '@mui/material';
 import ClientSidebar from '../components/ClientSidebar';
 import Topbar from '../components/Topbar';
 
@@ -7,8 +7,6 @@ const drawerWidth = 250;
 
 const ClientLayout = ({ children }) => {
   const [mobileOpen, setMobileOpen] = useState(false);
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
    return (
     <Box sx={{ display: 'flex', minHeight: '100vh', overflow: 'hidden' }}>
