@@ -21,6 +21,7 @@ import AddCategoryDialog from "../../components/AddCategoryDialog";
 import AddEditItemDialog from "../../components/AddEditItemDialog";
 import axios from "axios";
 import { useAuth } from "../../context/AuthContext";
+import HoverZoomImage from "../../components/HoverZoomImage";
 
 const DEFAULT_API = process.env.REACT_APP_API_URL || "";
 
@@ -164,8 +165,8 @@ const MyCategories = () => {
         )}
       </Box>
 
-        {loading &&
-          ( Array.from(new Array(3)).map((_, i) => (
+      {loading &&
+        (Array.from(new Array(3)).map((_, i) => (
           <Card key={i} sx={{ mb: 2 }}>
             <CardContent>
               <Grid container alignItems="center">
@@ -207,244 +208,249 @@ const MyCategories = () => {
           No categories found
         </Typography>
       )}
-        { !loading && categories.map((category) => {
-          const isOpen = openCard === category._id;
+      {!loading && categories.map((category) => {
+        const isOpen = openCard === category._id;
 
-      return (
-      <Card key={category._id} sx={{ mb: 2 }}>
-        <CardContent>
-          <Grid container alignItems="center">
-            <Grid item xs={7} sm={7}>
-              <Typography fontWeight="bold">{category.categoryName}</Typography>
-              <Typography variant="body2" color="text.secondary">
-                {category.items.length} items in this category
-              </Typography>
-            </Grid>
-
-            {!isMobile && !isTablet && (
-              <Grid item sm={2}>
-                {isOpen && (
-                  <Typography fontWeight="bold" textAlign="right" sx={{ pr: 2 }}>
-                    Price
+        return (
+          <Card key={category._id} sx={{ mb: 2 }}>
+            <CardContent>
+              <Grid container alignItems="center">
+                <Grid item xs={7} sm={7}>
+                  <Typography fontWeight="bold">{category.categoryName}</Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    {category.items.length} items in this category
                   </Typography>
+                </Grid>
+
+                {!isMobile && !isTablet && (
+                  <Grid item sm={2}>
+                    {isOpen && (
+                      <Typography fontWeight="bold" textAlign="right" sx={{ pr: 2 }}>
+                        Price
+                      </Typography>
+                    )}
+                  </Grid>
                 )}
-              </Grid>
-            )}
 
-            {!isMobile && !isTablet && (
-              <Grid item sm={2}>
-                {isOpen && <Typography fontWeight="bold" textAlign="right">Status</Typography>}
-              </Grid>
-            )}
+                {!isMobile && !isTablet && (
+                  <Grid item sm={2}>
+                    {isOpen && <Typography fontWeight="bold" textAlign="right">Status</Typography>}
+                  </Grid>
+                )}
 
-            <Grid
-              item
-              xs={5}
-              sm={1}
-              display="flex"
-              alignItems="center"
-              justifyContent="flex-end"
-              gap={1}
-              sx={{
-                flexWrap: "nowrap",
-              }}
-            >
-              {!isOpen && (
-                <Button
-                  size="small"
-                  variant="outlined"
-                  disabled={deletingId === category._id}
-                  onClick={() => handleDeleteCategory(category._id)}
+                <Grid
+                  item
+                  xs={5}
+                  sm={1}
+                  display="flex"
+                  alignItems="center"
+                  justifyContent="flex-end"
+                  gap={1}
                   sx={{
-                    minWidth: isMobile ? 70 : 80,
-                    px: isMobile ? 1 : 1.5,
-                    height: 32,
-                    whiteSpace: "nowrap",
+                    flexWrap: "nowrap",
                   }}
                 >
-                  {deletingId === category._id ? (
-                    <CircularProgress size={16} color="error" />
-                  ) : (
-                    "Delete"
+                  {!isOpen && (
+                    <Button
+                      size="small"
+                      variant="outlined"
+                      disabled={deletingId === category._id}
+                      onClick={() => handleDeleteCategory(category._id)}
+                      sx={{
+                        minWidth: isMobile ? 70 : 80,
+                        px: isMobile ? 1 : 1.5,
+                        height: 32,
+                        whiteSpace: "nowrap",
+                      }}
+                    >
+                      {deletingId === category._id ? (
+                        <CircularProgress size={16} color="error" />
+                      ) : (
+                        "Delete"
+                      )}
+                    </Button>
                   )}
-                </Button>
-              )}
 
-              <IconButton
-                size="small"
-                onClick={() => setOpenCard(isOpen ? null : category._id)}
-              >
-                {isOpen ? <KeyboardArrowDown /> : <KeyboardArrowRight />}
-              </IconButton>
-            </Grid>
-
-
-          </Grid>
-
-          {isOpen && (
-            <>
-              <Divider sx={{ my: 1 }} />
-
-              {isTablet && (
-                <Grid container sx={{ mb: 1 }}>
-                  <Grid item xs={6}>
-                    <Typography fontWeight="bold">Price</Typography>
-                  </Grid>
-                  <Grid item xs={6}>
-                    <Typography fontWeight="bold">Status</Typography>
-                  </Grid>
-                </Grid>
-              )}
-
-              {category.items.map((item, index) => (
-                <React.Fragment key={item.id}>
-                  <Grid
-                    container
-                    alignItems={isMobile || isTablet ? "flex-start" : "center"}
-                    spacing={isMobile || isTablet ? 1 : 0}
-                    py={0.6}
+                  <IconButton
+                    size="small"
+                    onClick={() => setOpenCard(isOpen ? null : category._id)}
                   >
-                    <Grid item xs={12} sm={isTablet ? 6 : 7}>
-                      <Box display="flex" alignItems="center" gap={1}>
-                        <Avatar variant="rounded" sx={{ width: 34, height: 34 }} src={item.image || ""} />
+                    {isOpen ? <KeyboardArrowDown /> : <KeyboardArrowRight />}
+                  </IconButton>
+                </Grid>
 
-                        <Typography>{item.name}</Typography>
-                      </Box>
+
+              </Grid>
+
+              {isOpen && (
+                <>
+                  <Divider sx={{ my: 1 }} />
+
+                  {isTablet && (
+                    <Grid container sx={{ mb: 1 }}>
+                      <Grid item xs={6}>
+                        <Typography fontWeight="bold">Price</Typography>
+                      </Grid>
+                      <Grid item xs={6}>
+                        <Typography fontWeight="bold">Status</Typography>
+                      </Grid>
                     </Grid>
+                  )}
 
-                    <Grid item xs={6} sm={isTablet ? 3 : 2} sx={{ mt: isMobile || isTablet ? 1 : 0 }}>
-                      <Typography textAlign={isMobile || isTablet ? "left" : "right"} sx={{ pr: isTablet ? 0 : 3 }}>
-                        ${item.price}
-                      </Typography>
-                    </Grid>
-
-                    <Grid
-                      item
-                      xs={6}
-                      sm={isTablet ? 3 : 2}
-                      sx={{ mt: isMobile || isTablet ? 1 : 0 }}
-                      display="flex"
-                      justifyContent={isMobile || isTablet ? "flex-start" : "flex-end"}
-                    >
-                      <Select
-                        size="small"
-                        value={item.itemStatus} // DB se aaya hua value
-                        disabled={updatingStatus === item._id} // progress ke waqt disable
-                        sx={{
-                          height: 32,
-                          width: 150,
-                          "& .MuiSelect-select": {
-                            display: "flex",
-                            alignItems: "center",
-                            gap: 1,
-                            paddingRight: "44px",
-                            whiteSpace: "nowrap",
-                            overflow: "hidden",
-                            textOverflow: "ellipsis",
-                          },
-                          "& .MuiSelect-icon": {
-                            right: 8,
-                            top: "50%",
-                            transform: "translateY(-50%)",
-                          },
-                        }}
-                        renderValue={(value) => {
-                          if (updatingStatus === item._id) {
-                            return <CircularProgress size={18} />;
-                          }
-                          const option = value === "IN_STOCK" ? STATUS_OPTIONS.in : STATUS_OPTIONS.out;
-                          return (
-                            <Box display="flex" alignItems="center" gap={1}>
-                              <Box
-                                sx={{
-                                  width: 8,
-                                  height: 8,
-                                  borderRadius: "50%",
-                                  bgcolor: option.color,
-                                  flexShrink: 0,
-                                }}
-                              />
-                              <Typography variant="body2" noWrap>
-                                {option.label}
-                              </Typography>
-                            </Box>
-                          );
-                        }}
-                        onChange={(e) => handleStatusChange(category._id, item._id, e.target.value)}
+                  {category.items.map((item, index) => (
+                    <React.Fragment key={item.id}>
+                      <Grid
+                        container
+                        alignItems={isMobile || isTablet ? "flex-start" : "center"}
+                        spacing={isMobile || isTablet ? 1 : 0}
+                        py={0.6}
                       >
-                        <MenuItem value="IN_STOCK">
+                        <Grid item xs={12} sm={isTablet ? 6 : 7}>
                           <Box display="flex" alignItems="center" gap={1}>
-                            <Box sx={{ width: 8, height: 8, borderRadius: "50%", bgcolor: "green" }} />
-                            In Stock
+                            <HoverZoomImage
+                              src={item.image}
+                              size={34}
+                              zoomSize={200}
+                            />
+
+
+                            <Typography>{item.name}</Typography>
                           </Box>
-                        </MenuItem>
-                        <MenuItem value="OUT_OF_STOCK">
-                          <Box display="flex" alignItems="center" gap={1}>
-                            <Box sx={{ width: 8, height: 8, borderRadius: "50%", bgcolor: "red" }} />
-                            Out of Stock
-                          </Box>
-                        </MenuItem>
-                      </Select>
+                        </Grid>
+
+                        <Grid item xs={6} sm={isTablet ? 3 : 2} sx={{ mt: isMobile || isTablet ? 1 : 0 }}>
+                          <Typography textAlign={isMobile || isTablet ? "left" : "right"} sx={{ pr: isTablet ? 0 : 3 }}>
+                            ${item.price}
+                          </Typography>
+                        </Grid>
+
+                        <Grid
+                          item
+                          xs={6}
+                          sm={isTablet ? 3 : 2}
+                          sx={{ mt: isMobile || isTablet ? 1 : 0 }}
+                          display="flex"
+                          justifyContent={isMobile || isTablet ? "flex-start" : "flex-end"}
+                        >
+                          <Select
+                            size="small"
+                            value={item.itemStatus} // DB se aaya hua value
+                            disabled={updatingStatus === item._id} // progress ke waqt disable
+                            sx={{
+                              height: 32,
+                              width: 150,
+                              "& .MuiSelect-select": {
+                                display: "flex",
+                                alignItems: "center",
+                                gap: 1,
+                                paddingRight: "44px",
+                                whiteSpace: "nowrap",
+                                overflow: "hidden",
+                                textOverflow: "ellipsis",
+                              },
+                              "& .MuiSelect-icon": {
+                                right: 8,
+                                top: "50%",
+                                transform: "translateY(-50%)",
+                              },
+                            }}
+                            renderValue={(value) => {
+                              if (updatingStatus === item._id) {
+                                return <CircularProgress size={18} />;
+                              }
+                              const option = value === "IN_STOCK" ? STATUS_OPTIONS.in : STATUS_OPTIONS.out;
+                              return (
+                                <Box display="flex" alignItems="center" gap={1}>
+                                  <Box
+                                    sx={{
+                                      width: 8,
+                                      height: 8,
+                                      borderRadius: "50%",
+                                      bgcolor: option.color,
+                                      flexShrink: 0,
+                                    }}
+                                  />
+                                  <Typography variant="body2" noWrap>
+                                    {option.label}
+                                  </Typography>
+                                </Box>
+                              );
+                            }}
+                            onChange={(e) => handleStatusChange(category._id, item._id, e.target.value)}
+                          >
+                            <MenuItem value="IN_STOCK">
+                              <Box display="flex" alignItems="center" gap={1}>
+                                <Box sx={{ width: 8, height: 8, borderRadius: "50%", bgcolor: "green" }} />
+                                In Stock
+                              </Box>
+                            </MenuItem>
+                            <MenuItem value="OUT_OF_STOCK">
+                              <Box display="flex" alignItems="center" gap={1}>
+                                <Box sx={{ width: 8, height: 8, borderRadius: "50%", bgcolor: "red" }} />
+                                Out of Stock
+                              </Box>
+                            </MenuItem>
+                          </Select>
 
 
-                    </Grid>
+                        </Grid>
 
-                    <Grid
-                      item
-                      xs={12}
-                      sm={isTablet ? 12 : 1}
-                      sx={{ mt: isMobile || isTablet ? 1 : 0 }}
-                      display="flex"
-                      justifyContent={isMobile || isTablet ? "flex-start" : "flex-end"}
-                      gap={1}
-                    >
-                      <IconButton
-                        size="small"
-                        onClick={() => {
-                          setEditItemData(item);
-                          setActiveCategoryId(category._id);
-                          setOpenItemDialog(true);
-                        }}
-                      >
-                        <Edit fontSize="small" />
-                      </IconButton>
-                      <IconButton
-                        size="small"
-                        color="error"
-                        disabled={deletingId === item._id}
-                        onClick={() => handleDeleteItem(category._id, item._id)}
-                      >
-                        {deletingId === item._id ? <CircularProgress size={16} /> : <Delete fontSize="small" />}
-                      </IconButton>
+                        <Grid
+                          item
+                          xs={12}
+                          sm={isTablet ? 12 : 1}
+                          sx={{ mt: isMobile || isTablet ? 1 : 0 }}
+                          display="flex"
+                          justifyContent={isMobile || isTablet ? "flex-start" : "flex-end"}
+                          gap={1}
+                        >
+                          <IconButton
+                            size="small"
+                            onClick={() => {
+                              setEditItemData(item);
+                              setActiveCategoryId(category._id);
+                              setOpenItemDialog(true);
+                            }}
+                          >
+                            <Edit fontSize="small" />
+                          </IconButton>
+                          <IconButton
+                            size="small"
+                            color="error"
+                            disabled={deletingId === item._id}
+                            onClick={() => handleDeleteItem(category._id, item._id)}
+                          >
+                            {deletingId === item._id ? <CircularProgress size={16} /> : <Delete fontSize="small" />}
+                          </IconButton>
 
-                    </Grid>
-                  </Grid>
+                        </Grid>
+                      </Grid>
 
-                  {index !== category.items.length - 1 && <Divider sx={{ ml: isMobile ? 0 : 6 }} />}
-                </React.Fragment>
-              ))}
+                      {index !== category.items.length - 1 && <Divider sx={{ ml: isMobile ? 0 : 6 }} />}
+                    </React.Fragment>
+                  ))}
 
-              <Box
-                display="flex"
-                alignItems="center"
-                gap={1}
-                mt={1.5}
-                sx={{ cursor: "pointer" }}
-                onClick={() => {
-                  setEditItemData(null);
-                  setActiveCategoryId(category._id);
-                  setOpenItemDialog(true);
-                }}
-              >
-                <Add color="primary" />
-                <Typography color="primary">Add Item</Typography>
-              </Box>
-            </>
-          )}
-        </CardContent>
-      </Card>
-      );
-        })}
+                  <Box
+                    display="flex"
+                    alignItems="center"
+                    gap={1}
+                    mt={1.5}
+                    sx={{ cursor: "pointer" }}
+                    onClick={() => {
+                      setEditItemData(null);
+                      setActiveCategoryId(category._id);
+                      setOpenItemDialog(true);
+                    }}
+                  >
+                    <Add color="primary" />
+                    <Typography color="primary">Add Item</Typography>
+                  </Box>
+                </>
+              )}
+            </CardContent>
+          </Card>
+        );
+      })}
 
       <AddCategoryDialog
         open={openDialog}

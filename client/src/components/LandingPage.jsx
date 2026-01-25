@@ -14,11 +14,16 @@ import hero1 from "../assets/img/hero-carousel-1.jpg";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Link } from "react-router-dom";
+import { useAuth } from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
+
 
 const DEFAULT_API = process.env.REACT_APP_API_URL || "";
 
 const LandingPage = () => {
   // Contact form state
+  const { user } = useAuth();
+  const navigate = useNavigate();
   const [contactForm, setContactForm] = useState({
     name: '',
     email: '',
@@ -69,16 +74,37 @@ const LandingPage = () => {
 
   // AOS & Preloader
   useEffect(() => {
+    //AOS init
     AOS.init({ duration: 1000 });
 
+    // Preloader hide
     const hidePreloader = () => {
-      const preloader = document.getElementById('preloader');
-      if (preloader) preloader.classList.add('hidden');
+      const preloader = document.getElementById("preloader");
+      if (preloader) preloader.classList.add("hidden");
     };
 
-    document.addEventListener('DOMContentLoaded', hidePreloader);
+    document.addEventListener("DOMContentLoaded", hidePreloader);
     setTimeout(hidePreloader, 1000);
   }, []);
+
+
+  const handleLoginClick = (source) => {
+    if (!user) {
+      // First time login, open login page
+      navigate("/login", { state: { from: source } });
+      return;
+    }
+
+    // User already logged in, redirect to proper dashboard
+    if (source === "schedules") {
+      if (user.role === "admin") navigate("/admin/shops");
+      else navigate("/shops");
+      return;
+    }
+
+    if (user.role === "admin") navigate("/admin/dashboard");
+    else navigate("/client/dashboard");
+  };
 
   return (
     <div className="index-page" id="top">
@@ -90,7 +116,9 @@ const LandingPage = () => {
             <h1 className="sitename">Central Kitchen</h1>
           </a>
           <div className="auth-section">
-            <Link to="/login" className="btn login-btn">Log In</Link>
+             <button className="btn login-btn" onClick={() => handleLoginClick("login")}>
+              Log In
+            </button>
             <Link to="/signup" className="btn signup-btn">Register</Link>
           </div>
         </div>
@@ -108,8 +136,12 @@ const LandingPage = () => {
                 <li><a className="nav-link active" href="#hero">Home</a></li>
                 <li><a className="nav-link" href="#about">About</a></li>
                 <li><a className="nav-link" href="#contact">Contact</a></li>
-                <li><Link className='nav-link' to="/login" state={{from:"schedules"}}>Schedules</Link></li>
-              </ul>
+                  <li>
+                  <button className='nav-link' onClick={() => handleLoginClick("schedules")}>
+                    Schedules
+                  </button>
+                </li>
+              </ul> 
             </div>
           </div>
         </nav>
@@ -146,7 +178,7 @@ const LandingPage = () => {
           </div>
 
           {/* CTA Banner */}
-          <section className="cta-banner" id="membership" style={{marginTop:"30px"}}>
+          <section className="cta-banner" id="membership" style={{ marginTop: "30px" }}>
             <div className="cta-overlay">
               <h2>Become a Member</h2>
               <p>Our commissary kitchen is a licensed, commercial-grade facility...</p>

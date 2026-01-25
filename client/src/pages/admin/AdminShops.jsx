@@ -85,7 +85,7 @@ const AdminShops = () => {
             <div className="page-content">
                 <div style={{ marginTop: "24px", marginBottom: "5px" }}>
                     <h4 style={{ fontWeight: 600 }}>
-                        Categories
+                        Food Trucks
                     </h4>
                 </div>
                 <div className="shops-container">
@@ -106,7 +106,12 @@ const AdminShops = () => {
                                 <div key={shop._id} className="shop-card"
                                     onClick={() => {
                                         console.log("Navigating to shopId:", shop._id);
-                                        navigate(`/admin/categories/${shop._id}`)
+                                        navigate(`/admin/categories/${shop._id}`,{
+                                            state:{
+                                                shopName:shop.shopName,
+                                                ownerId: shop.userId, 
+                                            }
+                                        });
                                     }}>
                                     <img src={shop.shopImage} alt={shop.shopName} />
 

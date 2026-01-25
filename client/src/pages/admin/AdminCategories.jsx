@@ -16,20 +16,23 @@ import {
   Skeleton,
   Button
 } from "@mui/material";
-import { KeyboardArrowDown, KeyboardArrowRight, Edit, Delete } from "@mui/icons-material";
+import { KeyboardArrowDown, KeyboardArrowRight, Edit, Delete, Add } from "@mui/icons-material";
 import AddEditItemDialog from "../../components/AddEditItemDialog";
 import axios from "axios";
-import { useAuth } from "../../context/AuthContext";
-import { useParams } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import { ArrowBack } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
+import HoverZoomImage from "../../components/HoverZoomImage";
+import AddCategoryDialog from "../../components/AddCategoryDialog";
 
 
 const DEFAULT_API = process.env.REACT_APP_API_URL || "";
 
 const AdminCategories = () => {
-  const { user } = useAuth();
   const { shopId } = useParams();
+  const location = useLocation();
+  const shopName = location.state?.shopName || "Shop";
+  const shopOwnerId = location.state?.ownerId;
 
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -39,6 +42,7 @@ const AdminCategories = () => {
   const [openItemDialog, setOpenItemDialog] = useState(false);
   const [editItemData, setEditItemData] = useState(null);
   const [activeCategoryId, setActiveCategoryId] = useState(null);
+  const [openDialog, setOpenDialog] = useState(false);
   const navigate = useNavigate();
 
   const theme = useTheme();
@@ -129,18 +133,44 @@ const AdminCategories = () => {
 
   return (
     <Box p={{ xs: 2, md: 3 }}>
-      <Box display="flex" alignItems="center" gap={1} mb={3}>
-        <IconButton
-          size="small"
-          onClick={() => navigate(-1)}  
+      <Box mb={3}>
+        <Box
+          display="flex"
+          alignItems="center"
+          gap={1}
         >
-          <ArrowBack />
-        </IconButton>
+          <IconButton size="small" onClick={() => navigate(-1)}>
+            <ArrowBack />
+          </IconButton>
 
-        <Typography variant={isMobile ? "h6" : "h5"}>
-          Edit Categories
-        </Typography>
+          <Typography variant={isMobile ? "h6" : "h5"}>
+            {shopName}
+          </Typography>
+
+          {!isMobile && (
+            <Button
+              variant="contained"
+              startIcon={<Add />}
+              sx={{ color: "white", ml: "auto" }}
+              onClick={() => setOpenDialog(true)}
+            >
+              Add Category
+            </Button>
+          )}
+        </Box>
+        {isMobile && (
+          <Button
+            variant="contained"
+            startIcon={<Add />}
+            fullWidth
+            sx={{ color: "white", mt: 1 }}
+            onClick={() => setOpenDialog(true)}
+          >
+            Add Category
+          </Button>
+        )}
       </Box>
+
 
 
       {loading &&
@@ -286,7 +316,11 @@ const AdminCategories = () => {
                         >
                           <Grid item xs={12} sm={isTablet ? 6 : 7}>
                             <Box display="flex" alignItems="center" gap={1}>
-                              <Avatar variant="rounded" sx={{ width: 34, height: 34 }} src={item.image || ""} />
+                              <HoverZoomImage
+                                src={item.image}
+                                size={34}
+                                zoomSize={200}
+                              />
                               <Typography>{item.name}</Typography>
                             </Box>
                           </Grid>
@@ -370,12 +404,37 @@ const AdminCategories = () => {
                         {index !== category.items.length - 1 && <Divider sx={{ ml: isMobile ? 0 : 6 }} />}
                       </React.Fragment>
                     ))}
+
+                    <Box
+                      display="flex"
+                      alignItems="center"
+                      gap={1}
+                      mt={1.5}
+                      sx={{ cursor: "pointer" }}
+                      onClick={() => {
+                        setEditItemData(null);
+                        setActiveCategoryId(category._id);
+                        setOpenItemDialog(true);
+                      }}
+                    >
+                      <Add color="primary" />
+                      <Typography color="primary">Add Item</Typography>
+                    </Box>
                   </>
                 )}
               </CardContent>
             </Card>
           );
         })}
+
+      <AddCategoryDialog
+        open={openDialog}
+        handleClose={() => setOpenDialog(false)}
+        ownerId={shopOwnerId}
+        handleCreate={(newCategory) => {
+          fetchCategories();
+        }}
+      />
 
       <AddEditItemDialog
         open={openItemDialog}

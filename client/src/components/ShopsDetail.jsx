@@ -20,7 +20,8 @@ import {
   ArrowBack,
 } from "@mui/icons-material";
 import axios from "axios";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
+import HoverZoomImage from "./HoverZoomImage";
 
 const DEFAULT_API = process.env.REACT_APP_API_URL || "";
 
@@ -32,6 +33,8 @@ const STATUS_OPTIONS = {
 const ShopsDetail = () => {
   const { shopId } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
+  const shopName = location.state?.shopName || "Shop";
 
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
@@ -50,6 +53,7 @@ const ShopsDetail = () => {
         `${DEFAULT_API}/api/categories/all/${shopId}`
       );
       setCategories(res.data.categories || []);
+
     } catch (err) {
       console.error(err);
     } finally {
@@ -78,7 +82,10 @@ const ShopsDetail = () => {
           </Grid>
           <Grid item xs={8}>
             <Typography textAlign="center" fontWeight="bold" variant="h6">
-              Categories
+              {shopName}
+            </Typography>
+            <Typography sx={{ py: 1 }} textAlign="center" variant="body2" color="primary">
+              Menu Items
             </Typography>
           </Grid>
         </Grid>
@@ -99,10 +106,10 @@ const ShopsDetail = () => {
 
       {/* EMPTY */}
       {!loading && categories.length === 0 && (
-        <Typography textAlign="center">No categories found</Typography>
+        <Typography textAlign="center">No Menus found</Typography>
       )}
 
-  
+
       {!loading &&
         categories.map((category) => {
           const isOpen = openCard === category._id;
@@ -132,7 +139,7 @@ const ShopsDetail = () => {
                       </Grid>
                       <Grid item sm={2}>
                         {isOpen && (
-                          <Typography fontWeight="bold" textAlign="right" sx={{pr:3}}>
+                          <Typography fontWeight="bold" textAlign="right" sx={{ pr: 3 }}>
                             Status
                           </Typography>
                         )}
@@ -161,27 +168,37 @@ const ShopsDetail = () => {
                   </Grid>
                 </Grid>
 
-              
+
                 {isOpen && (
                   <>
                     <Divider sx={{ my: 1 }} />
 
+                    {category.items.length === 0 && (
+                      <Typography
+                        textAlign="center"
+                        color="text.secondary"
+                        sx={{ py: 2 }}
+                      >
+                        No items found
+                      </Typography>
+                    )}
+
                     {category.items.map((item, index) => (
                       <React.Fragment key={item._id}>
                         <Grid container spacing={2} alignItems="center" py={1}>
-                    
+
                           <Grid item xs={12} sm={6}>
                             <Box display="flex" alignItems="center" gap={1}>
-                              <Avatar
-                                variant="rounded"
-                                src={item.image || ""}
-                                sx={{ width: 36, height: 36 }}
+                              <HoverZoomImage
+                                src={item.image}
+                                size={34}
+                                zoomSize={200}
                               />
                               <Typography>{item.name}</Typography>
                             </Box>
                           </Grid>
 
-                      
+
                           <Grid item xs={6} sm={2}>
                             <Typography
                               textAlign={isDesktop ? "right" : "left"}
@@ -190,7 +207,7 @@ const ShopsDetail = () => {
                             </Typography>
                           </Grid>
 
-                      
+
                           <Grid item xs={6} sm={2}>
                             <Box
                               display="flex"
@@ -219,7 +236,7 @@ const ShopsDetail = () => {
                             </Box>
                           </Grid>
 
-                      
+
                           {/* <Grid item xs={12} sm={2}>
                             <Box
                               display="flex"

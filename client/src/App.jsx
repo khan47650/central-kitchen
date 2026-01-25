@@ -45,16 +45,6 @@ function App() {
 }
 
 function AppWithAuth() {
-  const { user, justLoggedIn, setJustLoggedIn } = useContext(AuthContext);
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    if (user && justLoggedIn) {
-      if (user.role === 'admin') navigate('/admin/dashboard');
-      else if (user.role === 'client') navigate('/client/dashboard');
-      setJustLoggedIn(false);
-    }
-  }, [user, justLoggedIn, navigate, setJustLoggedIn]);
 
   return <AppRoutes />;
 }

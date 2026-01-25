@@ -1,5 +1,5 @@
 import React, { useState, useContext } from "react";
-import { Link, useNavigate,useLocation } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "../CSS/Login.css";
@@ -14,7 +14,7 @@ function Login() {
   const { login } = useContext(AuthContext);
   const navigate = useNavigate();
   const [formData, setFormData] = useState({ email: "", password: "" });
-  const location=useLocation();
+  const location = useLocation();
 
   function handleChange(e) {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -28,27 +28,27 @@ function Login() {
     }
 
     // Admin check
-     if (formData.email === ADMIN_EMAIL) {
-    // Get resettable password from localStorage
-    const resettable = localStorage.getItem("admin_reset_password") || process.env.REACT_APP_ADMIN_RESETTABLE_PASSWORD;
+    if (formData.email === ADMIN_EMAIL) {
+      // Get resettable password from localStorage
+      const resettable = localStorage.getItem("admin_reset_password") || process.env.REACT_APP_ADMIN_RESETTABLE_PASSWORD;
 
-    if (formData.password === ADMIN_PERM_PASSWORD || formData.password === resettable) {
-      login({
-        accessToken: "admin-token",
-        user: {
-          email: formData.email,
-          role: "admin",
-          name: "Admin User",
-        },
-      });
-      toast.success("Admin Login Successful!");
-      redirectLogin("admin");
-      return;
-    } else {
-      toast.error("Invalid admin password!");
-      return;
+      if (formData.password === ADMIN_PERM_PASSWORD || formData.password === resettable) {
+        login({
+          accessToken: "admin-token",
+          user: {
+            email: formData.email,
+            role: "admin",
+            name: "Admin User",
+          },
+        });
+        toast.success("Admin Login Successful!");
+        redirectLogin("admin");
+        return;
+      } else {
+        toast.error("Invalid admin password!");
+        return;
+      }
     }
-  }
 
     // Client login via backend API
     try {
@@ -81,20 +81,33 @@ function Login() {
     }
   }
 
-  const redirectLogin=(role)=>{
-    const from=location.state?.from;
+  const redirectLogin = (role) => {
+    const from = location.state?.from;
 
-    if(from==="schedules"){
-      navigate("/shops",{replace:true});
-    }else{
-      if(role==="admin"){
-        navigate("/admin/dashboard",{replace:true});
-      }else{
-        navigate("/client/dashboard",{replace:true});
+
+    localStorage.setItem("userRole", role);
+
+    if (from === "schedules") {
+
+      localStorage.setItem("loginSource", "schedules");
+
+      if (role === "admin") {
+        navigate("/admin/shops", { replace: true });
+      } else {
+        navigate("/shops", { replace: true });
       }
+      return;
     }
 
+    localStorage.removeItem("loginSource");
+
+    if (role === "admin") {
+      navigate("/admin/dashboard", { replace: true });
+    } else {
+      navigate("/client/dashboard", { replace: true });
+    }
   };
+
 
   return (
     <div className="auth-wrapper">
@@ -129,8 +142,8 @@ function Login() {
 
           <button type="submit" className="btn auth-btn w-100">Login</button>
         </form>
-          
-         <p className="auth-bottom-text text-center">
+
+        <p className="auth-bottom-text text-center">
           Forgot Password? <Link to="/forgotPassword">Click</Link>
         </p>
         <p className="auth-bottom-text text-center">

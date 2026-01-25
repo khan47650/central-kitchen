@@ -4,7 +4,7 @@ import { AuthContext } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 
 const ShopsTopbar = () => {
-  const { user, logout } = useContext(AuthContext);
+  const { user, logout, loading } = useContext(AuthContext); // loading bhi le liya
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -41,7 +41,7 @@ const ShopsTopbar = () => {
           variant="body1"
           sx={{ fontWeight: 500, color: "text.secondary" }}
         >
-          Hello, {user?.role === "admin" ? "Admin" : user?.name || "Guest"}
+          {loading ? "Loading..." : `Hello, ${user?.fullName || "Guest"}`}
         </Typography>
 
         <Button

@@ -18,13 +18,14 @@ import { ToastContainer, toast } from "react-toastify";
 
 const DEFAULT_API = process.env.REACT_APP_API_URL || "";
 
-const AddCategoryDialog = ({ open, handleClose, handleCreate }) => {
+const AddCategoryDialog = ({ open, handleClose, handleCreate ,ownerId}) => {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [loading, setLoading] = useState(false);
   const { user } = useAuth();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const finalUserId = ownerId || user?._id;
 
 
 
@@ -52,7 +53,7 @@ const AddCategoryDialog = ({ open, handleClose, handleCreate }) => {
 
   const handleCreateCategory = async ({ name, description }) => {
     const res = await axios.post(
-      `${DEFAULT_API}/api/categories/add/${user._id}`,
+      `${DEFAULT_API}/api/categories/add/${finalUserId}`,
       { categoryName: name, categoryDescription: description || "" },
       { headers: { "Content-Type": "application/json" } }
     );

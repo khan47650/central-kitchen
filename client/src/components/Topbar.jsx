@@ -1,12 +1,11 @@
 import React, { useContext } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { AppBar, Toolbar, Typography, Box, IconButton } from '@mui/material';
 import { AuthContext } from '../context/AuthContext';
 import MenuIcon from '@mui/icons-material/Menu';
 import '../Styles/topbar.css'; 
 
 const Topbar = ({ mobileOpen, setMobileOpen }) => {
-  const { user, logout } = useContext(AuthContext);
+  const { user, logout, loading } = useContext(AuthContext); 
   const drawerWidth = 240;
 
   const handleLogout = () => {
@@ -47,7 +46,7 @@ const Topbar = ({ mobileOpen, setMobileOpen }) => {
 
         <Box className="topbar-right">
           <Typography className="topbar-greeting">
-            Hello, {user?.name || user?.role || 'guest'}!
+            {loading ? "Loading..." : `Hello, ${user?.fullName  || user?.role || 'Guest'}!`}
           </Typography>
 
           <button className="topbar-logout" onClick={handleLogout}>
