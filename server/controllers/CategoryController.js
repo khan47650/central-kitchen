@@ -98,7 +98,7 @@ exports.getShopCategories = async (req, res) => {
   try {
     const { shopId } = req.params;
 
-    const categories = await Category.find({ shopId: shopId }).lean();
+    const categories = await Category.find({ shopId: shopId }).populate("shopId", "shopName").lean();
     res.status(200).json({ categories });
   } catch (error) {
     console.error("Server error", error);
