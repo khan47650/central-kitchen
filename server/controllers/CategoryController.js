@@ -135,9 +135,9 @@ exports.addItem = async (req, res) => {
     const { categoryId } = req.params;
     const { name, price, description, itemStatus } = req.body;
 
-    if (!name || !price) {
+    if (!name) {
       return res.status(400).json({
-        message: "Item name and price are required",
+        message: "Item name is required",
       });
     }
 

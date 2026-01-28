@@ -4,8 +4,8 @@ const mongoose = require('mongoose');
 const ItemSchema = new mongoose.Schema({
     image: { type: String, required: true },
     name: { type: String, required: true },
-    price: { type: Number, required: true },
-    description: { type: String, required: true },
+    price: { type: Number},
+    description: { type: String},
     itemStatus: {
         type: String,
         enum: ["IN_STOCK", "OUT_OF_STOCK"],
