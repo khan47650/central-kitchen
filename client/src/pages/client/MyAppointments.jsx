@@ -14,12 +14,15 @@ import {
   Toolbar,
   Button,
   Skeleton,
-  useMediaQuery
+  useMediaQuery,
+  IconButton
 } from '@mui/material';
 import axios from 'axios';
 import moment from 'moment-timezone';
 import { useTheme } from '@mui/material/styles';
 import { useSearchParams } from 'react-router-dom';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import { useNavigate } from 'react-router-dom';
 
 
 
@@ -33,7 +36,8 @@ const MyAppointments = () => {
   const [rowsPerPage, setRowsPerPage] = useState(30);
   const [loading, setLoading] = useState(true);
   const [searchParams] = useSearchParams();
-  const type = searchParams.get('type'); // null | upcoming | completed
+  const type = searchParams.get('type');
+  const navigate=useNavigate();
 
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
@@ -118,9 +122,20 @@ const MyAppointments = () => {
   return (
     <Box p={isMobile ? 1 : 3}>
       <Toolbar>
-        <Typography variant={isMobile ? 'h6' : 'h5'}>
-          {heading}
-        </Typography>
+        <Box sx={{
+          borderRadius: 3,
+          display: 'flex',
+          alignItems: 'center',
+          gap: 2
+        }}>
+
+          <IconButton onClick={() => navigate(-1)}>
+            <ArrowBackIcon />
+          </IconButton>
+          <Typography variant={isMobile ? 'h6' : 'h5'}>
+            {heading}
+          </Typography>
+        </Box>
 
       </Toolbar>
 

@@ -67,8 +67,8 @@ const AddEditItemDialog = ({ open, onClose, itemData, categoryId, onSuccess }) =
 
 
   const handleSubmit = async () => {
-    if (!name || !price || (!imageFile && !imagePreview)) {
-      toast.error("Item name , price & image are required");
+    if (!name || (!imageFile && !imagePreview)) {
+      toast.error("Item name and image are required");
       return;
     }
 

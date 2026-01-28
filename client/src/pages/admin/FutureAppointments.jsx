@@ -1,13 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import {
   Table, TableHead, TableRow, TableCell, TableBody, TablePagination, Typography, Box,
-  Button, Skeleton
+  Button, Skeleton,
+  IconButton
 } from '@mui/material';
 import moment from 'moment-timezone';
 import axios from 'axios';
 import { useMediaQuery, TableContainer } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import SlotDetailsDialog from '../../components/SlotDetailsDialog';
+import { useNavigate } from 'react-router-dom';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 
 const DEFAULT_API = process.env.REACT_APP_API_URL || "";
@@ -25,6 +28,7 @@ const FutureAppointments = () => {
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const [selectedSlot, setSelectedSlot] = useState(null);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const navigate=useNavigate();
 
 
 
@@ -90,7 +94,7 @@ const FutureAppointments = () => {
     return `${hour}:${minute} ${ampm}`;
   };
 
-  
+
   const handleViewDetails = (slot) => {
     const formattedSlot = {
       ...slot,
@@ -115,9 +119,21 @@ const FutureAppointments = () => {
 
   return (
     <Box p={3}>
-      <Typography variant={isMobile ? 'h6' : 'h5'} gutterBottom>
-        Future Appointments
-      </Typography>
+      <Box sx={{
+        mb: 3,
+        borderRadius: 3,
+        display: 'flex',
+        alignItems: 'center',
+        gap: 2
+      }}>
+
+        <IconButton onClick={() => navigate(-1)}>
+          <ArrowBackIcon />
+        </IconButton>
+        <Typography variant={isMobile ? 'h6' : 'h5'}>
+          Future Appointments
+        </Typography>
+      </Box>
 
 
       <TableContainer sx={{ maxWidth: '100%', overflowX: 'auto' }}>

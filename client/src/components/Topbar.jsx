@@ -2,14 +2,16 @@ import React, { useContext } from 'react';
 import { AppBar, Toolbar, Typography, Box, IconButton } from '@mui/material';
 import { AuthContext } from '../context/AuthContext';
 import MenuIcon from '@mui/icons-material/Menu';
-import '../Styles/topbar.css'; 
+import '../Styles/topbar.css';
+import { replace, useNavigate } from 'react-router-dom';
 
 const Topbar = ({ mobileOpen, setMobileOpen }) => {
-  const { user, logout, loading } = useContext(AuthContext); 
+  const { user, logout, loading } = useContext(AuthContext);
   const drawerWidth = 240;
+  const navigate=useNavigate();
 
   const handleLogout = () => {
-    logout(); 
+    logout();
   };
 
   return (
@@ -46,9 +48,12 @@ const Topbar = ({ mobileOpen, setMobileOpen }) => {
 
         <Box className="topbar-right">
           <Typography className="topbar-greeting">
-            {loading ? "Loading..." : `Hello, ${user?.fullName  || user?.role || 'Guest'}!`}
+            {loading ? "Loading..." : `Hello, ${user?.fullName || user?.role || 'Guest'}!`}
           </Typography>
 
+          <button className="topbar-home" onClick={()=>navigate('/',{replace:true})}>
+            Home
+          </button>
           <button className="topbar-logout" onClick={handleLogout}>
             Logout
           </button>

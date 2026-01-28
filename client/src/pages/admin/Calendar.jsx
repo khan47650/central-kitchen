@@ -1,10 +1,12 @@
 import React, { useState, useContext, useEffect } from 'react';
-import { Box, Typography, Button, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
+import { Box, Typography, Button, Dialog, DialogTitle, DialogContent, DialogActions, IconButton } from '@mui/material';
 import CalendarGrid from '../../components/CalendarGrid';
 import BookSlotModal from '../../components/BookSlotModal';
 import { AuthContext } from '../../context/AuthContext';
 import WeekNavigator from '../../components/WeekNavigator';
 import axios from 'axios';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import { useNavigate } from 'react-router-dom';
 
 const DEFAULT_API = process.env.REACT_APP_API_URL || "";
 const TOPBAR_HEIGHT = 64;
@@ -19,6 +21,7 @@ const Calendar = () => {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [slotToDelete, setSlotToDelete] = useState(null);
   const [deleting, setDeleting] = useState(false);
+  const navigate = useNavigate();
 
 
   const fetchSlots = async () => {
@@ -66,7 +69,7 @@ const Calendar = () => {
 
   const confirmDeleteSlot = async () => {
     try {
-       setDeleting(true);
+      setDeleting(true);
       await axios.delete(`${DEFAULT_API}/api/slots/delete/${slotToDelete._id}`);
 
       setSlots(prev =>
@@ -77,9 +80,9 @@ const Calendar = () => {
       setSlotToDelete(null);
     } catch (err) {
       console.error(err);
-    }finally {
-    setDeleting(false);
-  }
+    } finally {
+      setDeleting(false);
+    }
   };
 
 
@@ -111,9 +114,19 @@ const Calendar = () => {
           mb: 2,
         }}
       >
-        <Typography variant="h5" fontWeight={700}>
-           Hello, {user?.role === 'admin' ? 'Admin' : user?.name || 'Client'}
-        </Typography>
+        <Box sx={{
+          borderRadius: 3,
+          display: 'flex',
+          alignItems: 'center',
+          gap: 2
+        }}>
+          <IconButton onClick={() => navigate(-1)}>
+            <ArrowBackIcon />
+          </IconButton>
+          <Typography variant="h5" fontWeight={700}>
+            Hello, {user?.role === 'admin' ? 'Admin' : user?.fullName || 'Client'}
+          </Typography>
+        </Box>
 
         <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
           <Button
@@ -178,7 +191,7 @@ const Calendar = () => {
         </DialogContent>
 
         <DialogActions>
-          <Button onClick={() => setDeleteDialogOpen(false)}  disabled={deleting}>
+          <Button onClick={() => setDeleteDialogOpen(false)} disabled={deleting}>
             No
           </Button>
 
@@ -188,7 +201,7 @@ const Calendar = () => {
             onClick={confirmDeleteSlot}
             disabled={deleting}
           >
-           {deleting ? "Deleting..." : "Yes"}
+            {deleting ? "Deleting..." : "Yes"}
           </Button>
         </DialogActions>
       </Dialog>

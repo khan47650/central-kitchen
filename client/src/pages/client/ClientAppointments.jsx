@@ -15,13 +15,15 @@ import {
   TablePagination,
   Button,
   Toolbar,
-  Skeleton
+  Skeleton,
+  IconButton
 } from '@mui/material';
 import { AuthContext } from '../../context/AuthContext';
 import moment from 'moment-timezone';
 import { useMediaQuery, } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import SlotDetailsDialog from '../../components/SlotDetailsDialog';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 const AZ_TIMEZONE = 'America/Phoenix';
 
@@ -89,7 +91,7 @@ const ClientAppointments = () => {
     fetchUsersAndAppointments();
   }, []);
 
-  
+
   const formatTime12Hour = (time24) => {
     if (!time24 || time24 === '-') return '-';
     const [hourStr, minute] = time24.split(':');
@@ -122,9 +124,21 @@ const ClientAppointments = () => {
 
   return (
     <Box p={isMobile ? 1 : 3}>
-      <Typography variant={isMobile ? 'h6' : 'h5'} sx={{ mb: 2 }} noWrap>
-        All Appointments
-      </Typography>
+      <Box sx={{
+        mb: 3,
+        borderRadius: 3,
+        display: 'flex',
+        alignItems: 'center',
+        gap: 2
+      }}>
+
+        <IconButton onClick={() => navigate(-1)}>
+          <ArrowBackIcon />
+        </IconButton>
+        <Typography variant={isMobile ? 'h6' : 'h5'}>
+          All Appointments
+        </Typography>
+      </Box>
 
 
       <TableContainer sx={{ maxWidth: '100%', overflowX: 'auto' }}>
@@ -169,7 +183,7 @@ const ClientAppointments = () => {
                       <Button
                         variant="contained"
                         size="small"
-                        sx={{ minWidth: isMobile ? 60 : 120 ,color:'white'}}
+                        sx={{ minWidth: isMobile ? 60 : 120, color: 'white' }}
                         onClick={() => handleViewDetails(appt)}
                       >
                         {isMobile ? 'VIEW' : 'VIEW DETAILS'}

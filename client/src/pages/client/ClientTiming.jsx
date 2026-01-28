@@ -15,7 +15,8 @@ import {
   MenuItem,
   Skeleton,
   useMediaQuery,
-  CircularProgress
+  CircularProgress,
+  IconButton
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import EditIcon from '@mui/icons-material/Edit';
@@ -24,6 +25,9 @@ import AddShopDialog from '../../components/AddShopDialog';
 import { useAuth } from "../../context/AuthContext";
 import axios from 'axios';
 import moment from 'moment-timezone';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import { useNavigate } from 'react-router-dom';
+
 
 const TIME_OPTIONS = Array.from({ length: 15 }, (_, i) => {
   const hour = 6 + i;
@@ -50,6 +54,7 @@ const ClientTimings = () => {
   const [openDialog, setOpenDialog] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [savingId, setSavingId] = useState(null);
+  const navigate=useNavigate();
 
   const fileInputRef = useRef(null);
   const activeShopIndex = useRef(null);
@@ -242,9 +247,21 @@ const ClientTimings = () => {
       />
 
       <Box display="flex" justifyContent="space-between" mb={2}>
-        <Typography variant={isMobile ? 'h6' : 'h5'}>
-          Client Timings
-        </Typography>
+        <Box
+          sx={{
+            borderRadius: 3,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 2
+          }}
+        >
+          <IconButton onClick={() => navigate(-1)}>
+            <ArrowBackIcon />
+          </IconButton>
+          <Typography variant={isMobile ? 'h6' : 'h5'}>
+            Client Timings
+          </Typography>
+        </Box>
 
         {!loading && shops.length === 0 && (
           <Button

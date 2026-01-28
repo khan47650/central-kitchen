@@ -2,8 +2,10 @@ import React, { useEffect, useState } from "react";
 import "../../CSS/Shops.css";
 import axios from "axios";
 import moment from "moment-timezone";
-import { Skeleton } from "@mui/material";
+import { Skeleton,IconButton } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import { ArrowBack } from "@mui/icons-material";
+
 
 const DEFAULT_API = process.env.REACT_APP_API_URL || "";
 const AZ_TIMEZONE = "America/Phoenix";
@@ -83,8 +85,11 @@ const AdminShops = () => {
     return (
         <div className="page-wrapper">
             <div className="page-content">
-                <div style={{ marginTop: "24px", marginBottom: "5px" }}>
-                    <h4 style={{ fontWeight: 600 }}>
+                <div style={{ marginTop: "24px", marginBottom: "5px", display:"flex"}}>
+                      <IconButton size="small" onClick={() => navigate(-1)}>
+                                <ArrowBack />
+                              </IconButton>
+                    <h4 style={{ fontWeight: 600 ,paddingLeft:"20px" ,paddingTop:"5px"}}>
                         Food Trucks
                     </h4>
                 </div>

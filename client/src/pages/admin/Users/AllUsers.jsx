@@ -8,12 +8,15 @@ import {
   TableCell,
   TableBody,
   TablePagination,
-  Button
+  Button,
+  IconButton
 } from '@mui/material';
 import axios from 'axios';
 import { Skeleton } from "@mui/material";
 import { useTheme, useMediaQuery, TableContainer } from '@mui/material';
 import UserDetailsDialog from '../../../components/UserDetailsDialog';
+import { useNavigate } from 'react-router-dom';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 
 
@@ -26,6 +29,7 @@ const AllUsers = () => {
   const [selectedUser, setSelectedUser] = useState(null);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const navigate=useNavigate();
 
 
 
@@ -79,9 +83,21 @@ const AllUsers = () => {
 
   return (
     <Box p={3}>
-      <Typography variant={isMobile ? 'h6' : 'h5'} gutterBottom>
-        All Users
-      </Typography>
+      <Box sx={{
+        mb: 3,
+        borderRadius: 3,
+        display: 'flex',
+        alignItems: 'center',
+        gap: 2
+      }}>
+
+        <IconButton onClick={()=>navigate(-1)}>
+        <ArrowBackIcon/>
+        </IconButton>
+        <Typography variant={isMobile ? 'h6' : 'h5'}>
+          All Users
+        </Typography>
+      </Box>
 
 
       <TableContainer sx={{ maxWidth: '100%', overflowX: 'auto' }}>

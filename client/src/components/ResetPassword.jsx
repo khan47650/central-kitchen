@@ -4,7 +4,10 @@ import "react-toastify/dist/ReactToastify.css";
 import { Link, replace, useNavigate } from "react-router-dom";
 import logo from "../assets/img/logo3.png";
 import { AuthContext } from "../context/AuthContext";
-import { Box, useTheme, useMediaQuery } from "@mui/material";
+import "../CSS/authWrapper.css"
+import { Box, useTheme, useMediaQuery, IconButton, Typography } from "@mui/material";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+
 
 
 const DEFAULT_API = process.env.REACT_APP_API_URL || "";
@@ -21,15 +24,15 @@ const ResetPassword = () => {
     e.preventDefault();
 
     // If Admin
-   if (user.role === "admin") {
-    // Update only resettable password
-    localStorage.setItem("admin_reset_password", password);
-    toast.success("Admin resettable password updated!", {
-      onClose: () => navigate("/admin/dashboard", { replace: true }),
-      autoClose: 1200,
-    });
-    return;
-  }
+    if (user.role === "admin") {
+      // Update only resettable password
+      localStorage.setItem("admin_reset_password", password);
+      toast.success("Admin resettable password updated!", {
+        onClose: () => navigate("/admin/dashboard", { replace: true }),
+        autoClose: 1200,
+      });
+      return;
+    }
 
     // Client API call
     try {
@@ -45,48 +48,66 @@ const ResetPassword = () => {
 
       if (res.ok) {
         toast.success("Password updated successfully!", {
-       onClose: () => navigate("/client/dashboard", { replace: true }),
-      autoClose: 1200
-       });
-} else {
-  toast.error(data.message || "Error updating password");
-}
+          onClose: () => navigate("/client/dashboard", { replace: true }),
+          autoClose: 1200
+        });
+      } else {
+        toast.error(data.message || "Error updating password");
+      }
 
 
     } catch (error) {
       console.log("User object:", user);
       console.log("User ID:", user?._id);
-   
+
       toast.error("Something went wrong!");
     }
   };
 
   return (
-    <div className="auth-wrapper">
-      <ToastContainer autoClose={2000} />
-      <div className="auth-card">
-        <div className="text-center mb-4">
-          <img src={logo} alt="Logo" className="auth-logo" />
-          <h3 className="auth-title mt-2">Reset Password</h3>
-          <p className="auth-subtext">Enter your new password below</p>
+    <Box >
+      <Box sx={{
+        mb: 3,
+        p: 2,
+        borderRadius: 3,
+        display: "flex",
+        alignItems: "center",
+        gap: 2,
+      }}>
+        <IconButton onClick={() => navigate(-1)}>
+          <ArrowBackIcon />
+        </IconButton>
+        <Typography variant={isMobile ? 'h6' : 'h5'}>
+          Reset Password
+        </Typography>
+      </Box>
+      
+      <div className="auth-wrapper">
+        <ToastContainer autoClose={2000} />
+        <div className="auth-card">
+          <div className="text-center mb-4">
+            <img src={logo} alt="Logo" className="auth-logo" />
+            <h3 className="auth-title mt-2">Reset Password</h3>
+            <p className="auth-subtext">Enter your new password below</p>
+          </div>
+
+          <form onSubmit={handleSubmit}>
+            <label className="fw-semibold mb-1">New Password</label>
+            <input
+              type="password"
+              className="form-control mb-4"
+              placeholder="Enter new password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+
+            <button type="submit" className="btn auth-btn w-100">
+              Update Password
+            </button>
+          </form>
         </div>
-
-        <form onSubmit={handleSubmit}>
-          <label className="fw-semibold mb-1">New Password</label>
-          <input
-            type="password"
-            className="form-control mb-4"
-            placeholder="Enter new password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-
-          <button type="submit" className="btn auth-btn w-100">
-            Update Password
-          </button>
-        </form>
       </div>
-    </div>
+    </Box>
   );
 };
 

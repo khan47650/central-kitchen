@@ -21,6 +21,10 @@ import { useTheme } from '@mui/material/styles';
 import EditIcon from '@mui/icons-material/Edit';
 import axios from 'axios';
 import moment from 'moment-timezone';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import IconButton from '@mui/material/IconButton';
+import { useNavigate } from 'react-router-dom';
+
 
 const TIME_OPTIONS = Array.from({ length: 15 }, (_, i) => {
     const hour = 6 + i;
@@ -45,6 +49,7 @@ const AdminTimings = () => {
     const [loading, setLoading] = useState(true);
     const [savingId, setSavingId] = useState(null);
     const [deleteLoading, setDeleteLoading] = useState(false);
+    const navigate = useNavigate();
 
     const fileInputRef = useRef(null);
     const activeShopIndex = useRef(null);
@@ -155,7 +160,27 @@ const AdminTimings = () => {
     }
 
     return (
+
         <Box p={isMobile ? 1 : 3}>
+            {/* TOP HEADER */}
+            <Box
+                sx={{
+                    mb: 3,
+                    borderRadius: 3,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 2
+                }}
+            >
+                <IconButton onClick={() => navigate(-1)}>
+                    <ArrowBackIcon />
+                </IconButton>
+
+                <Typography variant={isMobile ? 'h6' : 'h5'}>
+                    Timings
+                </Typography>
+            </Box>
+
             <input type="file" hidden ref={fileInputRef} accept="image/*" onChange={handleImageChange} />
 
             {shops.length === 0 && <Typography align="center" color="text.secondary">No shops found</Typography>}

@@ -21,6 +21,8 @@ import AddCategoryDialog from "../../components/AddCategoryDialog";
 import AddEditItemDialog from "../../components/AddEditItemDialog";
 import axios from "axios";
 import { useAuth } from "../../context/AuthContext";
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import { useNavigate } from 'react-router-dom';
 import HoverZoomImage from "../../components/HoverZoomImage";
 
 const DEFAULT_API = process.env.REACT_APP_API_URL || "";
@@ -35,6 +37,7 @@ const MyCategories = () => {
   const [activeCategoryId, setActiveCategoryId] = useState(null);
   const [updatingStatus, setUpdatingStatus] = useState(null);
   const [hasShop, setHasShop] = useState(false);
+  const navigate = useNavigate();
 
 
 
@@ -151,7 +154,19 @@ const MyCategories = () => {
         gap={2}
         mb={3}
       >
-        <Typography variant={isMobile ? "h6" : "h5"}>My Categories</Typography>
+        <Box sx={{
+          borderRadius: 3,
+          display: 'flex',
+          alignItems: 'center',
+          gap: 2
+        }}>
+
+          <IconButton onClick={()=>navigate(-1)}>
+            <ArrowBackIcon />
+          </IconButton>
+
+          <Typography variant={isMobile ? "h6" : "h5"}>My Categories</Typography>
+        </Box>
         {hasShop && (
           <Button
             variant="contained"

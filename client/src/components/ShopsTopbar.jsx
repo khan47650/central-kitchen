@@ -1,11 +1,14 @@
 import React, { useContext } from "react";
-import { Box, Typography, Button } from "@mui/material";
+import { Box, Typography, Button, useTheme, useMediaQuery } from "@mui/material";
 import { AuthContext } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 
 const ShopsTopbar = () => {
-  const { user, logout, loading } = useContext(AuthContext); // loading bhi le liya
+  const { user, logout, loading } = useContext(AuthContext);
   const navigate = useNavigate();
+
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   const handleLogout = () => {
     logout();
@@ -19,30 +22,47 @@ const ShopsTopbar = () => {
         justifyContent: "space-between",
         alignItems: "center",
         backgroundColor: "#fff",
-        px: 3,
-        py: 2,
+        px: { xs: 2, sm: 3 },
+        py: { xs: 1.5, sm: 2 },
         borderRadius: 2,
         boxShadow: "0 6px 18px rgba(0,0,0,0.08)",
         mb: 3,
       }}
     >
+      {/* Title */}
       <Typography
-        variant="h5"
-        sx={{
-          fontWeight: 700,
-          color: "text.primary",
-        }}
+        variant={isMobile ? "h6" : "h5"}
+        sx={{ fontWeight: 700 }}
       >
         Food Trucks
       </Typography>
 
-      <Box display="flex" alignItems="center" gap={2.5}>
+      {/* Right side */}
+      <Box display="flex" alignItems="center" gap={2}>
+        {/* Hidden on mobile */}
         <Typography
-          variant="body1"
-          sx={{ fontWeight: 500, color: "text.secondary" }}
+          variant="body2"
+          sx={{
+            fontWeight: 500,
+            color: "text.secondary",
+            display: { xs: "none", sm: "block" },
+          }}
         >
           {loading ? "Loading..." : `Hello, ${user?.fullName || "Guest"}`}
         </Typography>
+
+        <Button
+          variant="outlined"
+          onClick={() => navigate("/", { replace: true })}
+          sx={{
+            textTransform: "none",
+            px: 2,
+            py: 0.6,
+            borderRadius: 2,
+          }}
+        >
+          Home
+        </Button>
 
         <Button
           variant="outlined"
@@ -50,10 +70,9 @@ const ShopsTopbar = () => {
           onClick={handleLogout}
           sx={{
             textTransform: "none",
-            px: 2.5,
-            py: 0.8,
+            px: 1.5,
+            py: 0.6,
             borderRadius: 2,
-            fontWeight: 500,
           }}
         >
           Logout

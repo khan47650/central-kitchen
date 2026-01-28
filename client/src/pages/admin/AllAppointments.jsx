@@ -1,12 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import {
-  Table, TableHead, TableRow, TableCell, TableBody, TablePagination, Button, Skeleton
+  Table, TableHead, TableRow, TableCell, TableBody, TablePagination, Button, Skeleton,
+  IconButton,
+  Box
 } from '@mui/material';
 import moment from 'moment-timezone';
 import { useMediaQuery, Paper, TableContainer, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import SlotDetailsDialog from '../../components/SlotDetailsDialog';
+import { useNavigate } from 'react-router-dom';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 
 const AZ_TIMEZONE = 'America/Phoenix';
@@ -23,6 +27,7 @@ const AllAppointments = () => {
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const [selectedSlot, setSelectedSlot] = useState(null);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const navigate=useNavigate();
 
   const formatTime12Hour = (time24) => {
     if (!time24) return '-';
@@ -105,10 +110,22 @@ const AllAppointments = () => {
   };
 
   return (
-    <>
-      <Typography variant={isMobile ? 'h6' : 'h5'} sx={{ mb: 2 }} noWrap>
-        All Appointments
-      </Typography>
+    <Box p={3}>
+      <Box sx={{
+        mb: 3,
+        borderRadius: 3,
+        display: 'flex',
+        alignItems: 'center',
+        gap: 2
+      }}>
+
+        <IconButton onClick={() => navigate(-1)}>
+          <ArrowBackIcon />
+        </IconButton>
+        <Typography variant={isMobile ? 'h6' : 'h5'}>
+          All Appointments
+        </Typography>
+      </Box>
 
       <TableContainer sx={{ maxWidth: '100%', overflowX: 'auto' }}>
         <Table size={isMobile ? 'small' : 'medium'}>
@@ -152,7 +169,7 @@ const AllAppointments = () => {
                         <Button
                           variant="contained"
                           size="small"
-                          sx={{ minWidth: isMobile ? 60 : 120,color:'white' }}
+                          sx={{ minWidth: isMobile ? 60 : 120, color: 'white' }}
                           onClick={() => handleViewDetails(row)}
                         >
                           {isMobile ? 'VIEW' : 'VIEW DETAILS'}
@@ -180,7 +197,7 @@ const AllAppointments = () => {
         onClose={handleCloseDialog}
         slot={selectedSlot}
       />
-    </>
+    </Box>
   );
 };
 
