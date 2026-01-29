@@ -2,8 +2,7 @@
   background-color: #fff;
   color: #ff6f00;
   border-bottom: 1px solid #eee;
-  padding: 8px 16px;
-  /* mobile first */
+  padding: 5px 5px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -11,7 +10,6 @@
   box-sizing: border-box;
 }
 
-/* wider screens: increase horizontal padding to match MUI spacing */
 @media (min-width: 900px) {
   .topbar {
     padding-left: 32px;
@@ -38,8 +36,8 @@
 }
 
 .topbar-logout {
-  font-weight: 700;
-  text-transform: uppercase;
+  font-weight: 600;
+  text-transform: none;
   border-radius: 8px;
   border: 1px solid #d32f2f;
   color: #d32f2f;
@@ -50,8 +48,8 @@
 }
 
 .topbar-home {
-  font-weight: 700;
-  text-transform: uppercase;
+  font-weight: 600;
+  text-transform: none;
   border-radius: 8px;
   border: 1px solid #ff6f00;
   color: #ff6f00;
@@ -69,18 +67,12 @@
   background-color: rgba(211, 47, 47, 0.06);
 }
 
-/* compact on very small screens */
-@media (max-width: 420px) {
-  .topbar-title {
-    font-size: 1rem;
-  }
-
-  .topbar-greeting {
-    display: none;
-  }
-
+@media (max-width: 600px) {
+  .topbar-home,
   .topbar-logout {
-    padding: 4px 8px;
-    font-size: 0.8rem;
+    padding: 4px 8px;   
+    font-size: 0.75rem;  
+    border-radius: 5px;
   }
 }
+

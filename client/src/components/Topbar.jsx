@@ -1,5 +1,13 @@
 import React, { useContext } from 'react';
-import { AppBar, Toolbar, Typography, Box, IconButton } from '@mui/material';
+import {
+  AppBar,
+  Toolbar,
+  Typography,
+  Box,
+  IconButton,
+  useTheme,
+  useMediaQuery
+} from '@mui/material';
 import { AuthContext } from '../context/AuthContext';
 import MenuIcon from '@mui/icons-material/Menu';
 import '../Styles/topbar.css';
@@ -8,7 +16,10 @@ import { replace, useNavigate } from 'react-router-dom';
 const Topbar = ({ mobileOpen, setMobileOpen }) => {
   const { user, logout, loading } = useContext(AuthContext);
   const drawerWidth = 240;
-  const navigate=useNavigate();
+  const navigate = useNavigate();
+
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   const handleLogout = () => {
     logout();
@@ -22,39 +33,64 @@ const Topbar = ({ mobileOpen, setMobileOpen }) => {
         backgroundColor: '#fff',
         color: 'primary.main',
         borderBottom: '1px solid #eee',
-        paddingX: { xs: 2, md: 4 },
+        paddingX: { xs: 1.5, md: 4 },
         zIndex: theme.zIndex.drawer + 1,
         left: { md: `${drawerWidth}px`, xs: 0 },
         width: { md: `calc(100% - ${drawerWidth}px)`, xs: '100%' },
       })}
       className="topbar"
     >
-      <Toolbar className="topbar" sx={{ minHeight: { xs: 56, sm: 64, md: 64 } }}>
-        {/* Hamburger icon for mobile */}
+      <Toolbar
+        className="topbar"
+        sx={{
+          minHeight: { xs: 56, sm: 64 },
+          gap: 1,
+        }}
+      >
+        {/* Hamburger (mobile only) */}
         <IconButton
           color="inherit"
           edge="start"
-          sx={{ display: { xs: 'inline-flex', md: 'none' }, mr: 2 }}
-          onClick={() => setMobileOpen(prev => !prev)} // toggle sidebar
+          sx={{ display: { xs: 'inline-flex', md: 'none' } }}
+          onClick={() => setMobileOpen(prev => !prev)}
         >
           <MenuIcon />
         </IconButton>
 
-        <Typography className="topbar-title">
+        <Typography
+          className="topbar-title"
+          sx={{
+            fontSize: isMobile ? '1rem' : '1.25rem',
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+          }}
+        >
           Central Kitchen Dashboard
         </Typography>
 
         <Box sx={{ flexGrow: 1 }} />
 
         <Box className="topbar-right">
-          <Typography className="topbar-greeting">
-            {loading ? "Loading..." : `Hello, ${user?.fullName || user?.role || 'Guest'}!`}
-          </Typography>
+          {!isMobile && (
+            <Typography className="topbar-greeting">
+              {loading
+                ? 'Loading...'
+                : `Hello, ${user?.fullName || user?.role || 'Guest'}!`}
+            </Typography>
+          )}
 
-          <button className="topbar-home" onClick={()=>navigate('/',{replace:true})}>
+          <button
+            className="topbar-home"
+            onClick={() => navigate('/', { replace: true })}
+          >
             Home
           </button>
-          <button className="topbar-logout" onClick={handleLogout}>
+
+          <button
+            className="topbar-logout"
+            onClick={handleLogout}
+          >
             Logout
           </button>
         </Box>
