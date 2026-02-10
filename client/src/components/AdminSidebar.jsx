@@ -9,6 +9,8 @@ import {
   CalendarMonth, Group, PendingActions, LockClock, HowToReg, Block, LockReset, AccessTime,Apps
 } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
+import CampaignIcon from '@mui/icons-material/Campaign';
+
 const drawerWidth = 240;
 
 const AdminSidebar = ({ mobileOpen, setMobileOpen }) => {
@@ -145,7 +147,7 @@ const AdminSidebar = ({ mobileOpen, setMobileOpen }) => {
               </ListItemIcon>
               <ListItemText primary="Pending Approval" />
             </ListItemButton>
-            <ListItemButton
+            {/* <ListItemButton
               sx={subItemStyle}
               selected={isActive('/admin/users/awaiting')}
               onClick={() => handleNavigate('/admin/users/awaiting')}
@@ -154,7 +156,7 @@ const AdminSidebar = ({ mobileOpen, setMobileOpen }) => {
                 <HowToReg />
               </ListItemIcon>
               <ListItemText primary="Awaiting Confirmation" />
-            </ListItemButton>
+            </ListItemButton> */}
             <ListItemButton
               sx={subItemStyle}
               selected={isActive('/admin/users/frozen')}
@@ -211,6 +213,17 @@ const AdminSidebar = ({ mobileOpen, setMobileOpen }) => {
           </ListItemIcon>
           <ListItemText primary="Categories" />
         </ListItemButton>
+        <ListItemButton
+          sx={itemStyle}
+          selected={isActive('/admin/updates')}
+          onClick={() => handleNavigate('/admin/updates')}
+        >
+          <ListItemIcon sx={{ color: 'white' }}>
+            <CampaignIcon />
+          </ListItemIcon>
+          <ListItemText primary="Announcement" />
+        </ListItemButton>
+        
       </List>
     </>
   );

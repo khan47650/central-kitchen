@@ -35,6 +35,7 @@ import ForgotPassword from './components/ForgotPassword';
 import MyCategories from './pages/client/MyCategories';
 import AdminCategories from './pages/admin/AdminCategories';
 import AdminShops from './pages/admin/AdminShops';
+import AdminUpdates from './pages/admin/AdminUpdates';
 
 function App() {
   return (
@@ -59,7 +60,7 @@ function AppRoutes() {
       <Route path="/success" element={<SuccessPage />} />
       <Route path="/successPassword" element={<SuccessPassword />} />
       <Route path="/shops" element={<Shops />} />
-      <Route path="/shops/:shopId" element={<ShopsDetail/>} />
+      <Route path="/shops/:shopId" element={<ShopsDetail />} />
       <Route path="/forgotPassword" element={<ForgotPassword />} />
 
       {/* ADMIN PROTECTED */}
@@ -111,14 +112,14 @@ function AppRoutes() {
           </PrivateRoute>
         }
       />
-      <Route
+      {/* <Route
         path="/admin/users/awaiting"
         element={
           <PrivateRoute roles={['admin']}>
             <AdminLayout><AwaitingConfirmation /></AdminLayout>
           </PrivateRoute>
         }
-      />
+      /> */}
       <Route
         path="/admin/users/frozen"
         element={
@@ -160,6 +161,14 @@ function AppRoutes() {
           </PrivateRoute>
         }
       />
+      <Route
+        path="/admin/updates"
+        element={
+          <PrivateRoute roles={['admin']}>
+            <AdminLayout><AdminUpdates /></AdminLayout>
+          </PrivateRoute>
+        }
+      />
 
       {/* CLIENT PROTECTED */}
       <Route
@@ -178,14 +187,14 @@ function AppRoutes() {
           </PrivateRoute>
         }
       />
-      <Route
+      {/* <Route
         path="/client/appointments"
         element={
           <PrivateRoute roles={['client']}>
             <ClientLayout><ClientAppointments /></ClientLayout>
           </PrivateRoute>
         }
-      />
+      /> */}
       <Route
         path="/client/my-appointments"
         element={
@@ -212,7 +221,7 @@ function AppRoutes() {
         }
       />
 
-       <Route
+      <Route
         path="/client/my-categories"
         element={
           <PrivateRoute roles={['client']}>

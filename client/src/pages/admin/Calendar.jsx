@@ -7,6 +7,7 @@ import WeekNavigator from '../../components/WeekNavigator';
 import axios from 'axios';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useNavigate } from 'react-router-dom';
+import AdminUnavailableSlotModal from '../../components/AdminUnavailableSlotModel';
 
 const DEFAULT_API = process.env.REACT_APP_API_URL || "";
 const TOPBAR_HEIGHT = 64;
@@ -17,6 +18,7 @@ const Calendar = () => {
   const [slots, setSlots] = useState([]);
   const [users, setUsers] = useState({});
   const [openModal, setOpenModal] = useState(false);
+  const [openUnavailableModal, setOpenUnavailableModal] = useState(false);
   const [selectedSlot, setSelectedSlot] = useState(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [slotToDelete, setSlotToDelete] = useState(null);
@@ -129,6 +131,12 @@ const Calendar = () => {
         </Box>
 
         <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+
+          {user?.role === 'admin' && (
+            <Button variant="outlined" color="error" onClick={() => setOpenUnavailableModal(true)}>
+              Make Unavailable Slot
+            </Button>
+          )}
           <Button
             variant="contained"
             onClick={() => setOpenModal(true)}
@@ -178,6 +186,13 @@ const Calendar = () => {
         onClose={() => setOpenModal(false)}
         userId={user._id}
         isAdmin={user.role === 'admin'}
+        onBooked={handleSlotBooked}
+        slots={slots}
+      />
+
+      <AdminUnavailableSlotModal
+        open={openUnavailableModal}
+        onClose={() => setOpenUnavailableModal(false)}
         onBooked={handleSlotBooked}
       />
 

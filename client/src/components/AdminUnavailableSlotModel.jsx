@@ -17,35 +17,28 @@ const AZ_TIMEZONE = 'America/Phoenix';
 const DEFAULT_API = process.env.REACT_APP_API_URL || "";
 const durations = [1, 2, 3];
 
-// 24-hour format for logic
 const workingHours = [];
 for (let hour = 6; hour <= 20; hour++) {
   workingHours.push(`${hour}:00`);
-  if (hour < 20) {
-    workingHours.push(`${hour}:30`);
-  }
+  if (hour < 20) workingHours.push(`${hour}:30`);
 }
 
-// 12-hour AM/PM conversion
 const formatTime12Hour = (time24) => {
   const [hourStr, minute] = time24.split(':');
   let hour = parseInt(hourStr);
   const ampm = hour >= 12 ? 'PM' : 'AM';
-  hour = hour % 12 || 12; // convert 0 to 12
+  hour = hour % 12 || 12;
   return `${hour}:${minute} ${ampm}`;
 };
 
-const BookSlotModal = ({ open, onClose, userId, isAdmin, onBooked, slots }) => {
-  const [loading, setLoading] = useState(false);
+const AdminUnavailableSlotModal = ({ open, onClose, onBooked }) => {
   const today = moment.tz(AZ_TIMEZONE);
-  const startOfWeek = moment.tz(AZ_TIMEZONE).startOf('week').add(1, 'day'); // Monday
-  const endOfWeek = moment.tz(AZ_TIMEZONE).startOf('week').add(4, 'day');   // Thursday
-
   const [startDate, setStartDate] = useState(today.format('YYYY-MM-DD'));
   const [startTime, setStartTime] = useState('');
   const [duration, setDuration] = useState(1);
   const [endTime, setEndTime] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (!startTime) {
@@ -63,111 +56,95 @@ const BookSlotModal = ({ open, onClose, userId, isAdmin, onBooked, slots }) => {
     setEndTime(endMoment.format('h:mm A')); // 12-hour format with minutes
   }, [startTime, duration, startDate]);
 
-
-  const isValidBookingDay = (dateStr) => {
-    const date = moment.tz(dateStr, 'YYYY-MM-DD', AZ_TIMEZONE);
-    const day = date.day();
-    return date.isBetween(startOfWeek, endOfWeek, 'day', '[]') && day >= 1 && day <= 4;
-  };
-
   const getAvailableTimes = () => {
-    if (!isValidBookingDay(startDate)) {
-      return workingHours.map(time => ({
-        time,
-        disabled: true
-      }));
-    }
-
-    const now = moment.tz(AZ_TIMEZONE);
-
-    // 🔹 Unavailable slots for this date
-    const unavailableSlots = slots.filter(s =>
-      s.date === startDate && s.unavailable
-    );
-
-    return workingHours.map(time => {
-      const slotMoment = moment.tz(`${startDate} ${time}`, 'YYYY-MM-DD HH:mm', AZ_TIMEZONE);
-
-      // 🔹 Check if overlaps any unavailable slot
-      const isOverlappingUnavailable = unavailableSlots.some(s => {
-        const start = moment.tz(`${s.date} ${s.startTime}`, 'YYYY-MM-DD HH:mm', AZ_TIMEZONE);
-        const end = moment.tz(`${s.date} ${s.endTime}`, 'YYYY-MM-DD HH:mm', AZ_TIMEZONE);
-        return slotMoment.isSameOrAfter(start) && slotMoment.isBefore(end);
-      });
-
-      return {
-        time,
-        disabled: slotMoment.isBefore(now) || isOverlappingUnavailable // 🔹 dono checks
-      };
-    });
+    return workingHours.map(time => ({ time, disabled: false }));
   };
-
 
   const handleSubmit = async () => {
-    if (!isValidBookingDay(startDate)) {
-      setError('Bookings are only allowed Monday–Thursday of this week.');
+    if (!startTime) {
+      setError('Start time select karo');
       return;
     }
 
     setLoading(true);
+    setError('');
 
     try {
+      // Slot create karna
       const res = await axios.post(`${DEFAULT_API}/api/slots/create`, {
         date: startDate,
-        startTime, // still 24-hour for backend
+        startTime,
         duration,
-        isAdmin
+        makeUnavailable: true
+
       });
 
       const bookRes = await axios.post(`${DEFAULT_API}/api/slots/book`, {
         slotId: res.data.slot._id,
-        userId,
-        isAdmin,
-        duration
+        userId: null,
+        isAdmin: true,
+        duration,
+        makeUnavailable: true
       });
 
       onBooked(bookRes.data.slot);
-      setError('');
       onClose();
     } catch (err) {
       console.error(err);
-      setError(err.response?.data?.error || 'Booking failed');
+      setError(err.response?.data?.error || 'Failed to make unavailable slot');
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
+  };
+
+  // Duration options based on selected startTime
+  const getDurationOptions = () => {
+    if (!startTime) return [];
+
+    const [hourStr, minuteStr] = startTime.split(':');
+    let hour = parseInt(hourStr);
+    let minute = parseInt(minuteStr);
+
+    // End of working hours: 20:00
+    const endOfDay = moment.tz(`${startDate} 20:00`, 'YYYY-MM-DD HH:mm', AZ_TIMEZONE);
+    const startMoment = moment.tz(`${startDate} ${hour}:${minute}`, 'YYYY-MM-DD H:mm', AZ_TIMEZONE);
+
+    const maxDuration = Math.ceil(moment.duration(endOfDay.diff(startMoment)).asHours());
+
+    // minimum 1 hour, max maxDuration
+    const options = [];
+    for (let d = 1; d <= maxDuration; d++) {
+      options.push(d);
+    }
+    return options;
   };
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth>
-      <DialogTitle>Book a Slot</DialogTitle>
+      <DialogTitle>Make Slot Unavailable</DialogTitle>
       <DialogContent>
         <Box display="flex" flexDirection="column" gap={2} mt={1}>
           <TextField
-            label="Booking Date"
+            label="Date"
             type="date"
             value={startDate}
-            onChange={(e) => { setStartDate(e.target.value); setError(''); }}
+            onChange={e => { setStartDate(e.target.value); setError(''); }}
             InputLabelProps={{ shrink: true }}
-            inputProps={{
-              min: startOfWeek.format('YYYY-MM-DD'),
-              max: endOfWeek.format('YYYY-MM-DD')
-            }}
             fullWidth
-            error={!!error}
-            helperText={error}
           />
 
           <TextField
             label="Start Time"
             select
             value={startTime}
-            onChange={(e) => setStartTime(e.target.value)}
+            onChange={e => setStartTime(e.target.value)}
             fullWidth
             displayEmpty
           >
             <MenuItem value="" disabled>Select a time</MenuItem>
-            {getAvailableTimes().map(({ time, disabled }) => (
-              <MenuItem key={time} value={time} disabled={disabled}>
-                {formatTime12Hour(time)} {/* <-- display in 12-hour */}
+            {getAvailableTimes().map(({ time }) => (
+              <MenuItem key={time} value={time}>
+                {formatTime12Hour(time)}
               </MenuItem>
             ))}
           </TextField>
@@ -176,10 +153,10 @@ const BookSlotModal = ({ open, onClose, userId, isAdmin, onBooked, slots }) => {
             label="Duration (hours)"
             select
             value={duration}
-            onChange={(e) => setDuration(parseInt(e.target.value))}
+            onChange={e => setDuration(parseInt(e.target.value))}
             fullWidth
           >
-            {durations.map((d) => (
+            {getDurationOptions().map(d => (
               <MenuItem key={d} value={d}>
                 {d} hour{d > 1 ? 's' : ''}
               </MenuItem>
@@ -188,23 +165,22 @@ const BookSlotModal = ({ open, onClose, userId, isAdmin, onBooked, slots }) => {
 
           <TextField
             label="End Time"
-            value={endTime} // <-- already converted to 12-hour
+            value={endTime}
             InputProps={{ readOnly: true }}
             fullWidth
           />
 
-          <Typography variant="body2" color="textSecondary">
-            Bookings allowed Monday–Thursday of this week only. Working hours: 6:00 AM – 8:00 PM.
-          </Typography>
+          {error && <Typography color="error">{error}</Typography>}
         </Box>
       </DialogContent>
+
       <DialogActions>
-        <Button onClick={handleSubmit} variant="contained" color="warning" disabled={loading}>
-          {loading ? "Booking Slot..." : "BOOK SLOT"}
+        <Button onClick={handleSubmit} variant="contained" color="error" disabled={loading}>
+          {loading ? "Creating..." : "MAKE UNAVAILABLE"}
         </Button>
       </DialogActions>
     </Dialog>
   );
 };
 
-export default BookSlotModal;
+export default AdminUnavailableSlotModal;

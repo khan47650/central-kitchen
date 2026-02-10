@@ -47,7 +47,8 @@ const AllAppointments = () => {
 
         // Fetch all slots
         const slotsRes = await axios.get(`${DEFAULT_API}/api/slots`);
-        const data = slotsRes.data.map(slot => {
+        const filteredSlots = slotsRes.data.filter(slot => !slot.unavailable);
+        const data = filteredSlots.map(slot => {
           let userName = "Not booked";
 
           if (slot.bookedBy) {

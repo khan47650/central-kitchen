@@ -32,7 +32,7 @@ const ClientSidebar = ({ mobileOpen, setMobileOpen }) => {
 
   const links = [
     { label: 'Schedule', path: '/client/schedule', icon: <CalendarMonth /> },
-    { label: 'All Appointments', path: '/client/appointments', icon: <EventAvailable /> },
+    // { label: 'All Appointments', path: '/client/appointments', icon: <EventAvailable /> },
     { label: 'My Appointments', path: '/client/my-appointments', icon: <AssignmentTurnedIn /> },
     { label: 'Settings', path: '/client/dashboard', icon: <Settings /> },
     { label: 'Reset Password', path: '/client/reset-password', icon: <LockReset /> },

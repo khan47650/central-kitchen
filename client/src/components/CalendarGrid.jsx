@@ -5,7 +5,11 @@ import moment from 'moment-timezone';
 const AZ_TIMEZONE = 'America/Phoenix';
 
 // Time slots in 24-hour for logic, but displayed as 12-hour
-const timeSlots = Array.from({ length: 15 }, (_, i) => `${6 + i}:00`);
+const timeSlots = [];
+for (let hour = 6; hour <= 20; hour++) {
+  timeSlots.push(`${hour}:00`);
+  if (hour < 20) timeSlots.push(`${hour}:30`); // avoid 20:30
+}
 
 // Convert 24-hour time to 12-hour AM/PM
 const formatTime12Hour = (time24) => {
@@ -102,13 +106,22 @@ const CalendarGrid = ({ selectedWeek, slots = [], users = {}, onEmptyCellClick, 
                   key={j}
                   onClick={() => {
                     if (bookedSlot) {
+                      // 🔹 Unavailable slot → clickable for Admin only
+                      if (bookedSlot.unavailable) {
+                        onBookedCellClick?.(bookedSlot);
+                        return; // normal users can’t click
+                      }
+
+                      // 🔹 Normal booked slot (admin or client)
                       onBookedCellClick?.(bookedSlot);
                       return;
                     }
+
+                    // 🔹 Empty & not past slot
                     if (!bookedSlot && !pastSlot) {
                       onEmptyCellClick({
                         date: day.format('YYYY-MM-DD'),
-                        startTime: slot, // keep 24-hour for backend
+                        startTime: slot, // 24-hour for backend
                       });
                     }
                   }}
@@ -116,26 +129,51 @@ const CalendarGrid = ({ selectedWeek, slots = [], users = {}, onEmptyCellClick, 
                     height: 40,
                     border: '1px solid #ccc',
                     backgroundColor: bookedSlot
-                      ? '#fde613'
+                      ? bookedSlot.unavailable
+                        ? '#cccccc' // gray for unavailable
+                        : '#fde613' // yellow for normal admin or client booking
                       : pastSlot
                         ? '#e0e0e0'
                         : '#fff',
+
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     fontSize: 13,
-                    cursor: pastSlot && !bookedSlot ? 'not-allowed' : 'pointer',
-                    color: pastSlot ? '#999' : '#000',
+
+                    cursor: bookedSlot
+                      ? bookedSlot.unavailable
+                        ? 'pointer' // Admin can click unavailable
+                        : 'pointer' // normal booked
+                      : pastSlot
+                        ? 'not-allowed'
+                        : 'pointer',
+
+                    color: bookedSlot
+                      ? bookedSlot.unavailable
+                        ? '#555'
+                        : '#000'
+                      : pastSlot
+                        ? '#999'
+                        : '#000',
+
                     '&:hover': {
-                      backgroundColor: !bookedSlot && !pastSlot ? '#e3f2fd' : undefined,
+                      backgroundColor:
+                        !bookedSlot && !pastSlot ? '#e3f2fd' : undefined,
                     },
                   }}
                 >
-                  {bookedSlot &&
-                    (bookedSlot.bookedBy === 'Admin'
-                      ? 'Admin'
-                      : users[bookedSlot.bookedBy]?.businessName || 'User')}
+                  {bookedSlot
+                    ? bookedSlot.unavailable
+                      ? 'Unavailable'
+                      : bookedSlot.bookedBy === 'Admin'
+                        ? 'Admin'
+                        : users[bookedSlot.bookedBy]?.businessName || 'User'
+                    : ''}
                 </Box>
+
+
+
               );
             })}
           </React.Fragment>

@@ -17,6 +17,9 @@ import { useTheme, useMediaQuery, TableContainer } from '@mui/material';
 import UserDetailsDialog from '../../../components/UserDetailsDialog';
 import { useNavigate } from 'react-router-dom';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import FreezUserDialog from '../../../components/FreezeUserDialog';
+import CircularProgress from '@mui/material/CircularProgress';
+
 
 
 
@@ -26,10 +29,13 @@ const AllUsers = () => {
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [loading, setLoading] = useState(true);
   const [openDialog, setOpenDialog] = useState(false);
+  const [openFreezDialog, setOpenFreezDialog] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
+  const [freezUserId, setFreezUserId] = useState(null);
+  const [unfreezLoadingId, setUnfreezLoadingId] = useState(null);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-  const navigate=useNavigate();
+  const navigate = useNavigate();
 
 
 
@@ -53,20 +59,30 @@ const AllUsers = () => {
     fetchAllUsers();
   }, []);
 
-  const freezUser = async (id) => {
-    await axios.put(`${DEFAULT_API}/api/users/freez/${id}`);
-    fetchAllUsers();
-
-  };
-
   const unfreezUser = async (id) => {
-    await axios.put(`${DEFAULT_API}/api/users/unfreez/${id}`);
-    fetchAllUsers();
+    try {
+      setUnfreezLoadingId(id);
+
+      await axios.put(`${DEFAULT_API}/api/users/unfreez/${id}`);
+      await fetchAllUsers();
+
+    } catch (err) {
+      console.error("Unfreeze error:", err);
+    } finally {
+      setUnfreezLoadingId(null);
+    }
   };
+
 
   const handleViewUser = (user) => {
     setSelectedUser(user);
     setOpenDialog(true);
+  };
+
+  const handleFreezUser = (user) => {
+    setFreezUserId(user._id);
+    setOpenFreezDialog(true);
+
   };
   const handleCloseDialog = () => {
     setOpenDialog(false);
@@ -91,8 +107,8 @@ const AllUsers = () => {
         gap: 2
       }}>
 
-        <IconButton onClick={()=>navigate(-1)}>
-        <ArrowBackIcon/>
+        <IconButton onClick={() => navigate(-1)}>
+          <ArrowBackIcon />
         </IconButton>
         <Typography variant={isMobile ? 'h6' : 'h5'}>
           All Users
@@ -152,10 +168,14 @@ const AllUsers = () => {
                           size="small"
                           sx={{ minWidth: isMobile ? 60 : 80 }}
                           onClick={() =>
-                            user.status === "freezed" ? unfreezUser(user._id) : freezUser(user._id)
+                            user.status === "freezed" ? unfreezUser(user._id) : handleFreezUser(user)
                           }
                         >
-                          {isMobile ? (user.status === "freezed" ? "UNFREEZE" : "FREEZE") : (user.status === "freezed" ? "UNFREEZE" : "FREEZE")}
+                          {unfreezLoadingId === user._id ? (
+                            <CircularProgress size={18} />
+                          ) : (
+                            user.status === "freezed" ? "UNFREEZE" : "FREEZE"
+                          )}
                         </Button>
 
                       </Box>
@@ -180,6 +200,15 @@ const AllUsers = () => {
         open={openDialog}
         onClose={handleCloseDialog}
         user={selectedUser}
+      />
+
+      <FreezUserDialog
+        open={openFreezDialog}
+        handleClose={() => setOpenFreezDialog(false)}
+        userId={freezUserId}
+        handleFreez={() => {
+          fetchAllUsers();
+        }}
       />
 
     </Box>
