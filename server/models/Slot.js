@@ -6,6 +6,10 @@ const slotSchema = new mongoose.Schema({
   endTime: { type: String, required: true },       // '19:00'
   booked: { type: Boolean, default: false },
   bookedBy: { type: mongoose.Schema.Types.Mixed, default: null }, // userId or 'Admin'
+  unavailable: {
+    type: Boolean,
+    default: false, // sirf admin-unavailable me true
+  },
 }, { timestamps: true });
 
 module.exports = mongoose.model('Slot', slotSchema);
