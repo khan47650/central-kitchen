@@ -96,18 +96,22 @@ router.get('/adminStats', async (req, res) => {
     // Deduct booked slots from today → end of week
     const bookedFutureSlots = await Slot.countDocuments({
       date: { $gte: today, $lte: endOfWeek },
-      booked: true,
-      unavailable: { $ne: true }
+      unavailable: { $ne: true },
+      $or: [
+        { "sections.section1.booked": true },
+        { "sections.section2.booked": true }
+      ]
     });
 
     const openSlots = totalFutureSlots - bookedFutureSlots;
 
-
-
     const currentWeekBookedSlots = await Slot.countDocuments({
       date: { $gte: startOfWeek, $lte: endOfWeek },
-      booked: true,
-      unavailable: { $ne: true }
+      unavailable: { $ne: true },
+      $or: [
+        { "sections.section1.booked": true },
+        { "sections.section2.booked": true }
+      ]
     });
 
     res.json({
@@ -136,7 +140,6 @@ router.get('/adminStats', async (req, res) => {
 });
 
 // recent activities API
-// recent activities API
 router.get('/recentActivities', async (req, res) => {
   try {
     const startOfWeek = moment.tz(AZ_TIMEZONE).startOf('week').toDate();
@@ -154,7 +157,7 @@ router.get('/recentActivities', async (req, res) => {
       date: u.updatedAt
     }));
 
-    // 🔥 BOOKED SLOTS BASED ON SECTIONS
+    //BOOKED SLOTS BASED ON SECTIONS
     const bookedSlots = await Slot.find({
       unavailable: { $ne: true },
       updatedAt: { $gte: startOfWeek, $lte: endOfWeek },
@@ -201,7 +204,7 @@ router.get('/recentActivities', async (req, res) => {
       })
     );
 
-    // 🔥 Merge + sort
+    //Merge + sort
     const recentActivities = [...approvedActivities, ...bookedActivities.flat()]
       .sort((a, b) => new Date(b.date) - new Date(a.date));
 
@@ -243,10 +246,20 @@ router.get('/clientDashboard/:userId', async (req, res) => {
     // Upcoming bookings
     const upcomingSlotsRaw = await Slot.find({
       unavailable: { $ne: true },
-      date: { $gte: now.format('YYYY-MM-DD'), $lte: endOfWeek.format('YYYY-MM-DD') }
+      date: { $lte: endOfWeek.format('YYYY-MM-DD') }
     });
 
-    const upcomingSlots = upcomingSlotsRaw.filter(slot => isUserBookedSlot(slot, userId));
+    const upcomingSlots = upcomingSlotsRaw.filter(slot => {
+      if (!isUserBookedSlot(slot, userId)) return false;
+
+      const slotStart = moment.tz(
+        `${slot.date} ${slot.startTime}`,
+        'YYYY-MM-DD HH:mm',
+        AZ_TIMEZONE
+      );
+
+      return slotStart.isAfter(now);
+    });
 
     // Completed bookings
     const completedSlotsRaw = await Slot.find({

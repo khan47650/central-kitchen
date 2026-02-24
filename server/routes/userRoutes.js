@@ -360,20 +360,11 @@ router.post("/create-announcement", upload.single("image"), async (req, res) => 
     let imageUrl = null;
 
     if (req.file) {
-      const streamUpload = () => {
-        return new Promise((resolve, reject) => {
-          const stream = cloudinary.uploader.upload_stream(
-            { folder: "announcements" },
-            (error, result) => {
-              if (error) reject(error);
-              else resolve(result);
-            }
-          );
-          stream.end(req.file.buffer);
-        });
-      };
+      const result = await cloudinary.uploader.upload(req.file.path, {
+        folder: "announcements",
+        public_id: `announcement_${Date.now()}`
+      });
 
-      const result = await streamUpload();
       imageUrl = result.secure_url;
     }
 
@@ -402,7 +393,7 @@ router.get("/latest-announcements", async (req, res) => {
     const announcements = await Announcement.find({
       createdAt: { $gte: last7Days },
     })
-      .sort({ createdAt: -1 }) 
+      .sort({ createdAt: -1 })
       .lean();
 
     res.json({ announcements });
