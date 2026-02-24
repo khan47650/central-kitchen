@@ -1,13 +1,15 @@
 import React from 'react';
 import { Box, Button } from '@mui/material';
-import moment from 'moment';
+import moment from 'moment-timezone';
+
+const AZ_TIMEZONE = 'America/Phoenix';
 
 const WeekNavigator = ({ selectedWeek, setSelectedWeek }) => {
-  const startOfWeek = moment(selectedWeek).startOf('week').add(1, 'day'); // Monday
-  const endOfWeek = moment(startOfWeek).add(3, 'days');
+  const startOfWeek = moment.tz(selectedWeek, AZ_TIMEZONE).startOf('week').add(1, 'day'); // Monday
+  const endOfWeek = moment(startOfWeek).add(6, 'days'); // Sunday
 
-  const handlePrev = () => setSelectedWeek(moment(selectedWeek).subtract(7, 'days').toDate());
-  const handleNext = () => setSelectedWeek(moment(selectedWeek).add(7, 'days').toDate());
+  const handlePrev = () => setSelectedWeek(moment.tz(selectedWeek, AZ_TIMEZONE).subtract(7, 'days').toDate());
+  const handleNext = () => setSelectedWeek(moment.tz(selectedWeek, AZ_TIMEZONE).add(7, 'days').toDate());
 
   return (
     <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
