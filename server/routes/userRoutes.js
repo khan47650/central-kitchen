@@ -6,7 +6,8 @@ const sendEmail = require('../utils/sendEmail');
 const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
 const Announcement = require("../models/Announcement");
-const upload = require("../middleware/multer");
+const multer = require("multer");
+const upload = multer({ dest: "uploads/" });
 const cloudinary = require("../utils/cloudinary");
 const moment = require('moment-timezone');
 const AZ_TIMEZONE = 'America/Phoenix';
@@ -367,6 +368,7 @@ router.post("/create-announcement", upload.single("image"), async (req, res) => 
 
       imageUrl = result.secure_url;
     }
+    
 
     // Set createdAt in Maricopa timezone
     const createdAt = moment().tz(AZ_TIMEZONE).toDate();
