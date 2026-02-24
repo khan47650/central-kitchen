@@ -65,34 +65,35 @@ router.get('/adminStats', async (req, res) => {
 
     // Open slots
     const startHour = 6;
-    const endHour = 20;
-    const workingDays = [1, 2, 3, 4];
+    const endHour = 22;
+    const slotIntervalMinutes = 30;
+    const workingDays = [1, 2, 3, 4, 5, 6, 7]; // Mon-Sun
 
     let totalFutureSlots = 0;
 
     for (let i = 0; i < 7; i++) {
-      const day = moment.tz(AZ_TIMEZONE).startOf("week").add(i, "days");
-      const dayNumber = day.isoWeekday();
-      const dayStr = day.format("YYYY-MM-DD");
+      // Week starts Monday
+      const day = moment.tz(AZ_TIMEZONE).startOf('isoWeek').add(i, 'days');
+      const dayNumber = day.isoWeekday(); // 1=Mon ... 7=Sun
 
-      // skip non working days
-      if (!workingDays.includes(dayNumber)) continue;
+      if (!workingDays.includes(dayNumber)) continue; // skip non-working days
+      if (day.isBefore(now, 'day')) continue; // skip past days
 
-      // skip past days
-      if (day.isBefore(moment.tz(AZ_TIMEZONE), 'day')) continue;
+      let dayStart = moment.tz(day.format('YYYY-MM-DD') + ` ${startHour}:00`, 'YYYY-MM-DD HH:mm', AZ_TIMEZONE);
+      let dayEnd = moment.tz(day.format('YYYY-MM-DD') + ` ${endHour}:00`, 'YYYY-MM-DD HH:mm', AZ_TIMEZONE);
 
-      // today slots
-      if (day.isSame(today, 'day')) {
-        const currentHour = now.hour();
-        for (let h = startHour; h < endHour; h++) {
-          if (h > currentHour) totalFutureSlots++;
-        }
-      } else {
-        totalFutureSlots += (endHour - startHour);
+      // Today → start from now or startHour whichever is later, rounded to next 30 min
+      if (day.isSame(now, 'day')) {
+        dayStart = moment.max(dayStart, now.clone());
+        const minutesToAdd = slotIntervalMinutes - (dayStart.minute() % slotIntervalMinutes);
+        dayStart.add(minutesToAdd, 'minutes');
       }
+
+      const minutes = dayEnd.diff(dayStart, 'minutes');
+      if (minutes > 0) totalFutureSlots += Math.floor(minutes / slotIntervalMinutes);
     }
 
-    // Count booked slots only from today → endOfWeek
+    // Deduct booked slots from today → end of week
     const bookedFutureSlots = await Slot.countDocuments({
       date: { $gte: today, $lte: endOfWeek },
       booked: true,
@@ -100,6 +101,8 @@ router.get('/adminStats', async (req, res) => {
     });
 
     const openSlots = totalFutureSlots - bookedFutureSlots;
+
+
 
     const currentWeekBookedSlots = await Slot.countDocuments({
       date: { $gte: startOfWeek, $lte: endOfWeek },
@@ -133,12 +136,13 @@ router.get('/adminStats', async (req, res) => {
 });
 
 // recent activities API
+// recent activities API
 router.get('/recentActivities', async (req, res) => {
   try {
     const startOfWeek = moment.tz(AZ_TIMEZONE).startOf('week').toDate();
     const endOfWeek = moment.tz(AZ_TIMEZONE).endOf('week').toDate();
 
-    // Approved users
+    // Approved users activity
     const approvedUsers = await User.find({
       status: 'approved',
       updatedAt: { $gte: startOfWeek, $lte: endOfWeek }
@@ -150,32 +154,55 @@ router.get('/recentActivities', async (req, res) => {
       date: u.updatedAt
     }));
 
-    // Booked slots
+    // 🔥 BOOKED SLOTS BASED ON SECTIONS
     const bookedSlots = await Slot.find({
-      booked: true,
       unavailable: { $ne: true },
-      updatedAt: { $gte: startOfWeek, $lte: endOfWeek }
+      updatedAt: { $gte: startOfWeek, $lte: endOfWeek },
+      $or: [
+        { "sections.section1.booked": true },
+        { "sections.section2.booked": true }
+      ]
     });
 
     const bookedActivities = await Promise.all(
-      bookedSlots.map(async (s) => {
-        let userName = 'Admin';
-        if (s.bookedBy && s.bookedBy !== 'Admin') {
-          const user = await User.findById(s.bookedBy).select('fullName');
-          userName = user?.fullName || 'Unknown';
+      bookedSlots.flatMap(async (slot) => {
+        const activities = [];
+
+        // Helper function to get user name
+        const getUserName = async (userId) => {
+          if (!userId || userId === "Admin") return "Admin";
+          const user = await User.findById(userId).select("fullName");
+          return user?.fullName || "Unknown";
+        };
+
+        // Section 1
+        if (slot.sections?.section1?.booked) {
+          activities.push({
+            user: await getUserName(slot.sections.section1.bookedBy),
+            action: "Booked (Section 1)",
+            date: slot.updatedAt,
+            slotDate: slot.date,
+            slotTime: `${slot.startTime} - ${slot.endTime}`
+          });
         }
 
-        return {
-          user: userName,
-          action: 'Booked',
-          date: s.updatedAt,
-          slotDate: s.date,
-          slotTime: `${s.startTime} - ${s.endTime}`
-        };
+        // Section 2
+        if (slot.sections?.section2?.booked) {
+          activities.push({
+            user: await getUserName(slot.sections.section2.bookedBy),
+            action: "Booked (Section 2)",
+            date: slot.updatedAt,
+            slotDate: slot.date,
+            slotTime: `${slot.startTime} - ${slot.endTime}`
+          });
+        }
+
+        return activities;
       })
     );
 
-    const recentActivities = [...approvedActivities, ...bookedActivities]
+    // 🔥 Merge + sort
+    const recentActivities = [...approvedActivities, ...bookedActivities.flat()]
       .sort((a, b) => new Date(b.date) - new Date(a.date));
 
     res.json({ recentActivities });
@@ -197,30 +224,55 @@ const getSlotType = (hour) => {
   return 'Unknown';
 };
 
+// Helper: check if user has booked any section in a slot
+const isUserBookedSlot = (slot, userId) => {
+  if (!slot.sections) return false;
+  return ['section1', 'section2'].some(
+    sec => slot.sections[sec]?.bookedBy === userId
+  );
+};
+
+// ----------------------- Client Dashboard -----------------------
 router.get('/clientDashboard/:userId', async (req, res) => {
   try {
     const { userId } = req.params;
     const now = moment.tz(AZ_TIMEZONE);
-    const startOfWeek = moment.tz(AZ_TIMEZONE).startOf('week').toDate();
-    const endOfWeek = moment.tz(AZ_TIMEZONE).endOf('week').toDate();
+    const startOfWeek = moment.tz(AZ_TIMEZONE).startOf('week');
+    const endOfWeek = moment.tz(AZ_TIMEZONE).endOf('week');
 
     // Upcoming bookings
-    const upcomingSlots = await Slot.find({ booked: true, bookedBy: userId, unavailable: { $ne: true },  date: { $gte: now.format('YYYY-MM-DD'), $lte: moment(endOfWeek).format('YYYY-MM-DD') } });
+    const upcomingSlotsRaw = await Slot.find({
+      unavailable: { $ne: true },
+      date: { $gte: now.format('YYYY-MM-DD'), $lte: endOfWeek.format('YYYY-MM-DD') }
+    });
+
+    const upcomingSlots = upcomingSlotsRaw.filter(slot => isUserBookedSlot(slot, userId));
 
     // Completed bookings
-    const completedSlots = await Slot.find({ booked: true, bookedBy: userId,unavailable: { $ne: true }, date: { $gte: moment(startOfWeek).format('YYYY-MM-DD'), $lte: now.format('YYYY-MM-DD') } })
-      .then(slots => slots.filter(slot => moment.tz(`${slot.date} ${slot.endTime}`, 'YYYY-MM-DD HH:mm', AZ_TIMEZONE).isBefore(now)));
+    const completedSlotsRaw = await Slot.find({
+      unavailable: { $ne: true },
+      date: { $gte: startOfWeek.format('YYYY-MM-DD'), $lte: now.format('YYYY-MM-DD') }
+    });
+
+    const completedSlots = completedSlotsRaw.filter(slot => {
+      const end = moment.tz(`${slot.date} ${slot.endTime}`, 'YYYY-MM-DD HH:mm', AZ_TIMEZONE);
+      return end.isBefore(now) && isUserBookedSlot(slot, userId);
+    });
 
     // Recent bookings
-    const recentBookings = await Slot.find({ bookedBy: userId,unavailable: { $ne: true }, date: { $gte: moment(startOfWeek).format('YYYY-MM-DD'), $lte: moment(endOfWeek).format('YYYY-MM-DD') } })
-      .sort({ date: -1, startTime: -1 });
+    const recentBookingsRaw = await Slot.find({
+      unavailable: { $ne: true },
+      date: { $gte: startOfWeek.format('YYYY-MM-DD'), $lte: endOfWeek.format('YYYY-MM-DD') }
+    }).sort({ date: -1, startTime: -1 });
 
-    const recentBookingsMapped = recentBookings.map(slot => ({
-      id: slot._id,
-      service: getSlotType(parseInt(slot.startTime.split(':')[0])),
-      date: `${slot.date} ${slot.startTime}`,
-      status: slot.booked ? 'Booked' : 'Cancelled',
-    }));
+    const recentBookingsMapped = recentBookingsRaw
+      .filter(slot => isUserBookedSlot(slot, userId))
+      .map(slot => ({
+        id: slot._id,
+        service: getSlotType(parseInt(slot.startTime.split(':')[0])),
+        date: `${slot.date} ${slot.startTime}`,
+        status: 'Booked', // section booked means booked
+      }));
 
     res.json({
       stats: { upcoming: upcomingSlots.length, completed: completedSlots.length, profileStatus: 'Verified' },
@@ -233,34 +285,28 @@ router.get('/clientDashboard/:userId', async (req, res) => {
   }
 });
 
-// GET client upcoming slots
+// ----------------------- Client Upcoming Slots -----------------------
 router.get('/client/upcoming/:userId', async (req, res) => {
   try {
     const { userId } = req.params;
     const now = moment.tz(AZ_TIMEZONE);
 
-    const slots = await Slot.find({
-      booked: true,
-      bookedBy: userId,
-      unavailable: { $ne: true } 
-    });
+    const slotsRaw = await Slot.find({ unavailable: { $ne: true } });
 
-    const upcoming = slots.filter(slot => {
-      const start = moment.tz(
-        `${slot.date} ${slot.startTime}`,
-        'YYYY-MM-DD HH:mm',
-        AZ_TIMEZONE
-      );
-      return start.isAfter(now);
+    const upcoming = slotsRaw.filter(slot => {
+      const start = moment.tz(`${slot.date} ${slot.startTime}`, 'YYYY-MM-DD HH:mm', AZ_TIMEZONE);
+      return start.isAfter(now) && isUserBookedSlot(slot, userId);
     });
 
     res.json(upcoming);
+
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: 'Server error' });
   }
 });
-// GET client completed slots
+
+// ----------------------- Client Completed Slots -----------------------
 router.get('/client/completed/:userId', async (req, res) => {
   try {
     const { userId } = req.params;
@@ -269,23 +315,14 @@ router.get('/client/completed/:userId', async (req, res) => {
     const startOfWeek = moment.tz(AZ_TIMEZONE).startOf('week');
     const endOfWeek = moment.tz(AZ_TIMEZONE).endOf('week');
 
-    const slots = await Slot.find({
-      booked: true,
-      bookedBy: userId,
+    const slotsRaw = await Slot.find({
       unavailable: { $ne: true },
-      date: {
-        $gte: startOfWeek.format('YYYY-MM-DD'),
-        $lte: endOfWeek.format('YYYY-MM-DD'),
-      }
+      date: { $gte: startOfWeek.format('YYYY-MM-DD'), $lte: endOfWeek.format('YYYY-MM-DD') }
     });
 
-    const completedThisWeek = slots.filter(slot => {
-      const end = moment.tz(
-        `${slot.date} ${slot.endTime}`,
-        'YYYY-MM-DD HH:mm',
-        AZ_TIMEZONE
-      );
-      return end.isBefore(now);
+    const completedThisWeek = slotsRaw.filter(slot => {
+      const end = moment.tz(`${slot.date} ${slot.endTime}`, 'YYYY-MM-DD HH:mm', AZ_TIMEZONE);
+      return end.isBefore(now) && isUserBookedSlot(slot, userId);
     });
 
     res.json(completedThisWeek);
@@ -295,7 +332,5 @@ router.get('/client/completed/:userId', async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 });
-
-
 
 module.exports = router;

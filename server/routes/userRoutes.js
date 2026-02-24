@@ -5,18 +5,17 @@ const router = express.Router();
 const sendEmail = require('../utils/sendEmail');
 const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
-const multer = require("multer");
+const Announcement = require("../models/Announcement");
+const upload = require("../middleware/multer");
+const cloudinary = require("../utils/cloudinary");
+const moment = require('moment-timezone');
+const AZ_TIMEZONE = 'America/Phoenix';
 
-
-const upload = multer({
-  storage: multer.memoryStorage(),
-  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB
-});
 
 
 // Example route
 router.get('/', (req, res) => {
-  res.json({ message: 'User route working ✅' });
+  res.json({ message: 'User route working' });
 });
 
 //get all users
@@ -349,64 +348,83 @@ router.post('/forgot-password', async (req, res) => {
 
 });
 
-router.post("/send-announcement",
-  upload.array("files"), 
-  async (req, res) => {
-    try {
-      const { subject, description } = req.body;
 
-      if (!subject || !description) {
-        return res.status(400).json({
-          message: "Subject and description are required",
-        });
-      }
-
-      const users = await User.find({ status: "approved" }).select("email");
-
-      if (!users.length) {
-        return res.status(404).json({ message: "No users found" });
-      }
-
-      const html = `
-        <div style="font-family:Arial; background:#f9fafb; padding:20px">
-          <div style="max-width:600px; background:#fff; margin:auto; padding:20px; border-radius:8px">
-            <h2 style="color:#111827">${subject}</h2>
-            <p style="color:#374151; font-size:14px; line-height:1.6">
-              ${description}
-            </p>
-            <hr />
-            <p style="font-size:13px; color:#6b7280">
-              Contact:
-              <a href="mailto:commissary@centralaz.edu">
-                commissary@centralaz.edu
-              </a>
-            </p>
-          </div>
-        </div>
-      `;
-
-      const attachments = req.files
-        ? req.files.map(file => ({
-            filename: file.originalname,
-            content: file.buffer,
-          }))
-        : [];
-
-      for (const user of users) {
-        await sendEmail(user.email, subject, html, attachments);
-      }
-
-      res.json({ message: "Announcement sent successfully" });
-
-    } catch (err) {
-      console.error(err);
-      res.status(500).json({ message: "Server error" });
+// SAVE ANNOUNCEMENT
+router.post("/create-announcement", upload.single("image"), async (req, res) => {
+  try {
+    const { title, description } = req.body;
+    if (!title || !description) {
+      return res.status(400).json({ message: "Title and description required" });
     }
+
+    let imageUrl = null;
+
+    if (req.file) {
+      const streamUpload = () => {
+        return new Promise((resolve, reject) => {
+          const stream = cloudinary.uploader.upload_stream(
+            { folder: "announcements" },
+            (error, result) => {
+              if (error) reject(error);
+              else resolve(result);
+            }
+          );
+          stream.end(req.file.buffer);
+        });
+      };
+
+      const result = await streamUpload();
+      imageUrl = result.secure_url;
+    }
+
+    // Set createdAt in Maricopa timezone
+    const createdAt = moment().tz(AZ_TIMEZONE).toDate();
+
+    const announcement = await Announcement.create({
+      title,
+      description,
+      image: imageUrl,
+      createdAt
+    });
+
+    res.json({ message: "Announcement saved", announcement });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error" });
   }
-);
+});
 
+// WEEKLY ANNOUNCEMENTS (LAST 7 DAYS IN MARICOPA TIMEZONE)
+router.get("/latest-announcements", async (req, res) => {
+  try {
+    const last7Days = moment().tz(AZ_TIMEZONE).subtract(7, 'days').toDate();
 
+    const announcements = await Announcement.find({
+      createdAt: { $gte: last7Days },
+    })
+      .sort({ createdAt: -1 }) 
+      .lean();
 
+    res.json({ announcements });
+  } catch (err) {
+    console.error("Weekly Announcement Error:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+// SINGLE LATEST ANNOUNCEMENT
+router.get("/latest-announcement", async (req, res) => {
+  try {
+    const announcement = await Announcement.findOne()
+      .sort({ createdAt: -1 })
+      .lean();
+
+    res.json({ announcement });
+  } catch (err) {
+    console.error("Latest Announcement Error:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
 
 
 module.exports = router;

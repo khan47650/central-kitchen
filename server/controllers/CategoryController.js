@@ -1,6 +1,7 @@
 const Category = require("../models/Category");
 const cloudinary = require("../utils/cloudinary");
 const Shop = require("../models/Shop");
+const sendEmail = require("../utils/sendEmail");
 
 ///add category
 exports.addCategory = async (req, res) => {
@@ -16,7 +17,7 @@ exports.addCategory = async (req, res) => {
       });
     }
 
-    const shop = await Shop.findOne({ userId });
+    const shop = await Shop.findOne({ userId }).populate("subscribers");
     if (!shop) {
       return res.status(403).json({
         message: "Please create a shop before adding categories",
@@ -39,6 +40,24 @@ exports.addCategory = async (req, res) => {
       categoryDescription: categoryDescription || "",
       items: [],
     });
+
+    // ---------------- SEND EMAIL ----------------
+    if (shop.subscribers.length > 0) {
+      const emails = shop.subscribers.map(s => s.email).filter(Boolean);
+
+      const html = `
+    <div style="font-family: Arial, sans-serif; color: #333;">
+      <h2>New Category Added!</h2>
+      <p>A new category <strong>${categoryName.trim()}</strong> has been added to your subscribed shop <strong>${shop.shopName}</strong>.</p>
+      ${categoryDescription ? `<p><em>Description:</em> ${categoryDescription}</p>` : ""}
+      <p>Go and check out: <a href="https://centralkitchen.us">centralkitchen.us</a></p>
+    </div>
+  `;
+
+      for (const email of emails) {
+        await sendEmail(email, `New Category in ${shop.shopName}`, html);
+      }
+    }
 
     res.status(201).json({ message: "Category added successfully", category });
 
@@ -166,6 +185,26 @@ exports.addItem = async (req, res) => {
 
     category.items.push(newItem);
     await category.save();
+
+    // ---------------- SEND EMAIL ----------------
+    const shop = await Shop.findById(category.shopId).populate("subscribers");
+    if (shop && shop.subscribers.length > 0) {
+      const emails = shop.subscribers.map(s => s.email).filter(Boolean);
+
+      const html = `
+    <div style="font-family: Arial, sans-serif; color: #333;">
+      <h2>New Item Added!</h2>
+      <p>A new item <strong>${name.trim()}</strong> has been added to the category <strong>${category.categoryName}</strong> in your subscribed shop <strong>${shop.shopName}</strong>.</p>
+      <p><strong>Price:</strong> $${price}</p>
+      ${description ? `<p><em>Description:</em> ${description}</p>` : ""}
+      <p>Go and check out: <a href="https://centralkitchen.us">centralkitchen.us</a></p>
+    </div>
+  `;
+
+      for (const email of emails) {
+        await sendEmail(email, `New Item in ${shop.shopName}`, html);
+      }
+    }
 
     res.status(201).json({
       message: "Item added successfully",

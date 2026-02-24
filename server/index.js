@@ -9,6 +9,7 @@ const contactRoutes = require('./routes/contactRoutes');
 const dashboardRoutes=require('./routes/dashboardRoutes');
 const shopRoutes=require('./routes/shopRoutes');
 const categoryRoutes=require('./routes/categoryRoutes');
+const publicUserRoutes=require('./routes/publicUserRoutes');
 
 const app = express();
 
@@ -30,6 +31,7 @@ app.use('/api/contact', contactRoutes);
 app.use('/api/stats',dashboardRoutes);
 app.use('/api/shops',shopRoutes);
 app.use('/api/categories',categoryRoutes);
+app.use('/api/publicUser',publicUserRoutes);
 
 // Health check route (optional)
 app.get('/', (req, res) => {
