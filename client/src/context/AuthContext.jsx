@@ -43,7 +43,7 @@ useEffect(() => {
       setAccessToken(token);
       setUser(data.user);
     } catch {
-      localStorage.clear();
+      localStorage.removeItem("token");
       setUser(null);
       setAccessToken(null);
     } finally {
@@ -64,7 +64,7 @@ useEffect(() => {
   const logout = () => {
     setUser(null);
     setAccessToken(null);
-    localStorage.clear();
+     localStorage.removeItem("token");
   };
 
   return (

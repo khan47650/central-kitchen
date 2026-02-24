@@ -8,9 +8,9 @@ import {
     Button,
     IconButton,
     useTheme,
-    useMediaQuery,
+    useMediaQuery
 } from "@mui/material";
-import { ArrowBack } from "@mui/icons-material";
+import { ArrowBack, PhotoCamera } from "@mui/icons-material";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
@@ -21,27 +21,29 @@ const DEFAULT_API = process.env.REACT_APP_API_URL || "";
 const AdminUpdates = () => {
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-    const navigate=useNavigate();
+    const navigate = useNavigate();
 
-    const [subject, setSubject] = useState("");
+    const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
-    const [files, setFiles] = useState([]);
+    const [image, setImage] = useState(null);
+    const [preview, setPreview] = useState(null);
     const [loading, setLoading] = useState(false);
 
     const handleBack = () => {
-       navigate(-1);
+        navigate(-1);
     };
 
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
 
-
-
-    const handleFileChange = (e) => {
-        setFiles(Array.from(e.target.files));
+        setImage(file);
+        setPreview(URL.createObjectURL(file));
     };
 
-    const handleSendEmail = async () => {
-        if (!subject || !description) {
-            toast.error("Subject or Description is missing");
+    const handleSaveAnnouncement = async () => {
+        if (!title || !description) {
+            toast.error("Title or Description missing");
             return;
         }
 
@@ -49,25 +51,20 @@ const AdminUpdates = () => {
 
         try {
             const formData = new FormData();
-            formData.append("subject", subject);
+            formData.append("title", title);
             formData.append("description", description);
+            if (image) formData.append("image", image);
 
-            files.forEach((file) => {
-                formData.append("files", file);
-            });
+            await axios.post(`${DEFAULT_API}/api/users/create-announcement`, formData);
 
-            await axios.post(
-                `${DEFAULT_API}/api/users/send-announcement`,
-                formData
-            );
-
-            toast.success("Announcement sent successfully!");
-            setSubject("");
+            toast.success("Announcement saved!");
+            setTitle("");
             setDescription("");
-            setFiles([]);
+            setImage(null);
+            setPreview(null);
         } catch (err) {
-            toast.error("Failed to send email");
             console.error(err);
+            toast.error("Failed to save announcement");
         } finally {
             setLoading(false);
         }
@@ -92,21 +89,77 @@ const AdminUpdates = () => {
                     margin: "auto",
                     borderRadius: 3,
                     boxShadow: 3,
-                    transition: "transform 0.3s ease, box-shadow 0.3s ease", 
+                    transition: "transform 0.3s ease, box-shadow 0.3s ease",
                     "&:hover": {
-                        transform: "scale(1.02)", 
-                        boxShadow: 6,             
+                        transform: "scale(1.02)",
+                        boxShadow: 6,
                     },
                 }}
             >
                 <CardContent>
-                    {/* Subject */}
+
+                    <Box display="flex" justifyContent="center" mb={2}>
+                        <Box position="relative" textAlign="center">
+
+                            {/* Preview Image */}
+                            {preview ? (
+                                <Box
+                                    component="img"
+                                    src={preview}
+                                    alt="preview"
+                                    sx={{
+                                        width: 120,
+                                        height: 120,
+                                        borderRadius: "50%",
+                                        objectFit: "cover",
+                                        border: "2px solid #ddd",
+                                    }}
+                                />
+                            ) : (
+                                <Box
+                                    component="label"
+                                    sx={{
+                                        width: 120,
+                                        height: 120,
+                                        borderRadius: "50%",
+                                        border: "2px dashed #ccc",
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent: "center",
+                                        cursor: "pointer",
+                                        bgcolor: "#f9fafb",
+                                        "&:hover": { bgcolor: "#f3f4f6" },
+                                    }}
+                                >
+                                    <PhotoCamera sx={{ fontSize: 40, color: "#9ca3af" }} />
+                                    <input hidden type="file" accept="image/*" onChange={handleImageChange} />
+                                </Box>
+                            )}
+
+                            {/* Small Edit Icon on Preview */}
+                            {preview && (
+                                <IconButton
+                                    component="label"
+                                    sx={{
+                                        position: "absolute",
+                                        bottom: 5,
+                                        right: 5,
+                                        bgcolor: "white",
+                                        border: "1px solid #ddd",
+                                    }}
+                                >
+                                    <PhotoCamera fontSize="small" />
+                                    <input hidden type="file" accept="image/*" onChange={handleImageChange} />
+                                </IconButton>
+                            )}
+                        </Box>
+                    </Box>
+
                     <TextField
                         fullWidth
-                        placeholder="Subject"
-                        variant="outlined"
-                        value={subject}
-                        onChange={(e) => setSubject(e.target.value)}
+                        placeholder="Title"
+                        value={title}
+                        onChange={(e) => setTitle(e.target.value)}
                         sx={{ mb: 3 }}
                     />
 
@@ -129,39 +182,14 @@ const AdminUpdates = () => {
                         }}
                     />
 
-                    {/* File upload */}
-                    <Button
-                        variant="outlined"
-                        component="label"
-                        sx={{ mb: 3, textTransform: "none" }}
-                        fullWidth
-                    >
-                        Upload File
-                        <input
-                            type="file"
-                            hidden
-                            multiple
-                            onChange={handleFileChange}
-                        />
-                    </Button>
-                    {files.length > 0 && (
-                        <Box mb={2}>
-                            {files.map((file, index) => (
-                                <Typography key={index} variant="body2">
-                                    {file.name}
-                                </Typography>
-                            ))}
-                        </Box>
-                    )}
-
                     <Button
                         variant="contained"
                         fullWidth
-                        onClick={handleSendEmail}
+                        onClick={handleSaveAnnouncement}
                         disabled={loading}
                         sx={{ color: "white" }}
                     >
-                        {loading ? "Sending..." : "Send Email"}
+                        {loading ? "Saving..." : "Save Announcement"}
                     </Button>
                 </CardContent>
             </Card>

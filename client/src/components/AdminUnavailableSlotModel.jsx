@@ -15,12 +15,12 @@ import axios from 'axios';
 
 const AZ_TIMEZONE = 'America/Phoenix';
 const DEFAULT_API = process.env.REACT_APP_API_URL || "";
-const durations = [1, 2, 3];
+const durations = [0.5, 1, 2, 3];
 
 const workingHours = [];
-for (let hour = 6; hour <= 20; hour++) {
+for (let hour = 6; hour <= 22; hour++) {
   workingHours.push(`${hour}:00`);
-  if (hour < 20) workingHours.push(`${hour}:30`);
+  if (hour < 22) workingHours.push(`${hour}:30`);
 }
 
 const formatTime12Hour = (time24) => {
@@ -51,9 +51,9 @@ const AdminUnavailableSlotModal = ({ open, onClose, onBooked }) => {
     const minute = parseInt(minuteStr);
 
     const startMoment = moment.tz(`${startDate} ${hour}:${minute}`, 'YYYY-MM-DD H:mm', AZ_TIMEZONE);
-    const endMoment = startMoment.clone().add(duration, 'hours'); // hours + exact minutes preserved
+    const endMoment = startMoment.clone().add(duration * 60, 'minutes');
 
-    setEndTime(endMoment.format('h:mm A')); // 12-hour format with minutes
+    setEndTime(endMoment.format('h:mm A'));
   }, [startTime, duration, startDate]);
 
   const getAvailableTimes = () => {
@@ -62,7 +62,7 @@ const AdminUnavailableSlotModal = ({ open, onClose, onBooked }) => {
 
   const handleSubmit = async () => {
     if (!startTime) {
-      setError('Start time select karo');
+      setError('Missing Fields');
       return;
     }
 
@@ -70,24 +70,18 @@ const AdminUnavailableSlotModal = ({ open, onClose, onBooked }) => {
     setError('');
 
     try {
-      // Slot create karna
       const res = await axios.post(`${DEFAULT_API}/api/slots/create`, {
         date: startDate,
         startTime,
         duration,
-        makeUnavailable: true
-
+        makeUnavailable: true,
+        sections: {
+          section1: null,
+          section2: null
+        }
       });
 
-      const bookRes = await axios.post(`${DEFAULT_API}/api/slots/book`, {
-        slotId: res.data.slot._id,
-        userId: null,
-        isAdmin: true,
-        duration,
-        makeUnavailable: true
-      });
-
-      onBooked(bookRes.data.slot);
+      onBooked(res.data.slot); 
       onClose();
     } catch (err) {
       console.error(err);
@@ -102,20 +96,19 @@ const AdminUnavailableSlotModal = ({ open, onClose, onBooked }) => {
     if (!startTime) return [];
 
     const [hourStr, minuteStr] = startTime.split(':');
-    let hour = parseInt(hourStr);
-    let minute = parseInt(minuteStr);
+    const hour = parseInt(hourStr);
+    const minute = parseInt(minuteStr);
 
-    // End of working hours: 20:00
-    const endOfDay = moment.tz(`${startDate} 20:00`, 'YYYY-MM-DD HH:mm', AZ_TIMEZONE);
     const startMoment = moment.tz(`${startDate} ${hour}:${minute}`, 'YYYY-MM-DD H:mm', AZ_TIMEZONE);
+    const endOfDay = moment.tz(`${startDate} 22:00`, 'YYYY-MM-DD HH:mm', AZ_TIMEZONE);
 
-    const maxDuration = Math.ceil(moment.duration(endOfDay.diff(startMoment)).asHours());
+    const maxMinutes = endOfDay.diff(startMoment, 'minutes');
 
-    // minimum 1 hour, max maxDuration
     const options = [];
-    for (let d = 1; d <= maxDuration; d++) {
-      options.push(d);
+    for (let m = 30; m <= maxMinutes; m += 30) {
+      options.push(m / 60); // convert to hours
     }
+
     return options;
   };
 
@@ -150,18 +143,23 @@ const AdminUnavailableSlotModal = ({ open, onClose, onBooked }) => {
           </TextField>
 
           <TextField
-            label="Duration (hours)"
+            label="Duration"
             select
             value={duration}
-            onChange={e => setDuration(parseInt(e.target.value))}
+            onChange={e => setDuration(parseFloat(e.target.value))}
             fullWidth
           >
             {getDurationOptions().map(d => (
               <MenuItem key={d} value={d}>
-                {d} hour{d > 1 ? 's' : ''}
+                {d < 1
+                  ? `${d * 60} minutes`
+                  : d === 1
+                    ? '1 hour'
+                    : `${d} hours`}
               </MenuItem>
             ))}
           </TextField>
+
 
           <TextField
             label="End Time"

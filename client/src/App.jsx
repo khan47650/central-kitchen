@@ -36,6 +36,7 @@ import MyCategories from './pages/client/MyCategories';
 import AdminCategories from './pages/admin/AdminCategories';
 import AdminShops from './pages/admin/AdminShops';
 import AdminUpdates from './pages/admin/AdminUpdates';
+import PublicUpdates from './pages/PublicUpdates';
 
 function App() {
   return (
@@ -62,6 +63,7 @@ function AppRoutes() {
       <Route path="/shops" element={<Shops />} />
       <Route path="/shops/:shopId" element={<ShopsDetail />} />
       <Route path="/forgotPassword" element={<ForgotPassword />} />
+      <Route path="/get-updates" element={<PublicUpdates />} />
 
       {/* ADMIN PROTECTED */}
       <Route

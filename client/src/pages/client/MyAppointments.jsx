@@ -37,7 +37,8 @@ const MyAppointments = () => {
   const [loading, setLoading] = useState(true);
   const [searchParams] = useSearchParams();
   const type = searchParams.get('type');
-  const navigate=useNavigate();
+  const navigate = useNavigate();
+  const [cancelling, setCancelling] = useState(null);
 
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
@@ -52,6 +53,7 @@ const MyAppointments = () => {
       setLoading(true);
       try {
         if (!user?._id) return;
+
 
 
         let endpoint = `/api/slots/my/${user._id}`;
@@ -94,15 +96,42 @@ const MyAppointments = () => {
 
   const handleCancel = async (slotId) => {
     try {
-      // const confirmCancel = window.confirm("Are you sure you want to cancel this appointment?");
-      // if (!confirmCancel) return;
+      if (!user?._id) return;
 
-      await axios.delete(`${DEFAULT_API}/api/slots/delete/${slotId}`);
+      setCancelling(slotId);
 
-      setAppointments(prev => prev.filter(appt => appt.id !== slotId));
+      const { data: slot } = await axios.get(`${DEFAULT_API}/api/slots/${slotId}`);
+      if (!slot) return;
+
+      let clientSection = null;
+      if (slot.sections.section1.bookedBy === user._id) clientSection = 'section1';
+      else if (slot.sections.section2.bookedBy === user._id) clientSection = 'section2';
+
+      if (!clientSection) return;
+
+      const otherSection = clientSection === 'section1' ? 'section2' : 'section1';
+
+      if (!slot.sections[otherSection].booked) {
+        await axios.delete(`${DEFAULT_API}/api/slots/delete/${slotId}`);
+        setAppointments(prev => prev.filter(appt => appt.id !== slotId));
+        return;
+      }
+
+      await axios.post(`${DEFAULT_API}/api/slots/clear-section`, {
+        slotId,
+        section: clientSection,
+        userId: user._id,
+        isAdmin: false
+      });
+
+      setAppointments(prev =>
+        prev.filter(appt => appt.id !== slotId)
+      );
+
     } catch (err) {
       console.error('Failed to cancel appointment:', err);
-      alert('Failed to cancel appointment');
+    } finally {
+      setCancelling(null);
     }
   };
 
@@ -182,8 +211,9 @@ const MyAppointments = () => {
                           size="small"
                           sx={{ minWidth: isMobile ? 60 : 100 }}
                           onClick={() => handleCancel(appt.id)}
+                          disabled={cancelling === appt.id}
                         >
-                          Cancel
+                          {cancelling === appt.id ? 'Cancelling...' : 'Cancel'}
                         </Button>
                       </TableCell>
                     )}

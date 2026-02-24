@@ -26,7 +26,7 @@ import IconButton from '@mui/material/IconButton';
 import { useNavigate } from 'react-router-dom';
 
 
-const TIME_OPTIONS = Array.from({ length: 15 }, (_, i) => {
+const TIME_OPTIONS = Array.from({ length: 17 }, (_, i) => {
     const hour = 6 + i;
     return {
         value: `${hour.toString().padStart(2, "0")}:00`, // 24h (DB)

@@ -89,22 +89,29 @@ const LandingPage = () => {
 
 
   const handleLoginClick = (source) => {
+
+    //If coming from schedules
+    if (source === "schedules") {
+      if (user && user.role === "admin") {
+        navigate("/admin/shops");
+      } else {
+        // guest OR normal user
+        navigate("/shops");
+      }
+      return;
+    }
+
+    // If not logged in (login/dashboard click)
     if (!user) {
-      // First time login, open login page
       navigate("/login", { state: { from: source } });
       return;
     }
 
-    // User already logged in, redirect to proper dashboard
-    if (source === "schedules") {
-      if (user.role === "admin") navigate("/admin/shops");
-      else navigate("/shops");
-      return;
-    }
-
+    // Logged in users
     if (user.role === "admin") navigate("/admin/dashboard");
     else navigate("/client/dashboard");
   };
+
 
   return (
     <div className="index-page" id="top">
@@ -116,7 +123,7 @@ const LandingPage = () => {
             <h1 className="sitename">Central Kitchen</h1>
           </a>
           <div className="auth-section">
-             <button className="btn login-btn" onClick={() => handleLoginClick("login")}>
+            <button className="btn login-btn" onClick={() => handleLoginClick("login")}>
               Log In
             </button>
             <Link to="/signup" className="btn signup-btn">Register</Link>
@@ -136,12 +143,12 @@ const LandingPage = () => {
                 <li><a className="nav-link active" href="#hero">Home</a></li>
                 <li><a className="nav-link" href="#about">About</a></li>
                 <li><a className="nav-link" href="#contact">Contact</a></li>
-                  <li>
+                <li>
                   <button className='nav-link' onClick={() => handleLoginClick("schedules")}>
                     Schedules
                   </button>
                 </li>
-              </ul> 
+              </ul>
             </div>
           </div>
         </nav>

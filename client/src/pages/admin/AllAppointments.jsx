@@ -38,61 +38,94 @@ const AllAppointments = () => {
     return `${hour}:${minute} ${ampm}`;
   };
 
-  useEffect(() => {
-    const fetchUsersAndAppointments = async () => {
-      try {
-        // Fetch all users
-        const usersRes = await axios.get(`${DEFAULT_API}/api/users/all`);
-        const allUsers = usersRes.data;
+ useEffect(() => {
+  const fetchUsersAndAppointments = async () => {
+    try {
+      //Fetch all users
+      const usersRes = await axios.get(`${DEFAULT_API}/api/users/all`);
+      const allUsers = usersRes.data;
 
-        // Fetch all slots
-        const slotsRes = await axios.get(`${DEFAULT_API}/api/slots`);
-        const filteredSlots = slotsRes.data.filter(slot => !slot.unavailable);
-        const data = filteredSlots.map(slot => {
-          let userName = "Not booked";
+      //Fetch all slots
+      const slotsRes = await axios.get(`${DEFAULT_API}/api/slots`);
+      const filteredSlots = slotsRes.data.filter(slot => !slot.unavailable);
 
-          if (slot.bookedBy) {
-            if (slot.bookedBy === "Admin") {
-              userName = "Admin";
-            } else if (typeof slot.bookedBy === "string") {
-              // If it's a valid userId
-              const foundUser = allUsers.find(u => u._id === slot.bookedBy);
-              userName = foundUser ? foundUser.businessName : "Unknown User";
-            } else if (typeof slot.bookedBy === "object") {
-              // If backend returns populated user object
-              userName = slot.bookedBy.fullName || "Unknown";
-            }
-          }
+      const data = [];
+      filteredSlots.forEach(slot => {
+        const bookedOn = slot.date
+          ? moment.tz(slot.date, AZ_TIMEZONE).format('MM/DD/YYYY')
+          : '-';
 
-          return {
-            id: slot._id,
-            userName,
-            bookedOn: slot.date ? moment.tz(slot.date, AZ_TIMEZONE).format('MM/DD/YYYY') : '-',
+        const bookingStart = formatTime12Hour(slot.startTime);
+        const bookingEnd = formatTime12Hour(slot.endTime) || '-';
 
-            bookingStart: formatTime12Hour(slot.startTime),
-            bookingEnd: formatTime12Hour(slot.endTime) || '-'
-          };
-        });
+        const sections = slot.sections || {};
 
-        // Sort by date + startTime for consistent order
-        data.sort((a, b) => {
-          const dateA = moment.tz(`${a.bookedOn} ${a.bookingStart}`, 'MM/DD/YYYY HH:mm', AZ_TIMEZONE);
+        const getUserName = (userId) => {
+          if (!userId) return "Not booked";
+          if (userId === "Admin") return "Admin";
+          const found = allUsers.find(u => u._id === userId);
+          return found ? found.businessName : "Unknown User";
+        };
 
-          const dateB = moment.tz(`${b.bookedOn} ${b.bookingStart}`, 'MM/DD/YYYY HH:mm', AZ_TIMEZONE);
+        // SECTION 1
+        if (sections.section1?.bookedBy) {
+          data.push({
+            id: slot._id + "_s1",
+            slotId: slot._id,
+            userName: getUserName(sections.section1.bookedBy),
+            section: "Section 1",
+            bookedOn,
+            bookingStart,
+            bookingEnd
+          });
+        }
 
-          return dateA - dateB;
-        });
+        // SECTION 2
+        if (sections.section2?.bookedBy) {
+          data.push({
+            id: slot._id + "_s2",
+            slotId: slot._id,
+            userName: getUserName(sections.section2.bookedBy),
+            section: "Section 2",
+            bookedOn,
+            bookingStart,
+            bookingEnd
+          });
+        }
 
-        setAppointments(data);
-        setLoading(false);
-      } catch (err) {
-        console.error('Failed to fetch users or appointments:', err);
-        setLoading(false);
-      }
-    };
+        // If no booking
+        if (!sections.section1?.bookedBy && !sections.section2?.bookedBy) {
+          data.push({
+            id: slot._id + "_empty",
+            slotId: slot._id,
+            userName: "Not booked",
+            section: "-",
+            bookedOn,
+            bookingStart,
+            bookingEnd
+          });
+        }
+      });
 
-    fetchUsersAndAppointments();
-  }, []);
+      //Sort data
+      data.sort((a, b) => {
+        const dateA = moment.tz(`${a.bookedOn} ${a.bookingStart}`, 'MM/DD/YYYY hh:mm A', AZ_TIMEZONE);
+        const dateB = moment.tz(`${b.bookedOn} ${b.bookingStart}`, 'MM/DD/YYYY hh:mm A', AZ_TIMEZONE);
+        return dateA - dateB;
+      });
+
+      //Set state
+      setAppointments(data);
+      setLoading(false);
+
+    } catch (err) {
+      console.error('Failed to fetch users or appointments:', err);
+      setLoading(false);
+    }
+  };
+
+  fetchUsersAndAppointments();
+}, []);
 
   const handleViewDetails = (slot) => {
     setSelectedSlot(slot);
@@ -133,6 +166,7 @@ const AllAppointments = () => {
           <TableHead>
             <TableRow>
               <TableCell>User Name</TableCell>
+              <TableCell>Booking Section</TableCell>
               <TableCell>Booked On</TableCell>
               <TableCell>Booking Start</TableCell>
               <TableCell>Booking End</TableCell>
@@ -163,6 +197,7 @@ const AllAppointments = () => {
                   .map(row => (
                     <TableRow key={row.id}>
                       <TableCell>{row.userName}</TableCell>
+                      <TableCell>{row.section}</TableCell> 
                       <TableCell>{row.bookedOn}</TableCell>
                       <TableCell>{row.bookingStart}</TableCell>
                       <TableCell>{row.bookingEnd}</TableCell>

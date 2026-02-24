@@ -28,54 +28,69 @@ const FutureAppointments = () => {
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const [selectedSlot, setSelectedSlot] = useState(null);
   const [dialogOpen, setDialogOpen] = useState(false);
-  const navigate=useNavigate();
+  const navigate = useNavigate();
 
 
 
   useEffect(() => {
     const fetchUsersAndAppointments = async () => {
       try {
-        //Fetch all users
+        // Fetch all users
         const usersRes = await axios.get(`${DEFAULT_API}/api/users/all`);
         const allUsers = usersRes.data;
         setUsers(allUsers);
 
-        //Fetch future slots
+        // Fetch future slots
         const slotsRes = await axios.get(`${DEFAULT_API}/api/slots/future`);
         const now = moment.tz(AZ_TIMEZONE);
         const futureSlots = slotsRes.data.filter(slot => {
-          const slotStart = moment.tz(`${slot.date}
-         ${slot.startTime}`,
-            'YYYY-MM-DD HH:mm',
-            AZ_TIMEZONE
-          );
+          const slotStart = moment.tz(`${slot.date} ${slot.startTime}`, 'YYYY-MM-DD HH:mm', AZ_TIMEZONE);
           return slotStart.isAfter(now);
         });
 
-        //Map slots to include userName
-        const mappedSlots = futureSlots.map(slot => {
-          let userName = "Not booked";
+        const data = [];
 
-          if (slot.bookedBy) {
-            if (slot.bookedBy === "Admin") {
-              userName = "Admin";
-            } else if (typeof slot.bookedBy === "string" && /^[0-9a-fA-F]{24}$/.test(slot.bookedBy)) {
-              const foundUser = allUsers.find(u => u._id === slot.bookedBy);
-              userName = foundUser ? foundUser.businessName : "Unknown User";
-            } else if (typeof slot.bookedBy === "object") {
-              userName = slot.bookedBy.fullName || "Unknown";
-            }
+        futureSlots.forEach(slot => {
+          const sections = slot.sections || {};
+
+          const getUserName = (userId) => {
+            if (!userId) return null;
+            if (userId === "Admin") return "Admin";
+            const found = allUsers.find(u => u._id === userId);
+            return found ? found.businessName : "Unknown User";
+          };
+
+          // Section 1
+          const user1 = getUserName(sections.section1?.bookedBy);
+          if (user1) {
+            data.push({
+              id: slot._id + "_s1",
+              slotId: slot._id,
+              userName: user1,
+              section: "Section 1",
+              date: slot.date,
+              startTime: slot.startTime,
+              endTime: slot.endTime
+            });
           }
 
-          return {
-            ...slot,
-            userName
-          };
+          // Section 2
+          const user2 = getUserName(sections.section2?.bookedBy);
+          if (user2) {
+            data.push({
+              id: slot._id + "_s2",
+              slotId: slot._id,
+              userName: user2,
+              section: "Section 2",
+              date: slot.date,
+              startTime: slot.startTime,
+              endTime: slot.endTime
+            });
+          }
         });
 
-        setAppointments(mappedSlots);
+        setAppointments(data);
         setLoading(false);
-
       } catch (err) {
         console.error('Error fetching users or appointments:', err);
         setLoading(false);
@@ -141,6 +156,7 @@ const FutureAppointments = () => {
           <TableHead>
             <TableRow>
               <TableCell>User Name</TableCell>
+              <TableCell>Booking Section</TableCell>
               <TableCell>Date</TableCell>
               <TableCell>Start Time</TableCell>
               <TableCell>End Time</TableCell>
@@ -171,6 +187,7 @@ const FutureAppointments = () => {
                   .map((slot, index) => (
                     <TableRow key={index}>
                       <TableCell>{slot.userName || '-'}</TableCell>
+                      <TableCell>{slot.section || '-'}</TableCell>
                       <TableCell>{slot.date}</TableCell>
                       <TableCell>{formatTime12Hour(slot.startTime)}</TableCell>
                       <TableCell>{formatTime12Hour(slot.endTime)}</TableCell>

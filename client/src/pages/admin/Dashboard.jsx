@@ -29,6 +29,7 @@ import moment from 'moment-timezone';
 import { Skeleton } from "@mui/material";
 import { useNavigate } from 'react-router-dom';
 import "../../Styles/dashboard.css"
+import Marquee from "react-fast-marquee"
 
 
 
@@ -41,7 +42,8 @@ const AdminDashboard = () => {
   const [stats, setStats] = useState(null);
   const [recentActivities, setRecentActivities] = useState([]);
   const [loading, setLoading] = useState(true);
-  const navigate=useNavigate();
+  const [announcements, setAnnouncements] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
 
@@ -59,7 +61,19 @@ const AdminDashboard = () => {
       }
     };
 
+    const fetchAnnouncements = async () => {
+      try {
+        const weekly = await axios.get(`${DEFAULT_API}/api/users/latest-announcements`);
+
+        setAnnouncements(weekly.data.announcements || []);
+      } catch (err) {
+        console.error("Announcement API error:", err);
+      }
+    };
+
+
     fetchStats();
+    fetchAnnouncements();
 
   }, []);
 
@@ -104,7 +118,7 @@ const AdminDashboard = () => {
       sub: `${stats?.todayAppointments?.completed ?? 0} completed • ${stats?.todayAppointments?.upcoming ?? 0} upcoming`,
       icon: <EventAvailable />,
       color: "#1976d2",
-      path:"/admin/appointments"
+      path: "/admin/appointments"
     },
     {
       id: 2,
@@ -113,7 +127,7 @@ const AdminDashboard = () => {
       sub: `${stats?.pendingApprovals?.pendingThisWeek ?? 0} pending • ${stats?.pendingApprovals?.awaitingThisWeek ?? 0} awaiting`,
       icon: <PendingActions />,
       color: "#f57c00",
-      path:"/admin/users/pending"
+      path: "/admin/users/pending"
     },
     {
       id: 3,
@@ -122,7 +136,7 @@ const AdminDashboard = () => {
       sub: `${stats?.activeUsers?.newThisWeek ?? 0} new today`,
       icon: <People />,
       color: "#2e7d32",
-      path:"/admin/users"
+      path: "/admin/users"
     },
     {
       id: 4,
@@ -131,15 +145,9 @@ const AdminDashboard = () => {
       sub: "Slots available this week",
       icon: <Today />,
       color: "#9c27b0",
-      path:"/admin/schedule"
+      path: "/admin/schedule"
     },
   ];
-
-  // const recent = [
-  //   { id: 1, user: 'Umair', action: 'Booked', when: '2025-11-07 09:00' },
-  //   { id: 2, user: 'Fatima', action: 'Cancelled', when: '2025-11-07 08:30' },
-  //   { id: 3, user: 'Ali', action: 'Approved', when: '2025-11-06 16:12' },
-  // ];
 
   return (
     <Box sx={{
@@ -166,9 +174,9 @@ const AdminDashboard = () => {
             width: { xs: '100%', sm: 'auto' },
             fontSize: { xs: 14, sm: 16 },
             minWidth: 120,
-            color:"white"
-          }}  
-          onClick={()=>navigate("/admin/schedule")}>
+            color: "white"
+          }}
+            onClick={() => navigate("/admin/schedule")}>
             Create Slot
           </Button>
           <Button variant="outlined" sx={{
@@ -179,7 +187,34 @@ const AdminDashboard = () => {
             Export Report
           </Button>
         </Stack>
-
+        {announcements.length > 0 && (
+          <Box
+            sx={{
+              bgcolor: "#16a34a",
+              color: "white",
+              py: 1,
+              px: 2,
+              borderRadius: 1,
+              mb: 1,
+              mt: 2,
+              overflow: "hidden",
+              width: "100%",
+              maxWidth: "100vw",
+            }}
+          >
+            <Marquee
+              gradient={false}
+              speed={50}
+              style={{ width: "100%" }}
+            >
+              {announcements.map((a, i) => (
+                <span key={i} style={{ marginRight: 60 }}>
+                  <b>{a.title}:</b> {a.description}
+                </span>
+              ))}
+            </Marquee>
+          </Box>
+        )}
       </Box>
 
       {/* Stat cards */}
@@ -188,8 +223,8 @@ const AdminDashboard = () => {
           <Grid item xs={12} sm={6} md={3} key={c.id}>
             <Paper
               elevation={2}
-              onClick={()=>navigate(c.path)}
-               className='dashboard-card'
+              onClick={() => navigate(c.path)}
+              className='dashboard-card'
               sx={{
                 p: 2,
                 display: 'flex',
@@ -199,7 +234,7 @@ const AdminDashboard = () => {
                 minHeight: 150,
                 overflow: 'hidden',
                 wordBreak: 'break-word',
-                cursor:'pointer'
+                cursor: 'pointer'
               }}
 
             >

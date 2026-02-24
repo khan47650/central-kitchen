@@ -64,19 +64,36 @@ const ShopsTopbar = () => {
           Home
         </Button>
 
-        <Button
-          variant="outlined"
-          color="error"
-          onClick={handleLogout}
-          sx={{
-            textTransform: "none",
-            px: 1.5,
-            py: 0.6,
-            borderRadius: 2,
-          }}
-        >
-          Logout
-        </Button>
+        {!user ? (
+          <Button
+            variant="contained"
+            color="secondary"
+            onClick={() => navigate("/get-updates")}
+            sx={{
+              textTransform: "none",
+              px: 2,
+              py: 0.6,
+              borderRadius: 2,
+            }}
+          >
+            Get Updates
+          </Button>
+        ) : (
+          <Button
+            variant="outlined"
+            color="error"
+            onClick={handleLogout}
+            sx={{
+              textTransform: "none",
+              px: 1.5,
+              py: 0.6,
+              borderRadius: 2,
+            }}
+          >
+            Logout
+          </Button>
+        )}
+
       </Box>
     </Box>
   );

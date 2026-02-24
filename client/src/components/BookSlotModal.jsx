@@ -15,13 +15,13 @@ import axios from 'axios';
 
 const AZ_TIMEZONE = 'America/Phoenix';
 const DEFAULT_API = process.env.REACT_APP_API_URL || "";
-const durations = [1, 2, 3];
+const durations = [0.5, 1, 1.5, 2, 2.5, 3];
 
 // 24-hour format for logic
 const workingHours = [];
-for (let hour = 6; hour <= 20; hour++) {
+for (let hour = 6; hour < 22; hour++) {
   workingHours.push(`${hour}:00`);
-  if (hour < 20) {
+  if (hour < 22) {
     workingHours.push(`${hour}:30`);
   }
 }
@@ -35,17 +35,26 @@ const formatTime12Hour = (time24) => {
   return `${hour}:${minute} ${ampm}`;
 };
 
-const BookSlotModal = ({ open, onClose, userId, isAdmin, onBooked, slots }) => {
+const BookSlotModal = ({ open, onClose, userId, isAdmin, onBooked, slots, selectedSlot }) => {
   const [loading, setLoading] = useState(false);
   const today = moment.tz(AZ_TIMEZONE);
-  const startOfWeek = moment.tz(AZ_TIMEZONE).startOf('week').add(1, 'day'); // Monday
-  const endOfWeek = moment.tz(AZ_TIMEZONE).startOf('week').add(4, 'day');   // Thursday
+  const startOfWeek = moment.tz(AZ_TIMEZONE).startOf('isoWeek'); // Monday 00:00
+  const endOfWeek = moment.tz(AZ_TIMEZONE).endOf('isoWeek');     // Sunday 23:59:59
 
   const [startDate, setStartDate] = useState(today.format('YYYY-MM-DD'));
   const [startTime, setStartTime] = useState('');
   const [duration, setDuration] = useState(1);
   const [endTime, setEndTime] = useState('');
   const [error, setError] = useState('');
+  const [section, setSection] = useState("section1");
+
+
+  useEffect(() => {
+    if (selectedSlot && open) {
+      setStartDate(selectedSlot.date);
+      setStartTime(selectedSlot.startTime);
+    }
+  }, [selectedSlot, open]);
 
   useEffect(() => {
     if (!startTime) {
@@ -58,7 +67,8 @@ const BookSlotModal = ({ open, onClose, userId, isAdmin, onBooked, slots }) => {
     const minute = parseInt(minuteStr);
 
     const startMoment = moment.tz(`${startDate} ${hour}:${minute}`, 'YYYY-MM-DD H:mm', AZ_TIMEZONE);
-    const endMoment = startMoment.clone().add(duration, 'hours'); // hours + exact minutes preserved
+    const endMoment = startMoment.clone().add(duration * 60, 'minutes');
+
 
     setEndTime(endMoment.format('h:mm A')); // 12-hour format with minutes
   }, [startTime, duration, startDate]);
@@ -66,9 +76,9 @@ const BookSlotModal = ({ open, onClose, userId, isAdmin, onBooked, slots }) => {
 
   const isValidBookingDay = (dateStr) => {
     const date = moment.tz(dateStr, 'YYYY-MM-DD', AZ_TIMEZONE);
-    const day = date.day();
-    return date.isBetween(startOfWeek, endOfWeek, 'day', '[]') && day >= 1 && day <= 4;
+    return date.isBetween(startOfWeek, endOfWeek, 'day', '[]');
   };
+
 
   const getAvailableTimes = () => {
     if (!isValidBookingDay(startDate)) {
@@ -80,7 +90,7 @@ const BookSlotModal = ({ open, onClose, userId, isAdmin, onBooked, slots }) => {
 
     const now = moment.tz(AZ_TIMEZONE);
 
-    // 🔹 Unavailable slots for this date
+    //Unavailable slots for this date
     const unavailableSlots = slots.filter(s =>
       s.date === startDate && s.unavailable
     );
@@ -88,7 +98,7 @@ const BookSlotModal = ({ open, onClose, userId, isAdmin, onBooked, slots }) => {
     return workingHours.map(time => {
       const slotMoment = moment.tz(`${startDate} ${time}`, 'YYYY-MM-DD HH:mm', AZ_TIMEZONE);
 
-      // 🔹 Check if overlaps any unavailable slot
+      //Check if overlaps any unavailable slot
       const isOverlappingUnavailable = unavailableSlots.some(s => {
         const start = moment.tz(`${s.date} ${s.startTime}`, 'YYYY-MM-DD HH:mm', AZ_TIMEZONE);
         const end = moment.tz(`${s.date} ${s.endTime}`, 'YYYY-MM-DD HH:mm', AZ_TIMEZONE);
@@ -101,29 +111,46 @@ const BookSlotModal = ({ open, onClose, userId, isAdmin, onBooked, slots }) => {
       };
     });
   };
+  const getAvailableDurations = () => {
+    if (!startTime) return durations.map(d => ({ d, disabled: true }));
+
+    const [h, m] = startTime.split(":").map(Number);
+    const startMoment = moment.tz(`${startDate} ${h}:${m}`, 'YYYY-MM-DD H:mm', AZ_TIMEZONE);
+    const closingMoment = moment.tz(`${startDate} 22:00`, 'YYYY-MM-DD HH:mm', AZ_TIMEZONE);
+
+    return durations.map(d => {
+      const endMoment = startMoment.clone().add(d * 60, 'minutes');
+      return {
+        d,
+        disabled: endMoment.isAfter(closingMoment)
+      };
+    });
+  };
+
 
 
   const handleSubmit = async () => {
     if (!isValidBookingDay(startDate)) {
-      setError('Bookings are only allowed Monday–Thursday of this week.');
+      setError('Bookings are only allowed Monday–Sunday of this week.');
       return;
     }
 
     setLoading(true);
 
     try {
-      const res = await axios.post(`${DEFAULT_API}/api/slots/create`, {
-        date: startDate,
-        startTime, // still 24-hour for backend
-        duration,
-        isAdmin
-      });
-
+      // const res = await axios.post(`${DEFAULT_API}/api/slots/create`, {
+      //   date: startDate,
+      //   startTime, // still 24-hour for backend
+      //   duration,
+      //   isAdmin
+      // });
       const bookRes = await axios.post(`${DEFAULT_API}/api/slots/book`, {
-        slotId: res.data.slot._id,
+        date: startDate,
+        startTime,
+        duration,
         userId,
         isAdmin,
-        duration
+        section // section1 / section2
       });
 
       onBooked(bookRes.data.slot);
@@ -156,6 +183,11 @@ const BookSlotModal = ({ open, onClose, userId, isAdmin, onBooked, slots }) => {
             helperText={error}
           />
 
+          <TextField select label="Book Section" value={section} onChange={e => setSection(e.target.value)}>
+            <MenuItem value="section1">Section 1</MenuItem>
+            <MenuItem value="section2">Section 2</MenuItem>
+          </TextField>
+
           <TextField
             label="Start Time"
             select
@@ -173,18 +205,19 @@ const BookSlotModal = ({ open, onClose, userId, isAdmin, onBooked, slots }) => {
           </TextField>
 
           <TextField
-            label="Duration (hours)"
+            label="Duration"
             select
             value={duration}
-            onChange={(e) => setDuration(parseInt(e.target.value))}
+            onChange={(e) => setDuration(parseFloat(e.target.value))}
             fullWidth
           >
-            {durations.map((d) => (
-              <MenuItem key={d} value={d}>
-                {d} hour{d > 1 ? 's' : ''}
+            {getAvailableDurations().map(({ d, disabled }) => (
+              <MenuItem key={d} value={d} disabled={disabled}>
+                {d === 0.5 ? "30 minutes" : `${d} hours`}
               </MenuItem>
             ))}
           </TextField>
+
 
           <TextField
             label="End Time"
@@ -194,7 +227,7 @@ const BookSlotModal = ({ open, onClose, userId, isAdmin, onBooked, slots }) => {
           />
 
           <Typography variant="body2" color="textSecondary">
-            Bookings allowed Monday–Thursday of this week only. Working hours: 6:00 AM – 8:00 PM.
+            Bookings allowed Monday–Thursday of this week only. Working hours: 6:00 AM – 10:00 PM.
           </Typography>
         </Box>
       </DialogContent>

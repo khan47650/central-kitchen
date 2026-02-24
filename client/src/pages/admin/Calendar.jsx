@@ -7,7 +7,9 @@ import WeekNavigator from '../../components/WeekNavigator';
 import axios from 'axios';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useNavigate } from 'react-router-dom';
+import CircularProgress from "@mui/material/CircularProgress";
 import AdminUnavailableSlotModal from '../../components/AdminUnavailableSlotModel';
+import SlotManageDialog from '../../components/SlotManageDialog';
 
 const DEFAULT_API = process.env.REACT_APP_API_URL || "";
 const TOPBAR_HEIGHT = 64;
@@ -22,8 +24,9 @@ const Calendar = () => {
   const [selectedSlot, setSelectedSlot] = useState(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [slotToDelete, setSlotToDelete] = useState(null);
-  const [deleting, setDeleting] = useState(false);
   const navigate = useNavigate();
+  const [loadingAction, setLoadingAction] = useState(null);
+  const [errorMsg, setErrorMsg] = useState("");
 
 
   const fetchSlots = async () => {
@@ -57,34 +60,66 @@ const Calendar = () => {
 
   }
 
-  const handleBookedCellClick = (slot) => {
-    if (user.role === 'admin') {
-      setSlotToDelete(slot);
-      setDeleteDialogOpen(true);
-      return;
-    }
-    if (slot.bookedBy === user._id) {
-      setSlotToDelete(slot);
-      setDeleteDialogOpen(true);
-    }
+  const handleBookedCellClick = (data) => {
+    setSlotToDelete(data);
+    setDeleteDialogOpen(true);
   };
 
-  const confirmDeleteSlot = async () => {
+  // const confirmDeleteSlot = async () => {
+  //   try {
+  //     setDeleting(true);
+  //     await axios.delete(`${DEFAULT_API}/api/slots/delete/${slotToDelete._id}`);
+
+  //     setSlots(prev =>
+  //       prev.filter(s => s._id !== slotToDelete._id)
+  //     );
+
+  //     setDeleteDialogOpen(false);
+  //     setSlotToDelete(null);
+  //   } catch (err) {
+  //     console.error(err);
+  //   } finally {
+  //     setDeleting(false);
+  //   }
+  // };
+
+  const deleteFullSlot = async () => {
     try {
-      setDeleting(true);
-      await axios.delete(`${DEFAULT_API}/api/slots/delete/${slotToDelete._id}`);
-
-      setSlots(prev =>
-        prev.filter(s => s._id !== slotToDelete._id)
-      );
-
+      setLoadingAction("full");
+      await axios.delete(`${DEFAULT_API}/api/slots/delete/${slotToDelete.slot._id}`);
+      fetchSlots();
       setDeleteDialogOpen(false);
-      setSlotToDelete(null);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setDeleting(false);
+    } catch (error) {
+      console.error("Failed to fetch shops:", error);
     }
+    finally {
+      setLoadingAction(null);
+    }
+
+  };
+  const deleteSection = async (section) => {
+    try {
+      if (user.role === "admin") {
+        setLoadingAction(section);
+      } else {
+        setLoadingAction("client");
+      }
+      await axios.post(`${DEFAULT_API}/api/slots/clear-section`, {
+        slotId: slotToDelete.slot._id,
+        section,
+        userId: user._id,
+        isAdmin: user.role === "admin"
+      });
+
+      fetchSlots();
+      setDeleteDialogOpen(false);
+
+    } catch (error) {
+      console.error("Failed to fetch shops:", error);
+    } finally {
+      setLoadingAction(null);
+    }
+
   };
 
 
@@ -95,7 +130,23 @@ const Calendar = () => {
   }, []);
 
   const handleSlotBooked = (newSlot) => {
-    setSlots(prev => [...prev, newSlot]);
+    setSlots(prev => {
+      const index = prev.findIndex(s => s._id === newSlot._id);
+      if (index !== -1) {
+        const updatedSlot = {
+          ...prev[index],
+          sections: {
+            ...prev[index].sections,
+            ...newSlot.sections
+          }
+        };
+        const newArray = [...prev];
+        newArray[index] = updatedSlot;
+        return newArray;
+      } else {
+        return [...prev, newSlot];
+      }
+    });
   };
 
   return (
@@ -188,6 +239,7 @@ const Calendar = () => {
         isAdmin={user.role === 'admin'}
         onBooked={handleSlotBooked}
         slots={slots}
+        selectedSlot={selectedSlot}
       />
 
       <AdminUnavailableSlotModal
@@ -196,30 +248,17 @@ const Calendar = () => {
         onBooked={handleSlotBooked}
       />
 
-      <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
-        <DialogTitle>Delete Slot</DialogTitle>
-
-        <DialogContent>
-          <Typography>
-            Do you want to delete this slot?
-          </Typography>
-        </DialogContent>
-
-        <DialogActions>
-          <Button onClick={() => setDeleteDialogOpen(false)} disabled={deleting}>
-            No
-          </Button>
-
-          <Button
-            color="error"
-            variant="contained"
-            onClick={confirmDeleteSlot}
-            disabled={deleting}
-          >
-            {deleting ? "Deleting..." : "Yes"}
-          </Button>
-        </DialogActions>
-      </Dialog>
+      <SlotManageDialog
+        open={deleteDialogOpen}
+        onClose={() => setDeleteDialogOpen(false)}
+        user={user}
+        slotToDelete={slotToDelete}
+        users={users}
+        loadingAction={loadingAction}
+        errorMsg={errorMsg}
+        deleteSection={deleteSection}
+        deleteFullSlot={deleteFullSlot}
+      />
 
     </Box>
   );

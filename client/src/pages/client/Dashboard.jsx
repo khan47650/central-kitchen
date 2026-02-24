@@ -9,12 +9,7 @@ import {
   TableRow,
   TableCell,
   TableBody,
-  LinearProgress,
-  Stack,
-  Button,
-  Divider,
-  Avatar,
-  CircularProgress,
+  Avatar
 } from '@mui/material';
 import { EventAvailable, CheckCircle, Verified } from '@mui/icons-material';
 import { useAuth } from '../../context/AuthContext';
@@ -22,8 +17,9 @@ import axios from 'axios';
 import moment from 'moment';
 import '../../Styles/clientDashboard.css';
 import { Skeleton } from "@mui/material";
+import { useTheme, useMediaQuery } from "@mui/material";
 import { useNavigate } from 'react-router-dom';
-import { Cursor } from 'mongoose';
+import Marquee from "react-fast-marquee"
 
 const DEFAULT_API = process.env.REACT_APP_API_URL || '';
 
@@ -32,6 +28,10 @@ const ClientDashboard = () => {
   const [stats, setStats] = useState(null);
   const [recentBookings, setRecentBookings] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [announcements, setAnnouncements] = useState([]);
+  const [latestAnnouncement, setLatestAnnouncement] = useState(null);
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -54,6 +54,22 @@ const ClientDashboard = () => {
 
     fetchClientData();
   }, [user, accessToken]);
+
+  useEffect(() => {
+    const fetchAnnouncements = async () => {
+      try {
+        const weekly = await axios.get(`${DEFAULT_API}/api/users/latest-announcements`);
+        const latest = await axios.get(`${DEFAULT_API}/api/users/latest-announcement`);
+
+        setAnnouncements(weekly.data.announcements || []);
+        setLatestAnnouncement(latest.data.announcement || null);
+      } catch (err) {
+        console.error("Announcement API error:", err);
+      }
+    };
+
+    fetchAnnouncements();
+  }, []);
 
   if (loading) {
     return (
@@ -115,33 +131,121 @@ const ClientDashboard = () => {
         Welcome {user?.fullName || 'Client'}
       </Typography>
 
-      {/* Stat Cards */}
-      <Grid container spacing={2} sx={{ mb: 2 ,mt:1}}>
-        {statCards.map((card) => (
-          <Grid item xs={12} sm={6} md={4} key={card.id}>
+      {announcements.length > 0 && (
+        <Box
+          sx={{
+            bgcolor: "#16a34a",
+            color: "white",
+            py: 1,
+            px: 2,
+            borderRadius: 1,
+            mb: 1,
+            mt:2,
+            overflow: "hidden",
+          }}
+        >
+          <Marquee gradient={false} speed={50}>
+            {announcements.map((a, i) => (
+              <span key={i} style={{ marginRight: 60 }}>
+                <b>{a.title}:</b> {a.description}
+              </span>
+            ))}
+          </Marquee>
+        </Box>
+      )}
+      {/* LEFT SIDE / Main Content */}
+      <Grid container spacing={2} sx={{ mb: 1, mt: 1 }} alignItems="flex-start">
+        {/* LEFT SIDE */}
+        <Grid item xs={12} md={8} sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+          {latestAnnouncement && (
             <Paper
-              className="stat-card"
-              onClick={() => {
-                if (card.label === 'Upcoming Bookings')
-                  navigate('/client/my-appointments?type=upcoming');
-
-                if (card.label === 'Completed')
-                  navigate('/client/my-appointments?type=completed');
+              sx={{
+                p: 2,
+                borderRadius: 2,
+                display: "flex",
+                flexDirection: "column",
+                gap: 1,
               }}
-              sx={{ display: 'flex', alignItems: 'center', gap: 2, p: 2,cursor:'pointer' }}
             >
-              <Avatar sx={{ bgcolor: card.color, width: 50, height: 50 }}>{card.icon}</Avatar>
-              <Box>
-                <Typography className="stat-label">{card.label}</Typography>
-                <Typography className="stat-value">{card.value}</Typography>
-              </Box>
+              {latestAnnouncement.image && (
+                <Box
+                  component="img"
+                  src={latestAnnouncement.image}
+                  sx={{
+                    width: "100%",
+                    maxHeight: 250,
+                    objectFit: "cover",
+                    borderRadius: 2,
+                    mb: 2,
+                  }}
+                />
+              )}
+
+              <Typography variant="h5" sx={{ fontWeight: 700 }}>
+                {latestAnnouncement.title}
+              </Typography>
+
+              <Typography variant="body1" sx={{ color: "#4b5563", mt: 1 }}>
+                {latestAnnouncement.description}
+              </Typography>
             </Paper>
+          )}
+
+          {/* Recent Bookings should always be directly below latestAnnouncement */}
+          <Paper className="section" sx={{ p: 2 }}>
+            <Typography variant="h6" className="section-title">
+              Recent Bookings
+            </Typography>
+            <Table size="small">
+              <TableHead>
+                <TableRow>
+                  <TableCell>Service</TableCell>
+                  <TableCell>Date</TableCell>
+                  <TableCell>Status</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {recentBookings.map((booking) => (
+                  <TableRow key={booking.id}>
+                    <TableCell>{booking.service}</TableCell>
+                    <TableCell>{moment(booking.date).format("YYYY-MM-DD HH:mm")}</TableCell>
+                    <TableCell>{booking.status}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </Paper>
+        </Grid>
+
+        {/* RIGHT SIDE - Stats Cards */}
+        <Grid item xs={12} md={4}>
+          <Grid container spacing={2} direction="column">
+            {statCards.map((card) => (
+              <Grid item key={card.id}>
+                <Paper
+                  className="stat-card"
+                  onClick={() => {
+                    if (card.label === "Upcoming Bookings")
+                      navigate("/client/my-appointments?type=upcoming");
+                    if (card.label === "Completed")
+                      navigate("/client/my-appointments?type=completed");
+                  }}
+                  sx={{ display: "flex", alignItems: "center", gap: 2, p: 2, cursor: "pointer" }}
+                >
+                  <Avatar sx={{ bgcolor: card.color, width: 50, height: 50 }}>{card.icon}</Avatar>
+                  <Box>
+                    <Typography className="stat-label">{card.label}</Typography>
+                    <Typography className="stat-value">{card.value}</Typography>
+                  </Box>
+                </Paper>
+              </Grid>
+            ))}
           </Grid>
-        ))}
+        </Grid>
       </Grid>
 
       {/* Bookings & Summary */}
-      <Grid container spacing={2}>
+      {/* <Grid container spacing={2}>
         <Grid item xs={12} md={8}>
           <Paper className="section" sx={{ p: 2 }}>
             <Typography variant="h6" className="section-title">
@@ -168,30 +272,10 @@ const ClientDashboard = () => {
           </Paper>
         </Grid>
 
-        <Grid item xs={12} md={4}>
-          <Paper className="section" sx={{ p: 2 }}>
-            <Typography variant="h6" className="section-title">
-              Activity Summary
-            </Typography>
-            <Stack spacing={2}>
-              <Box>
-                <Typography variant="body2">Booking Completion</Typography>
-                <LinearProgress variant="determinate" value={80} />
-              </Box>
-              <Box>
-                <Typography variant="body2">Cancellation Rate</Typography>
-                <LinearProgress variant="determinate" value={20} />
-              </Box>
-            </Stack>
-            <Divider sx={{ my: 2 }} />
-            <Button variant="contained" fullWidth>
-              View Insights
-            </Button>
-          </Paper>
-        </Grid>
 
-      </Grid>
-    </Box>
+
+      </Grid> */}
+    </Box >
   );
 };
 
