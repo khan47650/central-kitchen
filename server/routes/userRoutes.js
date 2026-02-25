@@ -353,9 +353,9 @@ router.post('/forgot-password', async (req, res) => {
 // SAVE ANNOUNCEMENT
 router.post("/create-announcement", upload.single("image"), async (req, res) => {
   try {
-    const { title, description } = req.body;
-    if (!title || !description) {
-      return res.status(400).json({ message: "Title and description required" });
+    const { title, description,duration } = req.body;
+    if (!title || !description || !duration) {
+      return res.status(400).json({ message: "Title, description and duration are required" });
     }
 
     let imageUrl = null;
@@ -368,7 +368,7 @@ router.post("/create-announcement", upload.single("image"), async (req, res) => 
 
       imageUrl = result.secure_url;
     }
-    
+
 
     // Set createdAt in Maricopa timezone
     const createdAt = moment().tz(AZ_TIMEZONE).toDate();
@@ -377,6 +377,7 @@ router.post("/create-announcement", upload.single("image"), async (req, res) => 
       title,
       description,
       image: imageUrl,
+      duration,
       createdAt
     });
 
@@ -387,20 +388,86 @@ router.post("/create-announcement", upload.single("image"), async (req, res) => 
   }
 });
 
+//Edit announcemnt
+router.put("/announcement/:id", upload.single("image"), async (req, res) => {
+  try {
+    const { title, description, duration } = req.body;
+    const { id } = req.params;
+
+    const updateData = { title, description, duration };
+    if (req.file) {
+      const result = await cloudinary.uploader.upload(req.file.path, {
+        folder: "announcements",
+        public_id: `announcement_${Date.now()}`
+      });
+      updateData.image = result.secure_url;
+    }
+
+    // Update announcement
+    const announcement = await Announcement.findByIdAndUpdate(id, updateData, { new: true });
+
+    if (announcement.duration !== duration) {
+      const maricopaTime = moment().tz(AZ_TIMEZONE).toDate();
+      announcement.updatedAt = maricopaTime;
+      await announcement.save();
+    }
+
+    // Fetch all announcements sorted by latest first
+    const announcements = await Announcement.find().sort({ updatedAt: -1 });
+
+    res.json({ message: "Announcement updated", announcement, announcements });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+///Delte announcement
+router.delete("/announcement/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    await Announcement.findByIdAndDelete(id);
+    res.json({ message: "Announcement deleted" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+// GET /announcements/all
+router.get("/announcements/all", async (req, res) => {
+  try {
+    const announcements = await Announcement.find().sort({ updatedAt: -1 }).lean();
+    res.json({ announcements });
+  } catch (err) {
+    console.error("Fetch All Announcements Error:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
 // WEEKLY ANNOUNCEMENTS (LAST 7 DAYS IN MARICOPA TIMEZONE)
 router.get("/latest-announcements", async (req, res) => {
   try {
-    const last7Days = moment().tz(AZ_TIMEZONE).subtract(7, 'days').toDate();
+    const now = moment().tz(AZ_TIMEZONE);
+    const last7Days = moment().tz(AZ_TIMEZONE).subtract(7, "days");
 
+    // Fetch announcements created in last 7 days
     const announcements = await Announcement.find({
       createdAt: { $gte: last7Days },
-    })
-      .sort({ createdAt: -1 })
-      .lean();
+    }).sort({ createdAt: -1 }).lean();
 
-    res.json({ announcements });
+    // Filter out expired announcements
+    const activeAnnouncements = announcements.filter(a => {
+      let expiry;
+      if (a.duration === "1 day") expiry = moment(a.createdAt).add(1, "days");
+      else if (a.duration === "1 week") expiry = moment(a.createdAt).add(7, "days");
+      else if (a.duration === "1 month") expiry = moment(a.createdAt).add(1, "months");
+      return now.isBefore(expiry);
+    });
+
+    res.json({ announcements: activeAnnouncements });
   } catch (err) {
-    console.error("Weekly Announcement Error:", err);
+    console.error("Weekly Announcements Error:", err);
     res.status(500).json({ message: "Server error" });
   }
 });
@@ -408,11 +475,20 @@ router.get("/latest-announcements", async (req, res) => {
 // SINGLE LATEST ANNOUNCEMENT
 router.get("/latest-announcement", async (req, res) => {
   try {
-    const announcement = await Announcement.findOne()
-      .sort({ createdAt: -1 })
-      .lean();
+    const now = moment().tz(AZ_TIMEZONE);
 
-    res.json({ announcement });
+    const announcements = await Announcement.find().sort({ updatedAt: -1 }).lean();
+
+    // Get the first announcement which is not expired
+    const latestActive = announcements.find(a => {
+      let expiry;
+      if (a.duration === "1 day") expiry = moment(a.createdAt).add(1, "days");
+      else if (a.duration === "1 week") expiry = moment(a.createdAt).add(7, "days");
+      else if (a.duration === "1 month") expiry = moment(a.createdAt).add(1, "months");
+      return now.isBefore(expiry);
+    });
+
+    res.json({ announcement: latestActive || null });
   } catch (err) {
     console.error("Latest Announcement Error:", err);
     res.status(500).json({ message: "Server error" });
