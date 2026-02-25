@@ -1,198 +1,255 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
     Box,
     Typography,
-    Card,
-    CardContent,
-    TextField,
     Button,
     IconButton,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogActions,
+    TextField,
+    MenuItem,
+    Card,
+    CardContent,
     useTheme,
     useMediaQuery
 } from "@mui/material";
-import { ArrowBack, PhotoCamera } from "@mui/icons-material";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { ArrowBack, PhotoCamera, Delete, Edit } from "@mui/icons-material";
+import { Skeleton } from "@mui/material";
 import axios from "axios";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
+import HoverZoomImage from "../../components/HoverZoomImage";
 
 const DEFAULT_API = process.env.REACT_APP_API_URL || "";
 
 const AdminUpdates = () => {
+    const navigate = useNavigate();
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-    const navigate = useNavigate();
 
+    const [announcements, setAnnouncements] = useState([]);
+
+    // Dialog state
+    const [open, setOpen] = useState(false);
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
+    const [duration, setDuration] = useState("1 week");
     const [image, setImage] = useState(null);
     const [preview, setPreview] = useState(null);
     const [loading, setLoading] = useState(false);
+    const [editingId, setEditingId] = useState(null); // for edit mode
 
-    const handleBack = () => {
-        navigate(-1);
+    const handleBack = () => navigate(-1);
+
+    const handleOpenDialog = () => setOpen(true);
+
+    const handleCloseDialog = () => {
+        setOpen(false);
+        setTitle("");
+        setDescription("");
+        setDuration("1 week");
+        setImage(null);
+        setPreview(null);
+        setEditingId(null);
     };
 
     const handleImageChange = (e) => {
         const file = e.target.files[0];
         if (!file) return;
-
         setImage(file);
         setPreview(URL.createObjectURL(file));
     };
 
-    const handleSaveAnnouncement = async () => {
-        if (!title || !description) {
-            toast.error("Title or Description missing");
-            return;
+    const fetchAnnouncements = async () => {
+        try {
+            const res = await axios.get(`${DEFAULT_API}/api/users/announcements/all`);
+            setAnnouncements(res.data.announcements);
+        } catch (err) {
+            console.error(err);
+            toast.error("Failed to fetch announcements");
         }
+    };
+
+    useEffect(() => { fetchAnnouncements(); }, []);
+
+    // Save or update announcement
+    const handleSaveAnnouncement = async () => {
+        if (!title || !description || !duration) return toast.error("Title,description and duration are required");
 
         setLoading(true);
-
         try {
             const formData = new FormData();
             formData.append("title", title);
             formData.append("description", description);
+            formData.append("duration", duration);
             if (image) formData.append("image", image);
 
-            await axios.post(`${DEFAULT_API}/api/users/create-announcement`, formData);
+            if (editingId) {
+                // Edit mode
+                await axios.put(`${DEFAULT_API}/api/users/announcement/${editingId}`, formData);
+                toast.success("Announcement updated!");
+            } else {
+                // Create mode
+                await axios.post(`${DEFAULT_API}/api/users/create-announcement`, formData);
+                toast.success("Announcement saved!");
+            }
 
-            toast.success("Announcement saved!");
-            setTitle("");
-            setDescription("");
-            setImage(null);
-            setPreview(null);
+            handleCloseDialog();
+            fetchAnnouncements();
         } catch (err) {
             console.error(err);
             toast.error("Failed to save announcement");
-        } finally {
-            setLoading(false);
+        } finally { setLoading(false); }
+    };
+
+    const handleDelete = async (id) => {
+        try {
+            await axios.delete(`${DEFAULT_API}/api/users/announcement/${id}`);
+            toast.success("Deleted successfully");
+            fetchAnnouncements();
+        } catch (err) {
+            toast.error("Delete failed");
         }
+    };
+
+    const handleEdit = (announcement) => {
+        setEditingId(announcement._id);
+        setTitle(announcement.title);
+        setDescription(announcement.description);
+        setDuration(announcement.duration);
+        setPreview(announcement.image || null);
+        setOpen(true);
     };
 
     return (
         <Box p={isMobile ? 1 : 2}>
             {/* Top bar */}
-            <Box display="flex" alignItems="center" mb={3}>
-                <IconButton onClick={handleBack}>
-                    <ArrowBack />
-                </IconButton>
-                <Typography variant={isMobile ? "h6" : "h5"} ml={1}>
-                    Announcement
-                </Typography>
+            <Box display="flex" alignItems="center" justifyContent="space-between" mb={3} flexWrap="wrap">
+                <Box display="flex" alignItems="center">
+                    <IconButton onClick={handleBack}><ArrowBack /></IconButton>
+                    <Typography variant={isMobile ? "h6" : "h5"} ml={1}>Announcements</Typography>
+                </Box>
+                <Button
+                    variant="contained"
+                    onClick={handleOpenDialog}
+                    sx={{ mt: isMobile ? 1 : 0, width: isMobile ? "100%" : "auto",color:"white" }}
+                >
+                    New Announcement
+                </Button>
             </Box>
 
-            {/* Card container */}
-            <Card
-                sx={{
-                    maxWidth: 700,
-                    margin: "auto",
-                    borderRadius: 3,
-                    boxShadow: 3,
-                    transition: "transform 0.3s ease, box-shadow 0.3s ease",
-                    "&:hover": {
-                        transform: "scale(1.02)",
-                        boxShadow: 6,
-                    },
-                }}
-            >
-                <CardContent>
-
-                    <Box display="flex" justifyContent="center" mb={2}>
-                        <Box position="relative" textAlign="center">
-
-                            {/* Preview Image */}
-                            {preview ? (
-                                <Box
-                                    component="img"
-                                    src={preview}
-                                    alt="preview"
-                                    sx={{
-                                        width: 120,
-                                        height: 120,
-                                        borderRadius: "50%",
-                                        objectFit: "cover",
-                                        border: "2px solid #ddd",
-                                    }}
-                                />
-                            ) : (
-                                <Box
-                                    component="label"
-                                    sx={{
-                                        width: 120,
-                                        height: 120,
-                                        borderRadius: "50%",
-                                        border: "2px dashed #ccc",
-                                        display: "flex",
-                                        alignItems: "center",
-                                        justifyContent: "center",
-                                        cursor: "pointer",
-                                        bgcolor: "#f9fafb",
-                                        "&:hover": { bgcolor: "#f3f4f6" },
-                                    }}
-                                >
-                                    <PhotoCamera sx={{ fontSize: 40, color: "#9ca3af" }} />
-                                    <input hidden type="file" accept="image/*" onChange={handleImageChange} />
+            <Box display="flex" flexDirection="column" gap={2}>
+                {announcements.length === 0
+                    ? Array.from({ length: 3 }).map((_, i) => (
+                        <Card key={i}>
+                            <CardContent sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+                                <Skeleton variant="rectangular" width={60} height={60} sx={{ borderRadius: 1 }} />
+                                <Box flex={1}>
+                                    <Skeleton width="80%" height={20} sx={{ mb: 1 }} />
+                                    <Skeleton width="50%" height={15} />
                                 </Box>
-                            )}
-
-                            {/* Small Edit Icon on Preview */}
-                            {preview && (
-                                <IconButton
-                                    component="label"
-                                    sx={{
-                                        position: "absolute",
-                                        bottom: 5,
-                                        right: 5,
-                                        bgcolor: "white",
-                                        border: "1px solid #ddd",
-                                    }}
+                                <Box display="flex" gap={1}>
+                                    <Skeleton variant="circular" width={40} height={40} />
+                                    <Skeleton variant="circular" width={40} height={40} />
+                                </Box>
+                            </CardContent>
+                        </Card>
+                    ))
+                    : announcements.map((a) => (
+                        <Card key={a._id} sx={{ "&:hover img": { transform: "scale(1.1)", transition: "0.3s" } }}>
+                            <CardContent sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+                                <Box
+                                    width={60}
+                                    height={60}
+                                    borderRadius={1}
+                                    bgcolor={a.image ? "transparent" : "#f3f4f6"}
+                                    display="flex"
+                                    alignItems="center"
+                                    justifyContent="center"
                                 >
-                                    <PhotoCamera fontSize="small" />
-                                    <input hidden type="file" accept="image/*" onChange={handleImageChange} />
-                                </IconButton>
-                            )}
-                        </Box>
+                                    {a.image ? (
+                                        <HoverZoomImage src={a.image} size={60} zoomSize={200} />
+                                    ) : (
+                                        <PhotoCamera sx={{ fontSize: 30, color: "#9ca3af" }} />
+                                    )}
+                                </Box>
+                                <Box flex={1}>
+                                    <Typography>{a.title}</Typography>
+                                    <Typography variant="caption">Duration: {a.duration}</Typography>
+                                </Box>
+                                <Box display="flex" gap={1}>
+                                    <IconButton onClick={() => handleEdit(a)}>
+                                        <Edit />
+                                    </IconButton>
+                                    <IconButton onClick={() => handleDelete(a._id)} sx={{ color: "red" }}>
+                                        <Delete />
+                                    </IconButton>
+                                </Box>
+                            </CardContent>
+                        </Card>
+                    ))}
+            </Box>
+
+            {/* Dialog */}
+            <Dialog open={open} onClose={handleCloseDialog} maxWidth="sm" fullWidth>
+                <DialogTitle>{editingId ? "Edit Announcement" : "New Announcement"}</DialogTitle>
+                <DialogContent sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+                    <Box position="relative" textAlign="center" mb={2}>
+                        {preview ? (
+                            <Box
+                                component="img"
+                                src={preview}
+                                alt="preview"
+                                sx={{
+                                    width: 120,
+                                    height: 120,
+                                    borderRadius: "50%",
+                                    objectFit: "cover",
+                                    border: "2px solid #ddd",
+                                    mb: 1
+                                }}
+                            />
+                        ) : (
+                            <Box
+                                component="label"
+                                sx={{
+                                    width: 120,
+                                    height: 120,
+                                    borderRadius: "50%",
+                                    border: "2px dashed #ccc",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    cursor: "pointer",
+                                    bgcolor: "#f9fafb",
+                                    "&:hover": { bgcolor: "#f3f4f6" },
+                                    mb: 1
+                                }}
+                            >
+                                <PhotoCamera sx={{ fontSize: 40, color: "#9ca3af" }} />
+                                <input hidden type="file" accept="image/*" onChange={handleImageChange} />
+                            </Box>
+                        )}
                     </Box>
 
-                    <TextField
-                        fullWidth
-                        placeholder="Title"
-                        value={title}
-                        onChange={(e) => setTitle(e.target.value)}
-                        sx={{ mb: 3 }}
-                    />
-
-                    {/* Description */}
-                    <TextField
-                        fullWidth
-                        placeholder="Description"
-                        variant="outlined"
-                        multiline
-                        rows={4}
-                        value={description}
-                        onChange={(e) => setDescription(e.target.value)}
-                        sx={{
-                            mb: 3, '& .MuiInputBase-input': {
-                                fontSize: '13px',
-                                lineHeight: '1.4',
-                                fontWeight: 400,
-                                color: '#6B7280'
-                            }
-                        }}
-                    />
-
-                    <Button
-                        variant="contained"
-                        fullWidth
-                        onClick={handleSaveAnnouncement}
-                        disabled={loading}
-                        sx={{ color: "white" }}
-                    >
-                        {loading ? "Saving..." : "Save Announcement"}
+                    <TextField fullWidth label="Title" value={title} onChange={e => setTitle(e.target.value)} sx={{ mb: 2 }} />
+                    <TextField fullWidth multiline rows={4} label="Description" value={description} onChange={e => setDescription(e.target.value)} sx={{ mb: 2 }} />
+                    <TextField select fullWidth label="Duration" value={duration} onChange={e => setDuration(e.target.value)} sx={{ mb: 2 }}>
+                        <MenuItem value="1 day">1 day</MenuItem>
+                        <MenuItem value="1 week">1 week</MenuItem>
+                        <MenuItem value="1 month">1 month</MenuItem>
+                    </TextField>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleCloseDialog}>Cancel</Button>
+                    <Button variant="contained" onClick={handleSaveAnnouncement} disabled={loading} sx={{color:"white"}}>
+                        {loading ? "Saving..." : editingId ? "Update" : "Save"}
                     </Button>
-                </CardContent>
-            </Card>
+                </DialogActions>
+            </Dialog>
 
             <ToastContainer autoClose={2000} />
         </Box>
