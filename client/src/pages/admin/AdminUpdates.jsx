@@ -55,14 +55,7 @@ const AdminUpdates = () => {
         setPreview(null);
         setEditingId(null);
     };
-
-    const handleImageChange = (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-        setImage(file);
-        setPreview(URL.createObjectURL(file));
-    };
-
+    
     const fetchAnnouncements = async () => {
         try {
             const res = await axios.get(`${DEFAULT_API}/api/users/announcements/all`);
@@ -135,7 +128,7 @@ const AdminUpdates = () => {
                 <Button
                     variant="contained"
                     onClick={handleOpenDialog}
-                    sx={{ mt: isMobile ? 1 : 0, width: isMobile ? "100%" : "auto",color:"white" }}
+                    sx={{ mt: isMobile ? 1 : 0, width: isMobile ? "100%" : "auto", color: "white" }}
                 >
                     New Announcement
                 </Button>
@@ -197,42 +190,51 @@ const AdminUpdates = () => {
             <Dialog open={open} onClose={handleCloseDialog} maxWidth="sm" fullWidth>
                 <DialogTitle>{editingId ? "Edit Announcement" : "New Announcement"}</DialogTitle>
                 <DialogContent sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+                    {/* Dialog Image Selector */}
                     <Box position="relative" textAlign="center" mb={2}>
-                        {preview ? (
-                            <Box
-                                component="img"
-                                src={preview}
-                                alt="preview"
-                                sx={{
-                                    width: 120,
-                                    height: 120,
-                                    borderRadius: "50%",
-                                    objectFit: "cover",
-                                    border: "2px solid #ddd",
-                                    mb: 1
+                        <Box
+                            component="label"
+                            sx={{
+                                width: 120,
+                                height: 120,
+                                borderRadius: "50%",
+                                border: preview ? "2px solid #ddd" : "2px dashed #ccc",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                cursor: "pointer",
+                                bgcolor: preview ? "transparent" : "#f9fafb",
+                                "&:hover": { bgcolor: preview ? "transparent" : "#f3f4f6" },
+                                mb: 1,
+                                overflow: "hidden",
+                            }}
+                        >
+                            {preview ? (
+                                <Box
+                                    component="img"
+                                    src={preview}
+                                    alt="preview"
+                                    sx={{
+                                        width: "100%",
+                                        height: "100%",
+                                        objectFit: "cover",
+                                    }}
+                                />
+                            ) : (
+                                <PhotoCamera sx={{ fontSize: 40, color: "#9ca3af" }} />
+                            )}
+                            <input
+                                hidden
+                                type="file"
+                                accept="image/*"
+                                onChange={(e) => {
+                                    const file = e.target.files[0];
+                                    if (!file) return;
+                                    setImage(file);
+                                    setPreview(URL.createObjectURL(file));
                                 }}
                             />
-                        ) : (
-                            <Box
-                                component="label"
-                                sx={{
-                                    width: 120,
-                                    height: 120,
-                                    borderRadius: "50%",
-                                    border: "2px dashed #ccc",
-                                    display: "flex",
-                                    alignItems: "center",
-                                    justifyContent: "center",
-                                    cursor: "pointer",
-                                    bgcolor: "#f9fafb",
-                                    "&:hover": { bgcolor: "#f3f4f6" },
-                                    mb: 1
-                                }}
-                            >
-                                <PhotoCamera sx={{ fontSize: 40, color: "#9ca3af" }} />
-                                <input hidden type="file" accept="image/*" onChange={handleImageChange} />
-                            </Box>
-                        )}
+                        </Box>
                     </Box>
 
                     <TextField fullWidth label="Title" value={title} onChange={e => setTitle(e.target.value)} sx={{ mb: 2 }} />
@@ -245,7 +247,7 @@ const AdminUpdates = () => {
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleCloseDialog}>Cancel</Button>
-                    <Button variant="contained" onClick={handleSaveAnnouncement} disabled={loading} sx={{color:"white"}}>
+                    <Button variant="contained" onClick={handleSaveAnnouncement} disabled={loading} sx={{ color: "white" }}>
                         {loading ? "Saving..." : editingId ? "Update" : "Save"}
                     </Button>
                 </DialogActions>
