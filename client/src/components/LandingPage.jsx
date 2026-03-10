@@ -10,7 +10,7 @@ import '../CSS/About.css';
 import '../CSS/Contact.css';
 import '../CSS/footer.css';
 import logo from "../assets/img/logo.png";
-import hero1 from "../assets/img/hero-carousel-1.jpg";
+import hero1 from "../assets/img/home_image.jpeg";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Link } from "react-router-dom";
@@ -175,12 +175,54 @@ const LandingPage = () => {
           </div>
           <div className="about-container">
             <div className="about-card" data-aos="fade-up" data-aos-delay="100">
-              <h3>What does "Commissary Kitchen" mean?</h3>
-              <p>  Commissary kitchens are commercial kitchens available to rent from third parties which can be set up in any location such as a Ghost Kitchen.</p>
+              <h3> "Commissary Kitchen"</h3>
+              <p>
+                Central Arizona College offers a unique opportunity for business owners in need of fully functional kitchen space. Whether you’re a food truck, caterer, baker, or small food producer, a commissary kitchen allows you to focus on what matters most: creating great food and growing your business.
+              </p>
+
+              <p><strong>Here are some key benefits for local food entrepreneurs:</strong></p>
+
+              <ul>
+                <li>Low Startup Costs</li>
+                <li>Health Department–Approved Space</li>
+                <li>Access to Commercial-Grade Equipment</li>
+                <li>Built-In Community & Networking</li>
+                <li>Flexible Packages to Meet Your Specific Business Needs</li>
+              </ul>
             </div>
             <div className="about-card" data-aos="fade-up" data-aos-delay="200">
-              <h3>What does "Central Kitchen" do?</h3>
-              <p>  Central Kitchen is a scheduling application, designed to streamline the process of scheduling a commissary kitchen.</p>
+              <h3>"Food Truck Paark"</h3>
+              <p>
+                Our food truck park offers a vibrant, low-risk way for food businesses to grow while serving customers in a lively, community-focused setting.
+              </p>
+
+              <p><strong>Whether you’re launching a new concept or expanding your reach, CAC is here to support you:</strong></p>
+
+              <ul>
+                <li>Built-In Foot Traffic</li>
+                <li>Prime Location Without High Overhead</li>
+                <li>Exclusive CAC Event and Catering Opportunities</li>
+                <li>Brand Exposure – Social Media, Signage, and Online Presence</li>
+              </ul>
+            </div>
+          </div>
+          <div className="about-container">
+            <div className="about-card full-width-card" data-aos="fade-up" data-aos-delay="300">
+              <h3>Food Trucks</h3>
+
+              <p>
+                Conveniently located at Central Arizona College, our food truck park brings the best local flavors together in one vibrant, outdoor destination. There’s something for everyone—from quick bites to crave-worthy meals—making it the perfect spot for quick lunches between classes, families, friends, and groups with different tastes.
+              </p>
+
+              <p>
+                Enjoy open seating, a relaxed atmosphere, and a community vibe that goes beyond just food. From study breaks and group hangouts to music and special events, the food truck park turns everyday meals into something worth looking forward to.
+              </p>
+
+              <p>
+                <strong>Great food. Easy location. Campus energy.</strong><br />
+                Come hungry. Stay awhile.
+              </p>
+
             </div>
           </div>
 

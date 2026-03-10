@@ -178,7 +178,7 @@ const AdminSidebar = ({ mobileOpen, setMobileOpen }) => {
           <ListItemIcon sx={{ color: 'white' }}>
             <Settings />
           </ListItemIcon>
-          <ListItemText primary="Settings" />
+          <ListItemText primary="Dashboard" />
         </ListItemButton>
 
         <ListItemButton
@@ -200,7 +200,7 @@ const AdminSidebar = ({ mobileOpen, setMobileOpen }) => {
           <ListItemIcon sx={{ color: 'white' }}>
             <AccessTime />
           </ListItemIcon>
-          <ListItemText primary="Timings" />
+          <ListItemText primary="Manage Shops" />
         </ListItemButton>
 
          <ListItemButton

@@ -34,9 +34,9 @@ const ClientSidebar = ({ mobileOpen, setMobileOpen }) => {
     { label: 'Schedule', path: '/client/schedule', icon: <CalendarMonth /> },
     // { label: 'All Appointments', path: '/client/appointments', icon: <EventAvailable /> },
     { label: 'My Appointments', path: '/client/my-appointments', icon: <AssignmentTurnedIn /> },
-    { label: 'Settings', path: '/client/dashboard', icon: <Settings /> },
+    { label: 'Dashboard', path: '/client/dashboard', icon: <Settings /> },
     { label: 'Reset Password', path: '/client/reset-password', icon: <LockReset /> },
-    { label: 'Timings', path: '/client/timings', icon: <AccessTime /> },
+    { label: 'My Shop', path: '/client/timings', icon: <AccessTime /> },
     { label: 'My Categories', path: '/client/my-categories', icon: <Apps /> },
   ];
 

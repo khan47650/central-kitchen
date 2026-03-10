@@ -159,7 +159,7 @@
 
 .cta-banner {
   position: relative;
- background-image: url('../assets/img/hero-carousel-1.jpg'); /* Replace with your actual image */
+ background-image: url('../assets/img/about_image.jpeg'); 
   background-size: cover;
   background-position: center;
   height: 60vh;
@@ -188,6 +188,10 @@
 .cta-overlay p {
   font-size: 1.05rem;
   margin-bottom: 1.25rem;
+}
+.full-width-card{
+  grid-column: 1 / -1;
+  margin-top: 25px;
 }
 
 @media (max-width: 720px) {
