@@ -48,7 +48,7 @@
   min-height: 260px;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
   position: relative;
   overflow: hidden;
 }
@@ -74,6 +74,7 @@
   font-weight: 700;
   color: var(--accent);
   margin-bottom: 18px;
+   margin-top: 0;
 }
 
 .about-card p {

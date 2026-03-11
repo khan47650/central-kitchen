@@ -191,7 +191,7 @@ const LandingPage = () => {
               </ul>
             </div>
             <div className="about-card" data-aos="fade-up" data-aos-delay="200">
-              <h3>"Food Truck Paark"</h3>
+              <h3>"Food Truck Park"</h3>
               <p>
                 Our food truck park offers a vibrant, low-risk way for food businesses to grow while serving customers in a lively, community-focused setting.
               </p>
