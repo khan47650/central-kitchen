@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import "../../CSS/Shops.css";
 import axios from "axios";
 import moment from "moment-timezone";
-import { Skeleton,IconButton } from "@mui/material";
+import { Skeleton, IconButton } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { ArrowBack } from "@mui/icons-material";
 
@@ -85,11 +85,11 @@ const AdminShops = () => {
     return (
         <div className="page-wrapper">
             <div className="page-content">
-                <div style={{ marginTop: "24px", marginBottom: "5px", display:"flex"}}>
-                      <IconButton size="small" onClick={() => navigate(-1)}>
-                                <ArrowBack />
-                              </IconButton>
-                    <h4 style={{ fontWeight: 600 ,paddingLeft:"20px" ,paddingTop:"5px"}}>
+                <div style={{ marginTop: "24px", marginBottom: "5px", display: "flex" }}>
+                    <IconButton size="small" onClick={() => navigate(-1)}>
+                        <ArrowBack />
+                    </IconButton>
+                    <h4 style={{ fontWeight: 600, paddingLeft: "20px", paddingTop: "5px" }}>
                         Food Trucks
                     </h4>
                 </div>
@@ -111,10 +111,10 @@ const AdminShops = () => {
                                 <div key={shop._id} className="shop-card"
                                     onClick={() => {
                                         console.log("Navigating to shopId:", shop._id);
-                                        navigate(`/admin/categories/${shop._id}`,{
-                                            state:{
-                                                shopName:shop.shopName,
-                                                ownerId: shop.userId, 
+                                        navigate(`/admin/categories/${shop._id}`, {
+                                            state: {
+                                                shopName: shop.shopName,
+                                                ownerId: shop.userId,
                                             }
                                         });
                                     }}>
@@ -151,7 +151,9 @@ const AdminShops = () => {
                         })}
 
                     {!loading && !shops.length && (
-                        <p className="no-shops">No shops found</p>
+                        <div className="no-shops-container">
+                            <p className="no-shops">No Shops Found</p>
+                        </div>
                     )}
                 </div>
             </div>

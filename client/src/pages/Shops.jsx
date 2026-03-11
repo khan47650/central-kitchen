@@ -104,12 +104,12 @@ const Shops = () => {
                                 <div key={shop._id} className="shop-card"
                                     onClick={() => {
                                         console.log("Navigating to shopId:", shop._id);
-                                            navigate(`/shops/${shop._id}`, {
-                                                state: {
-                                                    shopName: shop.shopName,
-                                                },
-                                            });
-                                    
+                                        navigate(`/shops/${shop._id}`, {
+                                            state: {
+                                                shopName: shop.shopName,
+                                            },
+                                        });
+
 
                                     }}>
                                     <img src={shop.shopImage} alt={shop.shopName} />
@@ -145,7 +145,9 @@ const Shops = () => {
                         })}
 
                     {!loading && !shops.length && (
-                        <p className="no-shops">No shops found</p>
+                        <div className="no-shops-container">
+                            <p className="no-shops">No Shops Found</p>
+                        </div>
                     )}
                 </div>
             </div>

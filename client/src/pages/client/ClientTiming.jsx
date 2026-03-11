@@ -191,8 +191,8 @@ const ClientTimings = () => {
     if (!file) return;
 
     const copy = [...shops];
-    copy[activeShopIndex.current].shopImage = URL.createObjectURL(file); // preview
-    copy[activeShopIndex.current].newFile = file; // actual file for backend
+    copy[activeShopIndex.current].shopImage = URL.createObjectURL(file); 
+    copy[activeShopIndex.current].newFile = file;
     copy[activeShopIndex.current].dirty = true;
     setShops(copy);
   };
@@ -259,7 +259,7 @@ const ClientTimings = () => {
             <ArrowBackIcon />
           </IconButton>
           <Typography variant={isMobile ? 'h6' : 'h5'}>
-            Client Timings
+             Manage Shop
           </Typography>
         </Box>
 

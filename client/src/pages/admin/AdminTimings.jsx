@@ -105,8 +105,8 @@ const AdminTimings = () => {
         if (!file) return;
 
         const copy = [...shops];
-        copy[activeShopIndex.current].shopImage = URL.createObjectURL(file); // preview
-        copy[activeShopIndex.current].newFile = file; // actual file for backend
+        copy[activeShopIndex.current].shopImage = URL.createObjectURL(file);
+        copy[activeShopIndex.current].newFile = file; 
         copy[activeShopIndex.current].dirty = true;
         setShops(copy);
     };
@@ -177,7 +177,7 @@ const AdminTimings = () => {
                 </IconButton>
 
                 <Typography variant={isMobile ? 'h6' : 'h5'}>
-                    Timings
+                    Manage Shops
                 </Typography>
             </Box>
 

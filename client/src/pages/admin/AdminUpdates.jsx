@@ -31,8 +31,8 @@ const AdminUpdates = () => {
     const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
     const [announcements, setAnnouncements] = useState([]);
+    const [loadingData, setLoadingData] = useState(true);
 
-    // Dialog state
     const [open, setOpen] = useState(false);
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
@@ -40,7 +40,7 @@ const AdminUpdates = () => {
     const [image, setImage] = useState(null);
     const [preview, setPreview] = useState(null);
     const [loading, setLoading] = useState(false);
-    const [editingId, setEditingId] = useState(null); // for edit mode
+    const [editingId, setEditingId] = useState(null);
 
     const handleBack = () => navigate(-1);
 
@@ -55,7 +55,7 @@ const AdminUpdates = () => {
         setPreview(null);
         setEditingId(null);
     };
-    
+
     const fetchAnnouncements = async () => {
         try {
             const res = await axios.get(`${DEFAULT_API}/api/users/announcements/all`);
@@ -63,6 +63,8 @@ const AdminUpdates = () => {
         } catch (err) {
             console.error(err);
             toast.error("Failed to fetch announcements");
+        } finally {
+            setLoadingData(false);
         }
     };
 
@@ -135,8 +137,8 @@ const AdminUpdates = () => {
             </Box>
 
             <Box display="flex" flexDirection="column" gap={2}>
-                {announcements.length === 0
-                    ? Array.from({ length: 3 }).map((_, i) => (
+                {loadingData ? (
+                    Array.from({ length: 3 }).map((_, i) => (
                         <Card key={i}>
                             <CardContent sx={{ display: "flex", alignItems: "center", gap: 2 }}>
                                 <Skeleton variant="rectangular" width={60} height={60} sx={{ borderRadius: 1 }} />
@@ -151,7 +153,16 @@ const AdminUpdates = () => {
                             </CardContent>
                         </Card>
                     ))
-                    : announcements.map((a) => (
+                ) : announcements.length === 0 ? (
+
+                    <Box width="100%" textAlign="center" mt={4}>
+                        <Typography variant="h6" color="text.secondary">
+                            No Announcement Found
+                        </Typography>
+                    </Box>
+
+                ) : (
+                    announcements.map((a) => (
                         <Card key={a._id} sx={{ "&:hover img": { transform: "scale(1.1)", transition: "0.3s" } }}>
                             <CardContent sx={{ display: "flex", alignItems: "center", gap: 2 }}>
                                 <Box
@@ -169,21 +180,30 @@ const AdminUpdates = () => {
                                         <PhotoCamera sx={{ fontSize: 30, color: "#9ca3af" }} />
                                     )}
                                 </Box>
+
                                 <Box flex={1}>
                                     <Typography>{a.title}</Typography>
-                                    <Typography variant="caption">Duration: {a.duration}</Typography>
+                                    <Typography variant="caption">
+                                        Duration: {a.duration}
+                                    </Typography>
                                 </Box>
+
                                 <Box display="flex" gap={1}>
                                     <IconButton onClick={() => handleEdit(a)}>
                                         <Edit />
                                     </IconButton>
-                                    <IconButton onClick={() => handleDelete(a._id)} sx={{ color: "red" }}>
+
+                                    <IconButton
+                                        onClick={() => handleDelete(a._id)}
+                                        sx={{ color: "red" }}
+                                    >
                                         <Delete />
                                     </IconButton>
                                 </Box>
                             </CardContent>
                         </Card>
-                    ))}
+                    ))
+                )}
             </Box>
 
             {/* Dialog */}

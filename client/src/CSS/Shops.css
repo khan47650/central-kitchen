@@ -91,6 +91,20 @@
   font-weight: 500;
 }
 
+.no-shops-container {
+  grid-column: 1 / -1; 
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 60px 0;
+}
+
+.no-shops {
+  font-size: 20px;
+  font-weight: 600;
+  color: #777;
+  text-align: center;
+}
 
 
 /* Tablet */
