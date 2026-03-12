@@ -24,6 +24,10 @@ import moment from 'moment-timezone';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import IconButton from '@mui/material/IconButton';
 import { useNavigate } from 'react-router-dom';
+import uiColors from '../../Styles/uiColors';
+import { darkSelectStyle, darkSelectMenuProps } from '../../Styles/uiSelectStyle';
+
+
 
 
 const TIME_OPTIONS = Array.from({ length: 17 }, (_, i) => {
@@ -106,7 +110,7 @@ const AdminTimings = () => {
 
         const copy = [...shops];
         copy[activeShopIndex.current].shopImage = URL.createObjectURL(file);
-        copy[activeShopIndex.current].newFile = file; 
+        copy[activeShopIndex.current].newFile = file;
         copy[activeShopIndex.current].dirty = true;
         setShops(copy);
     };
@@ -156,7 +160,7 @@ const AdminTimings = () => {
     };
 
     if (loading) {
-        return <Box p={2}>{[...Array(2)].map((_, i) => <Skeleton key={i} height={250} sx={{ mb: 2, borderRadius: 2 }} />)}</Box>;
+        return <Box p={2}>{[...Array(2)].map((_, i) => <Skeleton key={i} height={250} sx={{ mb: 2, borderRadius: 2, bgcolor: uiColors.skeleton.baseColor }} />)}</Box>;
     }
 
     return (
@@ -173,20 +177,20 @@ const AdminTimings = () => {
                 }}
             >
                 <IconButton onClick={() => navigate(-1)}>
-                    <ArrowBackIcon />
+                    <ArrowBackIcon sx={{ color: uiColors.text.primary }} />
                 </IconButton>
 
-                <Typography variant={isMobile ? 'h6' : 'h5'}>
+                <Typography variant={isMobile ? 'h6' : 'h5'} sx={{ color: uiColors.text.primary }}>
                     Manage Shops
                 </Typography>
             </Box>
 
             <input type="file" hidden ref={fileInputRef} accept="image/*" onChange={handleImageChange} />
 
-            {shops.length === 0 && <Typography align="center" color="text.secondary">No shops found</Typography>}
+            {shops.length === 0 && <Typography align="center" sx={{ color: uiColors.text.primary }}>No shops found</Typography>}
 
             {shops.map((shop, shopIndex) => (
-                <Paper key={shop._id} sx={{ p: 2, mb: 3, borderRadius: 3 }}>
+                <Paper key={shop._id} sx={{ p: 2, mb: 3, borderRadius: 3, bgcolor: uiColors.card }}>
                     <Box display="flex" alignItems="center" gap={2} mb={2}>
                         <Box position="relative">
                             <Box component="img" src={shop.shopImage} sx={{ width: 70, height: 70, borderRadius: '50%' }} />
@@ -195,8 +199,8 @@ const AdminTimings = () => {
                         </Box>
 
                         <Box flexGrow={1}>
-                            <Typography fontWeight={600}>{shop.shopName}</Typography>
-                            <Typography variant="body2" color="text.secondary">{shop.address}</Typography>
+                            <Typography fontWeight={400} sx={{ color: uiColors.text.primary }}>{shop.shopName} </Typography>
+                            <Typography variant="body2" sx={{ color: uiColors.text.secondary }}>{shop.address}</Typography>
                             <Typography variant="caption" sx={{
                                 color: getShopStatus(shop.timings) === 'Open' ? 'green' :
                                     getShopStatus(shop.timings) === 'Break' ? 'orange' : 'red',
@@ -206,48 +210,68 @@ const AdminTimings = () => {
                             </Typography>
                         </Box>
 
-                        <Button variant="outlined" size="small" onClick={() => deleteShop(shop._id)}>
-                            {deleteLoading ? <CircularProgress size={18} /> : "DELETE"}
+                        <Button variant="contained" size="small" sx={{
+                            color: "white",
+                            background: uiColors.gradient,
+                            "&:hover": {
+                                background: uiColors.gradientHover,
+                                transform: "translateY(-2px)",
+                                boxShadow: "0 6px 20px rgba(17,203,226,0.4)"
+                            }
+                        }} onClick={() => deleteShop(shop._id)} >
+                            {deleteLoading ? <CircularProgress size={18} sx={{ color: uiColors.text.primary }} /> : "DELETE"}
                         </Button>
                     </Box>
 
-                    <Typography fontWeight={600} mb={1}>Timings</Typography>
+                    <Typography fontWeight={600} mb={1} sx={{ color: uiColors.text.primary }}>Timings</Typography>
                     <TableContainer sx={{ overflowX: 'auto' }}>
                         <Table size="small">
                             <TableHead>
                                 <TableRow>
-                                    <TableCell>Day</TableCell>
-                                    <TableCell>Open</TableCell>
-                                    <TableCell>Open Time</TableCell>
-                                    <TableCell>Close Time</TableCell>
-                                    <TableCell>Break</TableCell>
-                                    <TableCell>Break Start</TableCell>
-                                    <TableCell>Break End</TableCell>
+                                    <TableCell sx={{ color: uiColors.text.primary }}>Day</TableCell>
+                                    <TableCell sx={{ color: uiColors.text.primary }}>Open</TableCell>
+                                    <TableCell sx={{ color: uiColors.text.primary }}>Open Time</TableCell>
+                                    <TableCell sx={{ color: uiColors.text.primary }}>Close Time</TableCell>
+                                    <TableCell sx={{ color: uiColors.text.primary }}>Break</TableCell>
+                                    <TableCell sx={{ color: uiColors.text.primary }}>Break Start</TableCell>
+                                    <TableCell sx={{ color: uiColors.text.primary }}>Break End</TableCell>
                                 </TableRow>
                             </TableHead>
                             <TableBody>
                                 {shop.timings.map((row, dayIndex) => (
                                     <TableRow key={row.day}>
-                                        <TableCell>{row.day}</TableCell>
+                                        <TableCell sx={{ color: uiColors.text.primary }}>{row.day}</TableCell>
                                         <TableCell>
-                                            <Checkbox checked={row.open}
+                                            <Checkbox checked={row.open} sx={{
+                                                color: uiColors.text.primary,
+                                                "&.Mui-checked": {
+                                                    color: uiColors.teal
+                                                }
+                                            }}
                                                 onChange={e => updateTiming(shopIndex, dayIndex, 'open', e.target.checked)} />
                                         </TableCell>
                                         <TableCell>
-                                            <Select size="small" value={row.openTime}
-                                                onChange={e => {
+                                            <Select
+                                                size="small"
+                                                value={row.openTime}
+                                                sx={darkSelectStyle}
+                                                MenuProps={darkSelectMenuProps}
+                                                onChange={(e) => {
                                                     if (isSameTime(e.target.value, row.closeTime)) return;
-                                                    updateTiming(shopIndex, dayIndex, 'openTime', e.target.value)
-                                                }}>
-                                                {TIME_OPTIONS.map(t =>
+                                                    updateTiming(shopIndex, dayIndex, "openTime", e.target.value);
+                                                }}
+                                            >
+                                                {TIME_OPTIONS.map((t) => (
                                                     <MenuItem key={t.value} value={t.value}>
                                                         {t.label}
                                                     </MenuItem>
-                                                )}
+                                                ))}
                                             </Select>
                                         </TableCell>
                                         <TableCell>
                                             <Select size="small" value={row.closeTime}
+                                                sx={darkSelectStyle}
+                                                MenuProps={darkSelectMenuProps}
                                                 onChange={e => {
                                                     if (isSameTime(e.target.value, row.openTime)) return;
                                                     updateTiming(shopIndex, dayIndex, 'closeTime', e.target.value)
@@ -267,11 +291,18 @@ const AdminTimings = () => {
                                             </Select>
                                         </TableCell>
                                         <TableCell>
-                                            <Checkbox checked={row.break}
+                                            <Checkbox checked={row.break} sx={{
+                                                color: uiColors.text.primary,
+                                                "&.Mui-checked": {
+                                                    color: uiColors.teal
+                                                }
+                                            }}
                                                 onChange={e => updateTiming(shopIndex, dayIndex, 'break', e.target.checked)} />
                                         </TableCell>
                                         <TableCell>
                                             <Select size="small" value={row.breakStart}
+                                                sx={darkSelectStyle}
+                                                MenuProps={darkSelectMenuProps}
                                                 onChange={e => {
                                                     if (isSameTime(e.target.value, row.breakEnd)) return;
                                                     updateTiming(shopIndex, dayIndex, 'breakStart', e.target.value)
@@ -285,6 +316,8 @@ const AdminTimings = () => {
                                         </TableCell>
                                         <TableCell>
                                             <Select size="small" value={row.breakEnd}
+                                                sx={darkSelectStyle}
+                                                MenuProps={darkSelectMenuProps}
                                                 onChange={e => {
                                                     if (isSameTime(e.target.value, row.breakStart)) return;
                                                     updateTiming(shopIndex, dayIndex, 'breakEnd', e.target.value)
@@ -309,8 +342,17 @@ const AdminTimings = () => {
                         </Table>
                     </TableContainer>
 
-                    <Button variant="contained" color="warning" sx={{ mt: 2 }} disabled={!shop.dirty || savingId === shop._id} onClick={() => saveSettings(shop)}>
-                        {savingId === shop._id ? <CircularProgress size={18} /> : 'Save Settings'}
+                    <Button variant="contained" color="warning" sx={{
+                        mt: 2,
+                        color: "white",
+                        background: shop.dirty && savingId !== shop._id ? uiColors.gradient : "grey", // active vs disabled
+                        "&:hover": {
+                            background: shop.dirty && savingId !== shop._id ? uiColors.gradientHover : "grey",
+                            transform: shop.dirty && savingId !== shop._id ? "translateY(-2px)" : "none",
+                            boxShadow: shop.dirty && savingId !== shop._id ? "0 6px 20px rgba(17,203,226,0.4)" : "none",
+                        },
+                    }} disabled={!shop.dirty || savingId === shop._id} onClick={() => saveSettings(shop)}>
+                        {savingId === shop._id ? <CircularProgress size={18} sx={{ color: uiColors.text.primary }} /> : 'Save Settings'}
                     </Button>
                 </Paper>
             ))}

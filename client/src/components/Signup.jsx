@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "../CSS/Signup.css";
-import logo from "../assets/img/logo3.png";
+import logo from "../assets/img/new_logo.svg";
 
 const DEFAULT_API = process.env.REACT_APP_API_URL || "";
 console.log("Backend URL:", DEFAULT_API);

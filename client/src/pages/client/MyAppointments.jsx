@@ -23,6 +23,7 @@ import { useTheme } from '@mui/material/styles';
 import { useSearchParams } from 'react-router-dom';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useNavigate } from 'react-router-dom';
+import uiColors from '../../Styles/uiColors';
 
 
 
@@ -159,24 +160,24 @@ const MyAppointments = () => {
         }}>
 
           <IconButton onClick={() => navigate(-1)}>
-            <ArrowBackIcon />
+            <ArrowBackIcon sx={{ color: uiColors.text.primary }} />
           </IconButton>
-          <Typography variant={isMobile ? 'h6' : 'h5'}>
+          <Typography variant={isMobile ? 'h6' : 'h5'} sx={{ color: uiColors.text.primary }}>
             {heading}
           </Typography>
         </Box>
 
       </Toolbar>
 
-      <TableContainer component={Paper} sx={{ mt: 2, overflowX: 'auto' }}>
+      <TableContainer component={Paper} sx={{ mt: 2, overflowX: 'auto', bgcolor: uiColors.card, borderRadius: 1 }}>
         <Table size={isMobile ? 'small' : 'medium'}>
           <TableHead>
             <TableRow>
-              <TableCell>Booked On</TableCell>
-              <TableCell>Booking Start</TableCell>
-              <TableCell>Booking End</TableCell>
+              <TableCell sx={{ color: uiColors.text.primary }}>Booked On</TableCell>
+              <TableCell sx={{ color: uiColors.text.primary }}>Booking Start</TableCell>
+              <TableCell sx={{ color: uiColors.text.primary }}>Booking End</TableCell>
               {type !== 'completed' && (
-                <TableCell>Action</TableCell>
+                <TableCell sx={{ color: uiColors.text.primary }}>Action</TableCell>
               )}
             </TableRow>
           </TableHead>
@@ -184,16 +185,30 @@ const MyAppointments = () => {
             {loading ? (
               Array.from(new Array(5)).map((_, index) => (
                 <TableRow key={index}>
-                  <TableCell><Skeleton /></TableCell>
-                  <TableCell><Skeleton /></TableCell>
-                  <TableCell><Skeleton /></TableCell>
-                  <TableCell><Skeleton /></TableCell>
+                  <TableCell><Skeleton sx={{
+                    bgcolor: uiColors.skeleton.baseColor,
+                    "&::after": { bgcolor: uiColors.skeleton.highlightColor }
+                  }} /></TableCell>
+                  <TableCell><Skeleton sx={{
+                    bgcolor: uiColors.skeleton.baseColor,
+                    "&::after": { bgcolor: uiColors.skeleton.highlightColor }
+                  }} /></TableCell>
+                  <TableCell><Skeleton sx={{
+                    bgcolor: uiColors.skeleton.baseColor,
+                    "&::after": { bgcolor: uiColors.skeleton.highlightColor }
+                  }} /></TableCell>
+                  <TableCell><Skeleton sx={{
+                    bgcolor: uiColors.skeleton.baseColor,
+                    "&::after": { bgcolor: uiColors.skeleton.highlightColor }
+                  }} /></TableCell>
                 </TableRow>
               ))
             ) : appointments.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={4} align="center">
-                  No appointments found.
+                  <Typography sx={{ py: 3, color: uiColors.text.primary }}>
+                    No Appointment Found
+                  </Typography>
                 </TableCell>
               </TableRow>
             ) : (
@@ -201,15 +216,22 @@ const MyAppointments = () => {
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                 .map((appt) => (
                   <TableRow key={appt.id}>
-                    <TableCell>{appt.bookedOn}</TableCell>
-                    <TableCell>{formatTime12Hour(appt.startTime)}</TableCell>
-                    <TableCell>{formatTime12Hour(appt.endTime)}</TableCell>
+                    <TableCell sx={{ color: uiColors.text.primary }}>{appt.bookedOn}</TableCell>
+                    <TableCell sx={{ color: uiColors.text.primary }}>{formatTime12Hour(appt.startTime)}</TableCell>
+                    <TableCell sx={{ color: uiColors.text.primary }}>{formatTime12Hour(appt.endTime)}</TableCell>
                     {type !== 'completed' && (
                       <TableCell>
                         <Button
-                          variant="outlined"
                           size="small"
-                          sx={{ minWidth: isMobile ? 60 : 100 }}
+                          sx={{
+                            minWidth: isMobile ? 60 : 100, background: uiColors.gradient,
+                            color: "white",
+                            "&:hover": {
+                              background: uiColors.gradientHover,
+                              transform: "translateY(-2px)",
+                              boxShadow: "0 6px 20px rgba(17,203,226,0.4)"
+                            }
+                          }}
                           onClick={() => handleCancel(appt.id)}
                           disabled={cancelling === appt.id}
                         >
@@ -233,6 +255,18 @@ const MyAppointments = () => {
         page={page}
         onPageChange={handleChangePage}
         onRowsPerPageChange={handleChangeRowsPerPage}
+        sx={{
+          color: "white",
+          "& .MuiTablePagination-actions .MuiIconButton-root": {
+            color: "white"
+          },
+          "& .MuiSelect-select, & .MuiInputBase-root, & .MuiTablePagination-displayedRows": {
+            color: "white"
+          },
+          "& .MuiTablePagination-selectIcon": {
+            color: "white"
+          }
+        }}
       />
     </Box>
   );

@@ -16,6 +16,7 @@ import { ToastContainer, toast } from "react-toastify";
 import { getPublicUser, setPublicUser, clearPublicUser } from "../utils/publicUser";
 import logo from "../assets/img/logo3.png";
 import { useNavigate } from "react-router-dom";
+import uiColors from "../Styles/uiColors";
 
 export default function PublicUpdates() {
   const navigate = useNavigate();
@@ -135,7 +136,7 @@ export default function PublicUpdates() {
               <div className="d-flex align-items-center justify-content-between mb-3">
                 <div className="d-flex align-items-center">
                   <IconButton onClick={() => navigate(-1)} sx={{ mr: 1 }}>
-                    <ArrowBackIcon />
+                    <ArrowBackIcon sx={{ color: uiColors.text.primary }} />
                   </IconButton>
                   <img src={logo} alt="Logo" className="signup-logo me-3" />
                   <div>
@@ -155,12 +156,12 @@ export default function PublicUpdates() {
                         <div key={field} className="col-12">
                           <TextField
                             fullWidth
-                            label={
+                            placeholder={
                               field === "firstName"
                                 ? "First Name"
                                 : field === "lastName"
-                                ? "Last Name"
-                                : field.charAt(0).toUpperCase() + field.slice(1)
+                                  ? "Last Name"
+                                  : field.charAt(0).toUpperCase() + field.slice(1)
                             }
                             name={field}
                             value={form[field]}
@@ -168,6 +169,19 @@ export default function PublicUpdates() {
                             size="small"
                             multiline={field === "address"}
                             rows={field === "address" ? 2 : undefined}
+                            sx={{
+                              bgcolor: uiColors.inputBg,
+                              "& .MuiInputBase-input": { color: "#fff" },
+                              "& .MuiInputBase-input::placeholder": {
+                                color: "#9ca3af",
+                                opacity: 1
+                              },
+                              "& .MuiOutlinedInput-notchedOutline": { borderColor: "#555" },
+                              "&:hover .MuiOutlinedInput-notchedOutline": { borderColor: "#777" },
+                              "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                                borderColor: uiColors.accent
+                              }
+                            }}
                           />
                         </div>
                       ))}
@@ -176,10 +190,19 @@ export default function PublicUpdates() {
 
                   <div className="d-flex justify-content-end">
                     <Button
-                      variant="outlined"
                       onClick={register}
                       disabled={loadingRegister}
                       startIcon={loadingRegister && <CircularProgress size={20} />}
+                      sx={{
+                        background: uiColors.gradient,
+                        color: uiColors.text.primary,
+                        px: 4,
+                        "&:hover": {
+                          background: uiColors.gradientHover,
+                          transform: "translateY(-2px)",
+                          boxShadow: "0 6px 20px rgba(17,203,226,0.4)"
+                        }
+                      }}
                     >
                       Register
                     </Button>
@@ -206,7 +229,7 @@ export default function PublicUpdates() {
             {/* HEADER */}
             <div className="d-flex align-items-center mb-3">
               <IconButton onClick={() => navigate(-1)} sx={{ mr: 1 }}>
-                <ArrowBackIcon />
+                <ArrowBackIcon sx={{ color: uiColors.text.primary }} />
               </IconButton>
               <img src={logo} alt="Logo" className="signup-logo me-3" />
               <Typography variant="h6" className="mb-0">
@@ -223,20 +246,71 @@ export default function PublicUpdates() {
                 setSelectedShops(value);
                 setDirty(true);
               }}
+              slotProps={{
+                paper: {
+                  sx: {
+                    bgcolor: uiColors.inputBg,
+                    color: "#fff"
+                  }
+                }
+              }}
               renderTags={(value, getTagProps) =>
                 value.map((option, index) => (
-                  <Chip key={option._id} label={option.shopName} {...getTagProps({ index })} />
+                  <Chip
+                    key={option._id}
+                    label={option.shopName}
+                    {...getTagProps({ index })}
+                    sx={{
+                      bgcolor: uiColors.accent,
+                      color: "#fff",
+                      fontWeight: 500,
+                      "& .MuiChip-deleteIcon": {
+                        color: "#fff"
+                      },
+                      "& .MuiChip-deleteIcon:hover": {
+                        color: "#ffdddd"
+                      }
+                    }}
+                  />
                 ))
               }
-              renderInput={(params) => <TextField {...params} label="Select Shops" />}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  placeholder="Select Shops"
+                  sx={{
+                    bgcolor: uiColors.inputBg,
+                    "& .MuiInputBase-input": { color: "#fff" },
+                    "& .MuiInputBase-input::placeholder": {
+                      color: "#9ca3af",
+                      opacity: 1
+                    },
+                    "& .MuiSvgIcon-root": { color: "#fff" }, // dropdown icon
+                    "& .MuiOutlinedInput-notchedOutline": { borderColor: "#555" },
+                    "&:hover .MuiOutlinedInput-notchedOutline": { borderColor: "#777" },
+                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                      borderColor: uiColors.accent
+                    }
+                  }}
+                />
+              )}
             />
 
             <Box mt={2} display="flex" gap={2}>
               <Button
-                variant="contained"
                 disabled={!dirty || loadingSave}
                 onClick={save}
-                startIcon={loadingSave && <CircularProgress size={20} />}
+                startIcon={loadingSave && <CircularProgress size={20} sx={{ color: uiColors.text.primary }} />}
+                sx={{
+                  background: uiColors.gradient,
+                  color: uiColors.text.primary,
+                  px: 4,
+                  "&:hover": {
+                    background: uiColors.gradientHover,
+                    transform: "translateY(-2px)",
+                    boxShadow: "0 6px 20px rgba(17,203,226,0.4)"
+                  }
+                }}
               >
                 Save
               </Button>
@@ -245,7 +319,7 @@ export default function PublicUpdates() {
                 variant="outlined"
                 onClick={unregister}
                 disabled={loadingUnregister}
-                startIcon={loadingUnregister && <CircularProgress size={20} />}
+                startIcon={loadingUnregister && <CircularProgress size={20} sx={{ color: uiColors.text.primary }} />}
               >
                 Unregister
               </Button>

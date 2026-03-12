@@ -24,6 +24,8 @@ import { useAuth } from "../../context/AuthContext";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useNavigate } from 'react-router-dom';
 import HoverZoomImage from "../../components/HoverZoomImage";
+import uiColors from "../../Styles/uiColors";
+import { darkSelectStyle, darkSelectMenuProps } from "../../Styles/uiSelectStyle";
 
 const DEFAULT_API = process.env.REACT_APP_API_URL || "";
 
@@ -157,18 +159,25 @@ const MyCategories = () => {
           gap: 2
         }}>
 
-          <IconButton onClick={()=>navigate(-1)}>
-            <ArrowBackIcon />
+          <IconButton onClick={() => navigate(-1)}>
+            <ArrowBackIcon sx={{ color: uiColors.text.primary }} />
           </IconButton>
 
-          <Typography variant={isMobile ? "h6" : "h5"}>My Categories</Typography>
+          <Typography variant={isMobile ? "h6" : "h5"} sx={{ color: uiColors.text.primary }}>My Categories</Typography>
         </Box>
         {hasShop && (
           <Button
             variant="contained"
-            startIcon={<Add />}
+            startIcon={<Add sx={{ color: uiColors.text.primary }} />}
             fullWidth={isMobile}
-            sx={{ color: "white" }}
+            sx={{
+              color: "white", ml: "auto", background: uiColors.gradient,
+              "&:hover": {
+                background: uiColors.gradientHover,
+                transform: "translateY(-2px)",
+                boxShadow: "0 6px 20px rgba(17,203,226,0.4)"
+              }
+            }}
             onClick={() => setOpenDialog(true)}
           >
             Add Category
@@ -178,31 +187,31 @@ const MyCategories = () => {
 
       {loading &&
         (Array.from(new Array(3)).map((_, i) => (
-          <Card key={i} sx={{ mb: 2 }}>
+          <Card key={i} sx={{ mb: 2 ,bgcolor: uiColors.card, color: uiColors.text.primary }}>
             <CardContent>
               <Grid container alignItems="center">
                 <Grid item xs={7} sm={7}>
-                  <Skeleton variant="text" width="60%" height={28} />
-                  <Skeleton variant="text" width="40%" height={20} />
+                  <Skeleton variant="text" width="60%" height={28} sx={{ bgcolor: uiColors.skeleton }} />
+                  <Skeleton variant="text" width="40%" height={20} sx={{ bgcolor: uiColors.skeleton }} />
                 </Grid>
                 <Grid item xs={5} sm={5} textAlign="right">
-                  <Skeleton variant="circular" width={32} height={32} />
+                  <Skeleton variant="circular" width={32} height={32} sx={{ bgcolor: uiColors.skeleton }} />
                 </Grid>
               </Grid>
               <Divider sx={{ my: 1 }} />
               {Array.from(new Array(2)).map((_, j) => (
                 <Grid container alignItems="center" spacing={1} py={0.6} key={j}>
                   <Grid item xs={12} sm={7}>
-                    <Skeleton variant="rectangular" width="100%" height={40} />
+                    <Skeleton variant="rectangular" width="100%" height={40} sx={{ bgcolor: uiColors.skeleton }} />
                   </Grid>
                   <Grid item xs={6} sm={2}>
-                    <Skeleton variant="text" width="60%" height={28} />
+                    <Skeleton variant="text" width="60%" height={28} sx={{ bgcolor: uiColors.skeleton }} />
                   </Grid>
                   <Grid item xs={6} sm={2}>
-                    <Skeleton variant="text" width="60%" height={28} />
+                    <Skeleton variant="text" width="60%" height={28} sx={{ bgcolor: uiColors.skeleton }} />
                   </Grid>
                   <Grid item xs={12} sm={1}>
-                    <Skeleton variant="circular" width={32} height={32} />
+                    <Skeleton variant="circular" width={32} height={32} sx={{ bgcolor: uiColors.skeleton }} />
                   </Grid>
                 </Grid>
               ))}
@@ -213,7 +222,7 @@ const MyCategories = () => {
       {!loading && categories.length === 0 && (
         <Typography
           textAlign="center"
-          color="text.secondary"
+          sx={{ color: uiColors.text.primary }}
           mt={4}
         >
           No categories found
@@ -223,12 +232,12 @@ const MyCategories = () => {
         const isOpen = openCard === category._id;
 
         return (
-          <Card key={category._id} sx={{ mb: 2 }}>
+          <Card key={category._id} sx={{ mb: 2 ,bgcolor: uiColors.card, color: uiColors.text.primary}}>
             <CardContent>
               <Grid container alignItems="center">
                 <Grid item xs={7} sm={7}>
-                  <Typography fontWeight="bold">{category.categoryName}</Typography>
-                  <Typography variant="body2" color="text.secondary">
+                  <Typography fontWeight="bold" sx={{ color: uiColors.text.primary }}>{category.categoryName}</Typography>
+                  <Typography variant="body2" sx={{ color: uiColors.text.secondary }}>
                     {category.items.length} items in this category
                   </Typography>
                 </Grid>
@@ -236,7 +245,7 @@ const MyCategories = () => {
                 {!isMobile && !isTablet && (
                   <Grid item sm={2}>
                     {isOpen && (
-                      <Typography fontWeight="bold" textAlign="right" sx={{ pr: 2 }}>
+                      <Typography fontWeight="bold" textAlign="right" sx={{ pr: 3, color: uiColors.text.primary }}>
                         Price
                       </Typography>
                     )}
@@ -245,7 +254,7 @@ const MyCategories = () => {
 
                 {!isMobile && !isTablet && (
                   <Grid item sm={2}>
-                    {isOpen && <Typography fontWeight="bold" textAlign="right">Status</Typography>}
+                    {isOpen && <Typography fontWeight="bold" textAlign="right" sx={{ color: uiColors.text.primary }}>Status</Typography>}
                   </Grid>
                 )}
 
@@ -264,18 +273,24 @@ const MyCategories = () => {
                   {!isOpen && (
                     <Button
                       size="small"
-                      variant="outlined"
                       disabled={deletingId === category._id}
                       onClick={() => handleDeleteCategory(category._id)}
                       sx={{
+                        background: uiColors.gradient,
                         minWidth: isMobile ? 70 : 80,
                         px: isMobile ? 1 : 1.5,
                         height: 32,
                         whiteSpace: "nowrap",
+                        color: "white",
+                        "&:hover": {
+                          background: uiColors.gradientHover,
+                          transform: "translateY(-2px)",
+                          boxShadow: "0 6px 20px rgba(17,203,226,0.4)"
+                        }
                       }}
                     >
                       {deletingId === category._id ? (
-                        <CircularProgress size={16} color="error" />
+                        <CircularProgress size={16} sx={{ color: uiColors.text.primary }} />
                       ) : (
                         "Delete"
                       )}
@@ -286,7 +301,7 @@ const MyCategories = () => {
                     size="small"
                     onClick={() => setOpenCard(isOpen ? null : category._id)}
                   >
-                    {isOpen ? <KeyboardArrowDown /> : <KeyboardArrowRight />}
+                    {isOpen ? <KeyboardArrowDown sx={{ color: uiColors.text.primary }} /> : <KeyboardArrowRight sx={{ color: uiColors.text.primary }} />}
                   </IconButton>
                 </Grid>
 
@@ -300,10 +315,10 @@ const MyCategories = () => {
                   {isTablet && (
                     <Grid container sx={{ mb: 1 }}>
                       <Grid item xs={6}>
-                        <Typography fontWeight="bold">Price</Typography>
+                        <Typography fontWeight="bold" sx={{ color: uiColors.text.primary }}>Price</Typography>
                       </Grid>
                       <Grid item xs={6}>
-                        <Typography fontWeight="bold">Status</Typography>
+                        <Typography fontWeight="bold" sx={{ color: uiColors.text.primary }}>Status</Typography>
                       </Grid>
                     </Grid>
                   )}
@@ -325,12 +340,12 @@ const MyCategories = () => {
                             />
 
 
-                            <Typography>{item.name}</Typography>
+                            <Typography sx={{ color: uiColors.text.primary }}>{item.name}</Typography>
                           </Box>
                         </Grid>
 
                         <Grid item xs={6} sm={isTablet ? 3 : 2} sx={{ mt: isMobile || isTablet ? 1 : 0 }}>
-                          <Typography textAlign={isMobile || isTablet ? "left" : "right"} sx={{ pr: isTablet ? 0 : 3 }}>
+                          <Typography textAlign={isMobile || isTablet ? "left" : "right"} sx={{ pr: isTablet ? 0 : 3, color: uiColors.text.primary }}>
                             ${item.price}
                           </Typography>
                         </Grid>
@@ -345,29 +360,13 @@ const MyCategories = () => {
                         >
                           <Select
                             size="small"
-                            value={item.itemStatus} // DB se aaya hua value
-                            disabled={updatingStatus === item._id} // progress ke waqt disable
-                            sx={{
-                              height: 32,
-                              width: 150,
-                              "& .MuiSelect-select": {
-                                display: "flex",
-                                alignItems: "center",
-                                gap: 1,
-                                paddingRight: "44px",
-                                whiteSpace: "nowrap",
-                                overflow: "hidden",
-                                textOverflow: "ellipsis",
-                              },
-                              "& .MuiSelect-icon": {
-                                right: 8,
-                                top: "50%",
-                                transform: "translateY(-50%)",
-                              },
-                            }}
+                            value={item.itemStatus}
+                            disabled={updatingStatus === item._id}
+                            sx={darkSelectStyle}
+                            MenuProps={darkSelectMenuProps}
                             renderValue={(value) => {
                               if (updatingStatus === item._id) {
-                                return <CircularProgress size={18} />;
+                                return <CircularProgress size={18} sx={{color:uiColors.text.primary}} />;
                               }
                               const option = value === "IN_STOCK" ? STATUS_OPTIONS.in : STATUS_OPTIONS.out;
                               return (
@@ -423,7 +422,7 @@ const MyCategories = () => {
                               setOpenItemDialog(true);
                             }}
                           >
-                            <Edit fontSize="small" />
+                            <Edit fontSize="small" sx={{color:uiColors.text.primary}} />
                           </IconButton>
                           <IconButton
                             size="small"
@@ -453,8 +452,8 @@ const MyCategories = () => {
                       setOpenItemDialog(true);
                     }}
                   >
-                    <Add color="primary" />
-                    <Typography color="primary">Add Item</Typography>
+                    <Add sx={{color:uiColors.teal}} />
+                    <Typography sx={{color:uiColors.teal}}>Add Item</Typography>
                   </Box>
                 </>
               )}

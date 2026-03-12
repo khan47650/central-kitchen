@@ -12,6 +12,7 @@ import {
 } from '@mui/material';
 import moment from 'moment-timezone';
 import axios from 'axios';
+import uiColors from '../Styles/uiColors';
 
 const AZ_TIMEZONE = 'America/Phoenix';
 const DEFAULT_API = process.env.REACT_APP_API_URL || "";
@@ -48,7 +49,6 @@ const BookSlotModal = ({ open, onClose, userId, isAdmin, onBooked, slots, select
   const [error, setError] = useState('');
   const [section, setSection] = useState("section1");
 
-
   useEffect(() => {
     if (selectedSlot && open) {
       setStartDate(selectedSlot.date);
@@ -69,16 +69,13 @@ const BookSlotModal = ({ open, onClose, userId, isAdmin, onBooked, slots, select
     const startMoment = moment.tz(`${startDate} ${hour}:${minute}`, 'YYYY-MM-DD H:mm', AZ_TIMEZONE);
     const endMoment = startMoment.clone().add(duration * 60, 'minutes');
 
-
     setEndTime(endMoment.format('h:mm A')); // 12-hour format with minutes
   }, [startTime, duration, startDate]);
-
 
   const isValidBookingDay = (dateStr) => {
     const date = moment.tz(dateStr, 'YYYY-MM-DD', AZ_TIMEZONE);
     return date.isBetween(startOfWeek, endOfWeek, 'day', '[]');
   };
-
 
   const getAvailableTimes = () => {
     if (!isValidBookingDay(startDate)) {
@@ -90,7 +87,6 @@ const BookSlotModal = ({ open, onClose, userId, isAdmin, onBooked, slots, select
 
     const now = moment.tz(AZ_TIMEZONE);
 
-    //Unavailable slots for this date
     const unavailableSlots = slots.filter(s =>
       s.date === startDate && s.unavailable
     );
@@ -98,7 +94,6 @@ const BookSlotModal = ({ open, onClose, userId, isAdmin, onBooked, slots, select
     return workingHours.map(time => {
       const slotMoment = moment.tz(`${startDate} ${time}`, 'YYYY-MM-DD HH:mm', AZ_TIMEZONE);
 
-      //Check if overlaps any unavailable slot
       const isOverlappingUnavailable = unavailableSlots.some(s => {
         const start = moment.tz(`${s.date} ${s.startTime}`, 'YYYY-MM-DD HH:mm', AZ_TIMEZONE);
         const end = moment.tz(`${s.date} ${s.endTime}`, 'YYYY-MM-DD HH:mm', AZ_TIMEZONE);
@@ -107,10 +102,11 @@ const BookSlotModal = ({ open, onClose, userId, isAdmin, onBooked, slots, select
 
       return {
         time,
-        disabled: slotMoment.isBefore(now) || isOverlappingUnavailable // 🔹 dono checks
+        disabled: slotMoment.isBefore(now) || isOverlappingUnavailable
       };
     });
   };
+
   const getAvailableDurations = () => {
     if (!startTime) return durations.map(d => ({ d, disabled: true }));
 
@@ -127,8 +123,6 @@ const BookSlotModal = ({ open, onClose, userId, isAdmin, onBooked, slots, select
     });
   };
 
-
-
   const handleSubmit = async () => {
     if (!isValidBookingDay(startDate)) {
       setError('Bookings are only allowed Monday–Sunday of this week.');
@@ -138,19 +132,13 @@ const BookSlotModal = ({ open, onClose, userId, isAdmin, onBooked, slots, select
     setLoading(true);
 
     try {
-      // const res = await axios.post(`${DEFAULT_API}/api/slots/create`, {
-      //   date: startDate,
-      //   startTime, // still 24-hour for backend
-      //   duration,
-      //   isAdmin
-      // });
       const bookRes = await axios.post(`${DEFAULT_API}/api/slots/book`, {
         date: startDate,
         startTime,
         duration,
         userId,
         isAdmin,
-        section // section1 / section2
+        section
       });
 
       onBooked(bookRes.data.slot);
@@ -164,8 +152,22 @@ const BookSlotModal = ({ open, onClose, userId, isAdmin, onBooked, slots, select
   };
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth>
-      <DialogTitle>Book a Slot</DialogTitle>
+    <Dialog
+      open={open}
+      onClose={onClose}
+      maxWidth="xs"
+      fullWidth
+      PaperProps={{
+        sx: {
+          bgcolor: uiColors.card,
+          color: "#fff",
+          borderRadius: 2
+        }
+      }}
+    >
+      <DialogTitle sx={{ color: uiColors.text.primary, fontWeight: "bold" }}>
+        Book a Slot
+      </DialogTitle>
       <DialogContent>
         <Box display="flex" flexDirection="column" gap={2} mt={1}>
           <TextField
@@ -179,11 +181,32 @@ const BookSlotModal = ({ open, onClose, userId, isAdmin, onBooked, slots, select
               max: endOfWeek.format('YYYY-MM-DD')
             }}
             fullWidth
+            sx={{
+              bgcolor: uiColors.inputBg,
+              input: { color: "#fff" },
+              "& .MuiInputLabel-root": { color: "#fff" },
+              "& .MuiFormHelperText-root": { color: "#ff4d4f" },
+              "& .MuiSvgIcon-root": { color: "#fff" }, // calendar icon
+              "& .MuiOutlinedInput-notchedOutline": { borderColor: "#555" }
+            }}
             error={!!error}
             helperText={error}
           />
 
-          <TextField select label="Book Section" value={section} onChange={e => setSection(e.target.value)}>
+          <TextField
+            select
+            label="Book Section"
+            value={section}
+            onChange={e => setSection(e.target.value)}
+            fullWidth
+            sx={{
+              bgcolor:uiColors.inputBg,
+              "& .MuiInputBase-root": { color: "#fff" }, // selected value
+              "& .MuiInputLabel-root": { color: "#fff" }, // label
+              "& .MuiSvgIcon-root": { color: "#fff" }, // dropdown arrow
+              "& .MuiOutlinedInput-notchedOutline": { borderColor: "#555" }
+            }}
+          >
             <MenuItem value="section1">Section 1</MenuItem>
             <MenuItem value="section2">Section 2</MenuItem>
           </TextField>
@@ -195,11 +218,18 @@ const BookSlotModal = ({ open, onClose, userId, isAdmin, onBooked, slots, select
             onChange={(e) => setStartTime(e.target.value)}
             fullWidth
             displayEmpty
+            sx={{
+              bgcolor: uiColors.inputBg,
+              "& .MuiInputBase-root": { color: "#fff" },
+              "& .MuiInputLabel-root": { color: "#fff" },
+              "& .MuiSvgIcon-root": { color: "#fff" },
+              "& .MuiOutlinedInput-notchedOutline": { borderColor: "#555" }
+            }}
           >
             <MenuItem value="" disabled>Select a time</MenuItem>
             {getAvailableTimes().map(({ time, disabled }) => (
               <MenuItem key={time} value={time} disabled={disabled}>
-                {formatTime12Hour(time)} {/* <-- display in 12-hour */}
+                {formatTime12Hour(time)}
               </MenuItem>
             ))}
           </TextField>
@@ -210,6 +240,13 @@ const BookSlotModal = ({ open, onClose, userId, isAdmin, onBooked, slots, select
             value={duration}
             onChange={(e) => setDuration(parseFloat(e.target.value))}
             fullWidth
+            sx={{
+              bgcolor: uiColors.inputBg,
+              "& .MuiInputBase-root": { color: "#fff" },
+              "& .MuiInputLabel-root": { color: "#fff" },
+              "& .MuiSvgIcon-root": { color: "#fff" },
+              "& .MuiOutlinedInput-notchedOutline": { borderColor: "#555" }
+            }}
           >
             {getAvailableDurations().map(({ d, disabled }) => (
               <MenuItem key={d} value={d} disabled={disabled}>
@@ -218,21 +255,40 @@ const BookSlotModal = ({ open, onClose, userId, isAdmin, onBooked, slots, select
             ))}
           </TextField>
 
-
           <TextField
             label="End Time"
-            value={endTime} // <-- already converted to 12-hour
+            value={endTime}
             InputProps={{ readOnly: true }}
             fullWidth
+            sx={{
+              bgcolor: uiColors.inputBg,
+              input: { color: "#fff" },
+              "& .MuiInputLabel-root": { color: "#fff" },
+              "& .MuiSvgIcon-root": { color: "#fff" },
+              "& .MuiOutlinedInput-notchedOutline": { borderColor: "#555" }
+            }}
           />
 
-          <Typography variant="body2" color="textSecondary">
-            Bookings allowed Monday–Thursday of this week only. Working hours: 6:00 AM – 10:00 PM.
+          <Typography variant="body2" sx={{ color: "#ccc" }}>
+            Bookings allowed only in Working hours: 6:00 AM – 10:00 PM.
           </Typography>
         </Box>
       </DialogContent>
       <DialogActions>
-        <Button onClick={handleSubmit} variant="contained" color="warning" disabled={loading}>
+        <Button
+          onClick={handleSubmit}
+          fullWidth
+          disabled={loading}
+          sx={{
+            background: uiColors.gradient,
+            color: uiColors.text.primary,
+            "&:hover": {
+              background: uiColors.gradientHover,
+              transform: "translateY(-2px)",
+              boxShadow: "0 6px 20px rgba(17,203,226,0.4)"
+            }
+          }}
+        >
           {loading ? "Booking Slot..." : "BOOK SLOT"}
         </Button>
       </DialogActions>

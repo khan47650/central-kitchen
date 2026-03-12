@@ -9,7 +9,7 @@ import '../CSS/hero.css';
 import '../CSS/About.css';
 import '../CSS/Contact.css';
 import '../CSS/footer.css';
-import logo from "../assets/img/logo.png";
+import logo from "../assets/img/new_logo.svg";
 import hero1 from "../assets/img/home_image.jpeg";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -156,7 +156,7 @@ const LandingPage = () => {
 
       <main className="main">
         {/* Hero Section */}
-        <section id="hero" className="hero section dark-background">
+        <section id="hero" className="hero-section-dark-background">
           <div id="hero-carousel" className="carousel slide carousel-fade" data-bs-ride="carousel" data-bs-interval="5000">
             <div className="carousel-item active">
               <img src={hero1} alt="Hero" />

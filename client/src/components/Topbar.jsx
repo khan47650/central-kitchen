@@ -12,6 +12,9 @@ import { AuthContext } from '../context/AuthContext';
 import MenuIcon from '@mui/icons-material/Menu';
 import '../Styles/topbar.css';
 import { replace, useNavigate } from 'react-router-dom';
+import uiColors from '../Styles/uiColors';
+
+
 
 const Topbar = ({ mobileOpen, setMobileOpen }) => {
   const { user, logout, loading } = useContext(AuthContext);
@@ -29,15 +32,13 @@ const Topbar = ({ mobileOpen, setMobileOpen }) => {
     <AppBar
       position="fixed"
       elevation={0}
-      sx={(theme) => ({
-        backgroundColor: '#fff',
-        color: 'primary.main',
-        borderBottom: '1px solid #eee',
+      sx={{
+        borderBottom: uiColors.background,
         paddingX: { xs: 1.5, md: 4 },
         zIndex: theme.zIndex.drawer + 1,
         left: { md: `${drawerWidth}px`, xs: 0 },
         width: { md: `calc(100% - ${drawerWidth}px)`, xs: '100%' },
-      })}
+      }}
       className="topbar"
     >
       <Toolbar

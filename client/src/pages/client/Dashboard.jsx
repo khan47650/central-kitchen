@@ -20,6 +20,7 @@ import { Skeleton } from "@mui/material";
 import { useTheme, useMediaQuery } from "@mui/material";
 import { useNavigate } from 'react-router-dom';
 import Marquee from "react-fast-marquee"
+import uiColors from '../../Styles/uiColors';
 
 const DEFAULT_API = process.env.REACT_APP_API_URL || '';
 
@@ -75,14 +76,23 @@ const ClientDashboard = () => {
     return (
       <Box sx={{ width: "100%" }}>
         {/* Header */}
-        <Skeleton variant="text" width={200} height={40} />
-        <Skeleton variant="text" width={300} height={20} />
+        <Skeleton variant="text" width={200} height={40} sx={{
+          bgcolor: uiColors.skeleton.baseColor,
+          "&::after": { bgcolor: uiColors.skeleton.highlightColor }
+        }} />
+        <Skeleton variant="text" width={300} height={20} sx={{
+          bgcolor: uiColors.skeleton.baseColor,
+          "&::after": { bgcolor: uiColors.skeleton.highlightColor }
+        }} />
 
         {/* Stat cards */}
-        <Grid container spacing={2} sx={{ mt: 2 }}>
+        <Grid container spacing={2} sx={{ mt: 2 }} >
           {[1, 2, 3, 4].map((i) => (
             <Grid item xs={12} sm={6} md={3} key={i}>
-              <Skeleton variant="rounded" height={150} />
+              <Skeleton variant="rounded" height={150} sx={{
+                bgcolor: uiColors.skeleton.baseColor,
+                "&::after": { bgcolor: uiColors.skeleton.highlightColor }
+              }} />
             </Grid>
           ))}
         </Grid>
@@ -90,10 +100,16 @@ const ClientDashboard = () => {
         {/* Content */}
         <Grid container spacing={2} sx={{ mt: 2 }}>
           <Grid item xs={12} md={8}>
-            <Skeleton variant="rounded" height={350} />
+            <Skeleton variant="rounded" height={350} sx={{
+              bgcolor: uiColors.skeleton.baseColor,
+              "&::after": { bgcolor: uiColors.skeleton.highlightColor }
+            }} />
           </Grid>
           <Grid item xs={12} md={4}>
-            <Skeleton variant="rounded" height={350} />
+            <Skeleton variant="rounded" height={350} sx={{
+              bgcolor: uiColors.skeleton.baseColor,
+              "&::after": { bgcolor: uiColors.skeleton.highlightColor }
+            }} />
           </Grid>
         </Grid>
       </Box>
@@ -127,20 +143,24 @@ const ClientDashboard = () => {
 
   return (
     <Box className="dashboard-container">
-      <Typography variant="h5" className="dashboard-header">
+      <Typography variant="h5" sx={{
+        background: uiColors.gradient,
+        WebkitBackgroundClip: "text",
+        WebkitTextFillColor: "transparent"
+      }}>
         Welcome {user?.fullName || 'Client'}
       </Typography>
 
       {announcements.length > 0 && (
         <Box
           sx={{
-            bgcolor: "#16a34a",
+            background: uiColors.teal,
             color: "white",
             py: 1,
             px: 2,
             borderRadius: 1,
             mb: 1,
-            mt:2,
+            mt: 2,
             overflow: "hidden",
           }}
         >
@@ -165,6 +185,15 @@ const ClientDashboard = () => {
                 display: "flex",
                 flexDirection: "column",
                 gap: 1,
+                bgcolor: uiColors.card,
+                color: uiColors.text.primary,
+                boxShadow: `0 0 10px ${uiColors.cardGlow}`,
+                transition: "all 0.3s",
+                "&:hover": {
+                  transform: "translateY(-4px)",
+                  boxShadow: `0 0 20px ${uiColors.teal}`
+                },
+                cursor: "pointer"
               }}
             >
               {latestAnnouncement.image && (
@@ -181,35 +210,45 @@ const ClientDashboard = () => {
                 />
               )}
 
-              <Typography variant="h5" sx={{ fontWeight: 700 }}>
+              <Typography variant="h5" sx={{ fontWeight: 700, color: uiColors.text.primary }}>
                 {latestAnnouncement.title}
               </Typography>
 
-              <Typography variant="body1" sx={{ color: "#4b5563", mt: 1 }}>
+              <Typography variant="body1" sx={{ color: uiColors.text.primary, mt: 1 }}>
                 {latestAnnouncement.description}
               </Typography>
             </Paper>
           )}
 
           {/* Recent Bookings should always be directly below latestAnnouncement */}
-          <Paper className="section" sx={{ p: 2 }}>
+          <Paper className="section" sx={{
+            p: 2, bgcolor: uiColors.card,
+            color: uiColors.text.primary,
+            boxShadow: `0 0 10px ${uiColors.cardGlow}`,
+            transition: "all 0.3s",
+            "&:hover": {
+              transform: "translateY(-4px)",
+              boxShadow: `0 0 20px ${uiColors.teal}`
+            },
+            cursor: "pointer"
+          }}>
             <Typography variant="h6" className="section-title">
               Recent Bookings
             </Typography>
             <Table size="small">
               <TableHead>
                 <TableRow>
-                  <TableCell>Service</TableCell>
-                  <TableCell>Date</TableCell>
-                  <TableCell>Status</TableCell>
+                  <TableCell sx={{ color: uiColors.text.primary }}>Service</TableCell>
+                  <TableCell sx={{ color: uiColors.text.primary }}>Date</TableCell>
+                  <TableCell sx={{ color: uiColors.text.primary }}>Status</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                 {recentBookings.map((booking) => (
                   <TableRow key={booking.id}>
-                    <TableCell>{booking.service}</TableCell>
-                    <TableCell>{moment(booking.date).format("YYYY-MM-DD HH:mm")}</TableCell>
-                    <TableCell>{booking.status}</TableCell>
+                    <TableCell sx={{ color: uiColors.text.primary }}>{booking.service}</TableCell>
+                    <TableCell sx={{ color: uiColors.text.primary }}>{moment(booking.date).format("YYYY-MM-DD HH:mm")}</TableCell>
+                    <TableCell sx={{ color: uiColors.text.primary }}>{booking.status}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>
@@ -223,14 +262,28 @@ const ClientDashboard = () => {
             {statCards.map((card) => (
               <Grid item key={card.id}>
                 <Paper
-                  className="stat-card"
                   onClick={() => {
                     if (card.label === "Upcoming Bookings")
                       navigate("/client/my-appointments?type=upcoming");
                     if (card.label === "Completed")
                       navigate("/client/my-appointments?type=completed");
                   }}
-                  sx={{ display: "flex", alignItems: "center", gap: 2, p: 2, cursor: "pointer" }}
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 2,
+                    p: 2,
+                    cursor: "pointer",
+                    bgcolor: uiColors.card, // <-- here is your card background
+                    color: uiColors.text.primary,
+                    borderRadius: 2,
+                    boxShadow: `0 0 10px ${uiColors.cardGlow}`,
+                    transition: "all 0.3s",
+                    "&:hover": {
+                      transform: "translateY(-4px)",
+                      boxShadow: `0 0 20px ${uiColors.teal}`
+                    }
+                  }}
                 >
                   <Avatar sx={{ bgcolor: card.color, width: 50, height: 50 }}>{card.icon}</Avatar>
                   <Box>

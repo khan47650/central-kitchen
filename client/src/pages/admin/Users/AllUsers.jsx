@@ -19,6 +19,7 @@ import { useNavigate } from 'react-router-dom';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import FreezUserDialog from '../../../components/FreezeUserDialog';
 import CircularProgress from '@mui/material/CircularProgress';
+import uiColors from '../../../Styles/uiColors';
 
 
 
@@ -108,37 +109,55 @@ const AllUsers = () => {
       }}>
 
         <IconButton onClick={() => navigate(-1)}>
-          <ArrowBackIcon />
+          <ArrowBackIcon sx={{ color: uiColors.text.primary }} />
         </IconButton>
-        <Typography variant={isMobile ? 'h6' : 'h5'}>
+        <Typography variant={isMobile ? 'h6' : 'h5'} sx={{ color: "white" }}>
           All Users
         </Typography>
       </Box>
 
 
-      <TableContainer sx={{ maxWidth: '100%', overflowX: 'auto' }}>
+      <TableContainer sx={{ maxWidth: '100%', overflowX: 'auto', bgcolor: uiColors.card, borderRadius: 1 }}>
         <Table size={isMobile ? 'small' : 'medium'}>
           <TableHead>
             <TableRow>
-              <TableCell>Name</TableCell>
-              <TableCell>Email</TableCell>
-              <TableCell>Role</TableCell>
-              <TableCell>Status</TableCell>
-              <TableCell>Action</TableCell>
+              <TableCell sx={{ color: uiColors.text.primary }}>Name</TableCell>
+              <TableCell sx={{ color: uiColors.text.primary }}>Email</TableCell>
+              <TableCell sx={{ color: uiColors.text.primary }}>Role</TableCell>
+              <TableCell sx={{ color: uiColors.text.primary }}>Status</TableCell>
+              <TableCell sx={{ color: uiColors.text.primary }}>Action</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {loading
               ? Array.from({ length: rowsPerPage }).map((_, index) => (
                 <TableRow key={index}>
-                  <TableCell><Skeleton width="80%" /></TableCell>
-                  <TableCell><Skeleton width="90%" /></TableCell>
-                  <TableCell><Skeleton width="60%" /></TableCell>
-                  <TableCell><Skeleton width="50%" /></TableCell>
+                  <TableCell><Skeleton width="80%" sx={{
+                    bgcolor: uiColors.skeleton.baseColor,
+                    "&::after": { bgcolor: uiColors.skeleton.highlightColor }
+                  }} /></TableCell>
+                  <TableCell><Skeleton width="90%" sx={{
+                    bgcolor: uiColors.skeleton.baseColor,
+                    "&::after": { bgcolor: uiColors.skeleton.highlightColor }
+                  }} /></TableCell>
+                  <TableCell><Skeleton width="60%" sx={{
+                    bgcolor: uiColors.skeleton.baseColor,
+                    "&::after": { bgcolor: uiColors.skeleton.highlightColor }
+                  }} /></TableCell>
+                  <TableCell><Skeleton width="50%" sx={{
+                    bgcolor: uiColors.skeleton.baseColor,
+                    "&::after": { bgcolor: uiColors.skeleton.highlightColor }
+                  }} /></TableCell>
                   <TableCell>
                     <Box display="flex" gap={1}>
-                      <Skeleton variant="rounded" width={60} height={30} />
-                      <Skeleton variant="rounded" width={80} height={30} />
+                      <Skeleton variant="rounded" width={60} height={30} sx={{
+                        bgcolor: uiColors.skeleton.baseColor,
+                        "&::after": { bgcolor: uiColors.skeleton.highlightColor }
+                      }} />
+                      <Skeleton variant="rounded" width={80} height={30} sx={{
+                        bgcolor: uiColors.skeleton.baseColor,
+                        "&::after": { bgcolor: uiColors.skeleton.highlightColor }
+                      }} />
                     </Box>
                   </TableCell>
                 </TableRow>
@@ -147,32 +166,46 @@ const AllUsers = () => {
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                 .map((user, index) => (
                   <TableRow key={index}>
-                    <TableCell>{user.fullName}</TableCell>
-                    <TableCell>{user.email}</TableCell>
-                    <TableCell>{user.role}</TableCell>
-                    <TableCell>{user.status}</TableCell>
-                    <TableCell>
+                    <TableCell sx={{ color: uiColors.text.primary }}>{user.fullName}</TableCell>
+                    <TableCell sx={{ color: uiColors.text.primary }}>{user.email}</TableCell>
+                    <TableCell sx={{ color: uiColors.text.primary }}>{user.role}</TableCell>
+                    <TableCell sx={{ color: uiColors.text.primary }}>{user.status}</TableCell>
+                    <TableCell sx={{ color: uiColors.text.primary }}>
                       <Box display="flex" gap={1}>
                         <Button
-                          variant="outlined"
                           size="small"
-                          sx={{ minWidth: isMobile ? 50 : 80 }}
+                          sx={{
+                            minWidth: isMobile ? 50 : 80, color: "white",
+                            background: uiColors.gradient,
+                            "&:hover": {
+                              background: uiColors.gradientHover,
+                              transform: "translateY(-2px)",
+                              boxShadow: "0 6px 20px rgba(17,203,226,0.4)"
+                            }
+                          }}
+
                           onClick={() => handleViewUser(user)}
                         >
                           VIEW
                         </Button>
 
-
                         <Button
-                          variant="outlined"
                           size="small"
-                          sx={{ minWidth: isMobile ? 60 : 80 }}
+                          sx={{
+                            minWidth: isMobile ? 60 : 80, color: "white",
+                            background: uiColors.gradient,
+                            "&:hover": {
+                              background: uiColors.gradientHover,
+                              transform: "translateY(-2px)",
+                              boxShadow: "0 6px 20px rgba(17,203,226,0.4)"
+                            }
+                          }}
                           onClick={() =>
                             user.status === "freezed" ? unfreezUser(user._id) : handleFreezUser(user)
                           }
                         >
                           {unfreezLoadingId === user._id ? (
-                            <CircularProgress size={18} />
+                            <CircularProgress size={18}  />
                           ) : (
                             user.status === "freezed" ? "UNFREEZE" : "FREEZE"
                           )}
@@ -194,6 +227,18 @@ const AllUsers = () => {
         onPageChange={handleChangePage}
         rowsPerPage={rowsPerPage}
         onRowsPerPageChange={handleChangeRowsPerPage}
+        sx={{
+          color: "white",
+          "& .MuiTablePagination-actions .MuiIconButton-root": {
+            color: "white"  
+          },
+          "& .MuiSelect-select, & .MuiInputBase-root, & .MuiTablePagination-displayedRows": {
+            color: "white" 
+          },
+          "& .MuiTablePagination-selectIcon": {
+            color: "white"  
+          }
+        }}
       />
 
       <UserDetailsDialog

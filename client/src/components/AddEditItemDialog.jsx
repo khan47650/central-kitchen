@@ -16,6 +16,7 @@ import { Close, AddAPhoto } from "@mui/icons-material";
 import ImageIcon from "@mui/icons-material/Image";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
+import uiColors from "../Styles/uiColors";
 
 const DEFAULT_API = process.env.REACT_APP_API_URL || "";
 
@@ -23,7 +24,6 @@ const AddEditItemDialog = ({ open, onClose, itemData, categoryId, onSuccess }) =
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const [status, setStatus] = useState("IN_STOCK");
-
 
   const [imagePreview, setImagePreview] = useState("");
   const [imageFile, setImageFile] = useState(null);
@@ -40,13 +40,12 @@ const AddEditItemDialog = ({ open, onClose, itemData, categoryId, onSuccess }) =
       setImagePreview(itemData.image || "");
       setStatus(itemData.itemStatus || "IN_STOCK");
       setImageFile(null);
-
     } else {
-        resetFields();
+      resetFields();
     }
   }, [itemData]);
 
-   const resetFields = () => {
+  const resetFields = () => {
     setName("");
     setPrice("");
     setDescription("");
@@ -64,7 +63,6 @@ const AddEditItemDialog = ({ open, onClose, itemData, categoryId, onSuccess }) =
       reader.readAsDataURL(file);
     }
   };
-
 
   const handleSubmit = async () => {
     if (!name || (!imageFile && !imagePreview)) {
@@ -86,7 +84,6 @@ const AddEditItemDialog = ({ open, onClose, itemData, categoryId, onSuccess }) =
       setLoading(true);
 
       if (itemData) {
-        //EDIT ITEM
         await axios.put(
           `${DEFAULT_API}/api/categories/editItem/${categoryId}/${itemData._id}`,
           formData,
@@ -94,7 +91,6 @@ const AddEditItemDialog = ({ open, onClose, itemData, categoryId, onSuccess }) =
         );
         toast.success("Item updated successfully");
       } else {
-        //ADD ITEM
         await axios.post(
           `${DEFAULT_API}/api/categories/item/${categoryId}`,
           formData,
@@ -118,21 +114,34 @@ const AddEditItemDialog = ({ open, onClose, itemData, categoryId, onSuccess }) =
     onClose();
   };
 
-
   return (
-    <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
+    <Dialog
+      open={open}
+      onClose={onClose}
+      fullWidth
+      maxWidth="sm"
+      PaperProps={{
+        sx: {
+          bgcolor: uiColors.card,
+          borderRadius: 2
+        }
+      }}
+    >
       <DialogTitle>
         <Box display="flex" justifyContent="space-between" alignItems="center">
-          <Typography variant={isMobile ? "h6" : "h5"}>
+          <Typography
+            variant={isMobile ? "h6" : "h5"}
+            sx={{ color: uiColors.text.primary, fontWeight: 600 }}
+          >
             {itemData ? "Edit Item" : "Add Item"}
           </Typography>
           <IconButton onClick={onClose}>
-            <Close />
+            <Close sx={{ color: "#fff" }} />
           </IconButton>
         </Box>
       </DialogTitle>
 
-      <DialogContent>
+      <DialogContent sx={{ mt: 1 }}>
         <Box display="flex" justifyContent="center" mb={3}>
           <Box position="relative">
             <Avatar
@@ -140,14 +149,14 @@ const AddEditItemDialog = ({ open, onClose, itemData, categoryId, onSuccess }) =
               sx={{
                 width: isMobile ? 90 : 120,
                 height: isMobile ? 90 : 120,
-                bgcolor: "#f5f5f5",
+                bgcolor: "#f5f5f5"
               }}
             >
               {!imagePreview && (
                 <ImageIcon
                   sx={{
                     fontSize: isMobile ? 32 : 40,
-                    color: "grey.500",
+                    color: "grey.500"
                   }}
                 />
               )}
@@ -172,12 +181,20 @@ const AddEditItemDialog = ({ open, onClose, itemData, categoryId, onSuccess }) =
           </Box>
         </Box>
 
+        {/* Input Fields */}
         <TextField
           fullWidth
           placeholder="Item Name"
           value={name}
           onChange={(e) => setName(e.target.value)}
           margin="normal"
+          sx={{
+            bgcolor: uiColors.input,
+            "& .MuiInputBase-input": { color: "#fff" },
+            "& .MuiInputLabel-root": { color: "#fff" },
+            "& .MuiOutlinedInput-notchedOutline": { borderColor: "rgba(255,255,255,0.3)" },
+            "&:hover .MuiOutlinedInput-notchedOutline": { borderColor: "rgba(255,255,255,0.6)" }
+          }}
         />
 
         <TextField
@@ -192,6 +209,13 @@ const AddEditItemDialog = ({ open, onClose, itemData, categoryId, onSuccess }) =
             }
           }}
           margin="normal"
+          sx={{
+            bgcolor: uiColors.inputBg,
+            "& .MuiInputBase-input": { color: "#fff" },
+            "& .MuiInputLabel-root": { color: "#fff" },
+            "& .MuiOutlinedInput-notchedOutline": { borderColor: "rgba(255,255,255,0.3)" },
+            "&:hover .MuiOutlinedInput-notchedOutline": { borderColor: "rgba(255,255,255,0.6)" }
+          }}
         />
 
         <TextField
@@ -202,6 +226,13 @@ const AddEditItemDialog = ({ open, onClose, itemData, categoryId, onSuccess }) =
           margin="normal"
           multiline
           rows={3}
+          sx={{
+            bgcolor: uiColors.inputBg,
+            "& .MuiInputBase-input": { color: "#fff" },
+            "& .MuiInputLabel-root": { color: "#fff" },
+            "& .MuiOutlinedInput-notchedOutline": { borderColor: "rgba(255,255,255,0.3)" },
+            "&:hover .MuiOutlinedInput-notchedOutline": { borderColor: "rgba(255,255,255,0.6)" }
+          }}
         />
 
         <Button
@@ -209,10 +240,19 @@ const AddEditItemDialog = ({ open, onClose, itemData, categoryId, onSuccess }) =
           fullWidth
           disabled={loading}
           onClick={handleSubmit}
-          sx={{ py: 1, color: "white",mt:1 }}
+          sx={{
+            py: 1, mt: 1, color: "#fff",
+            background: uiColors.gradient,
+            "&:hover": {
+              background: uiColors.gradientHover,
+              transform: "translateY(-2px)",
+              boxShadow: "0 6px 20px rgba(17,203,226,0.4)"
+            }
+          }}
         >
           {loading ? "Saving..." : itemData ? "Update" : "Add"}
         </Button>
+
         <ToastContainer autoClose={2000} />
       </DialogContent>
     </Dialog>

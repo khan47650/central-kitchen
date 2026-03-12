@@ -2,6 +2,7 @@
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  background-color: #0D0D22
 }
 
 .page-content {
@@ -20,16 +21,16 @@
 .shop-card {
   text-align: center;
   cursor: pointer;
-  background: #fff;
+  background: #262644;
   border-radius: 18px;
   padding: 25px 15px;
-  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 8px 22px rgba(255,255,255,0.12);
   transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
 .shop-card:hover {
   transform: translateY(-6px);
-  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 6px 20px #11CBE2;
 }
 
 .shop-card img {
@@ -45,6 +46,7 @@
   font-size: 18px;
   font-weight: 600;
   margin: 8px 0;
+  color: white;
 }
 
 .status {
@@ -75,7 +77,7 @@
 
 .timing-label {
   font-size: 13px;
-  color: #666;
+  color: #11CBE2;
   margin-bottom: 4px;
 }
 
@@ -83,12 +85,16 @@
   font-size: 16px;
   font-weight: 600;
   margin-bottom: 6px;
+  color: white;
 }
 
 .break-timing {
   font-size: 14px;
   color: #ff5722;
   font-weight: 500;
+}
+.timing-closed{
+  color: white;
 }
 
 .no-shops-container {
@@ -102,7 +108,7 @@
 .no-shops {
   font-size: 20px;
   font-weight: 600;
-  color: #777;
+  color: #ffff;
   text-align: center;
 }
 

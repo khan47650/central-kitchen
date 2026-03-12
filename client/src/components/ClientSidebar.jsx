@@ -21,6 +21,7 @@ import {
   Apps
 } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
+import uiColors from '../Styles/uiColors';
 
 const drawerWidth = 240;
 
@@ -43,13 +44,13 @@ const ClientSidebar = ({ mobileOpen, setMobileOpen }) => {
   const isActive = (path) => location.pathname === path;
 
   const itemStyle = {
-    color: 'white',
+    color: uiColors.sidebar.itemColor,
     '&.Mui-selected': {
-      backgroundColor: '#f5970cff',
+      backgroundColor: uiColors.sidebar.itemSelectedBg,
       fontWeight: 'bold',
     },
     '&:hover': {
-      backgroundColor: '#ef7707ff',
+      backgroundColor: uiColors.sidebar.itemHoverBg,
     },
   };
 
@@ -92,7 +93,7 @@ const ClientSidebar = ({ mobileOpen, setMobileOpen }) => {
           '& .MuiDrawer-paper': {
             width: drawerWidth,
             boxSizing: 'border-box',
-            backgroundColor: '#006232',
+            background: uiColors.card,
             color: 'white',
             minHeight: '100vh',
           },
@@ -113,7 +114,7 @@ const ClientSidebar = ({ mobileOpen, setMobileOpen }) => {
           '& .MuiDrawer-paper': {
             width: drawerWidth,
             boxSizing: 'border-box',
-            backgroundColor: '#006232',
+            background: uiColors.card,
             color: 'white',
           },
         }}

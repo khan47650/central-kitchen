@@ -10,6 +10,7 @@ import { useNavigate } from 'react-router-dom';
 import CircularProgress from "@mui/material/CircularProgress";
 import AdminUnavailableSlotModal from '../../components/AdminUnavailableSlotModel';
 import SlotManageDialog from '../../components/SlotManageDialog';
+import uiColors from '../../Styles/uiColors';
 
 const DEFAULT_API = process.env.REACT_APP_API_URL || "";
 const TOPBAR_HEIGHT = 64;
@@ -174,9 +175,14 @@ const Calendar = () => {
           gap: 2
         }}>
           <IconButton onClick={() => navigate(-1)}>
-            <ArrowBackIcon />
+            <ArrowBackIcon sx={{ color: uiColors.text.primary }} />
           </IconButton>
-          <Typography variant="h5" fontWeight={700}>
+          <Typography variant="h5" fontWeight={700} sx={{
+            background: uiColors.gradient,
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent",
+            backgroundClip: "text",
+          }}>
             Hello, {user?.role === 'admin' ? 'Admin' : user?.fullName || 'Client'}
           </Typography>
         </Box>
@@ -184,14 +190,30 @@ const Calendar = () => {
         <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
 
           {user?.role === 'admin' && (
-            <Button variant="outlined" color="error" onClick={() => setOpenUnavailableModal(true)}>
+            <Button onClick={() => setOpenUnavailableModal(true)} sx={{
+              color: "white",
+              background: uiColors.gradient,
+              "&:hover": {
+                background: uiColors.gradientHover,
+                transform: "translateY(-2px)",
+                boxShadow: "0 6px 20px rgba(17,203,226,0.4)"
+              }
+            }}>
               Make Unavailable Slot
             </Button>
           )}
           <Button
             variant="contained"
             onClick={() => setOpenModal(true)}
-            sx={{ color: "white" }}
+            sx={{
+              color: "white",
+              background: uiColors.gradient,
+              "&:hover": {
+                background: uiColors.gradientHover,
+                transform: "translateY(-2px)",
+                boxShadow: "0 6px 20px rgba(17,203,226,0.4)"
+              }
+            }}
           >
             Book Slot
           </Button>

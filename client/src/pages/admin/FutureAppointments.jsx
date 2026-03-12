@@ -11,6 +11,7 @@ import { useTheme } from '@mui/material/styles';
 import SlotDetailsDialog from '../../components/SlotDetailsDialog';
 import { useNavigate } from 'react-router-dom';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import uiColors from '../../Styles/uiColors';
 
 
 const DEFAULT_API = process.env.REACT_APP_API_URL || "";
@@ -143,42 +144,59 @@ const FutureAppointments = () => {
       }}>
 
         <IconButton onClick={() => navigate(-1)}>
-          <ArrowBackIcon />
+          <ArrowBackIcon sx={{ color: uiColors.text.primary }} />
         </IconButton>
-        <Typography variant={isMobile ? 'h6' : 'h5'}>
+        <Typography variant={isMobile ? 'h6' : 'h5'} sx={{ color: uiColors.text.primary }}>
           Future Appointments
         </Typography>
       </Box>
 
 
-      <TableContainer sx={{ maxWidth: '100%', overflowX: 'auto' }}>
+      <TableContainer sx={{ maxWidth: '100%', overflowX: 'auto', bgcolor: uiColors.card, borderRadius: 1 }}>
         <Table size={isMobile ? 'small' : 'medium'}>
           <TableHead>
             <TableRow>
-              <TableCell>User Name</TableCell>
-              <TableCell>Booking Section</TableCell>
-              <TableCell>Date</TableCell>
-              <TableCell>Start Time</TableCell>
-              <TableCell>End Time</TableCell>
-              <TableCell>Action</TableCell>
+              <TableCell sx={{ color: uiColors.text.primary }}>User Name</TableCell>
+              <TableCell sx={{ color: uiColors.text.primary }}>Booking Section</TableCell>
+              <TableCell sx={{ color: uiColors.text.primary }}>Date</TableCell>
+              <TableCell sx={{ color: uiColors.text.primary }}>Start Time</TableCell>
+              <TableCell sx={{ color: uiColors.text.primary }}>End Time</TableCell>
+              <TableCell sx={{ color: uiColors.text.primary }}>Action</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {loading
               ? Array.from(new Array(rowsPerPage)).map((_, index) => (
                 <TableRow key={index}>
-                  <TableCell><Skeleton /></TableCell>
-                  <TableCell><Skeleton /></TableCell>
-                  <TableCell><Skeleton /></TableCell>
-                  <TableCell><Skeleton /></TableCell>
-                  <TableCell><Skeleton /></TableCell>
+                  <TableCell><Skeleton sx={{
+                    bgcolor: uiColors.skeleton.baseColor,
+                    "&::after": { bgcolor: uiColors.skeleton.highlightColor }
+                  }} /></TableCell>
+                  <TableCell><Skeleton sx={{
+                    bgcolor: uiColors.skeleton.baseColor,
+                    "&::after": { bgcolor: uiColors.skeleton.highlightColor }
+                  }} /></TableCell>
+                  <TableCell><Skeleton sx={{
+                    bgcolor: uiColors.skeleton.baseColor,
+                    "&::after": { bgcolor: uiColors.skeleton.highlightColor }
+                  }} /></TableCell>
+                  <TableCell><Skeleton sx={{
+                    bgcolor: uiColors.skeleton.baseColor,
+                    "&::after": { bgcolor: uiColors.skeleton.highlightColor }
+                  }} /></TableCell>
+                  <TableCell><Skeleton sx={{
+                    bgcolor: uiColors.skeleton.baseColor,
+                    "&::after": { bgcolor: uiColors.skeleton.highlightColor }
+                  }} /></TableCell>
                 </TableRow>
               ))
               : appointments.length === 0
                 ? (
                   <TableRow>
                     <TableCell colSpan={5} align="center">
-                      No future appointments
+                      <Typography sx={{ py: 3, color: uiColors.text.primary }}>
+                        No Future Appointment Found
+                      </Typography>
                     </TableCell>
                   </TableRow>
                 )
@@ -186,16 +204,25 @@ const FutureAppointments = () => {
                   .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                   .map((slot, index) => (
                     <TableRow key={index}>
-                      <TableCell>{slot.userName || '-'}</TableCell>
-                      <TableCell>{slot.section || '-'}</TableCell>
-                      <TableCell>{slot.date}</TableCell>
-                      <TableCell>{formatTime12Hour(slot.startTime)}</TableCell>
-                      <TableCell>{formatTime12Hour(slot.endTime)}</TableCell>
+                      <TableCell sx={{ color: uiColors.text.primary }}>{slot.userName || '-'}</TableCell>
+                      <TableCell sx={{ color: uiColors.text.primary }}>{slot.section || '-'}</TableCell>
+                      <TableCell sx={{ color: uiColors.text.primary }}>{slot.date}</TableCell>
+                      <TableCell sx={{ color: uiColors.text.primary }}>{formatTime12Hour(slot.startTime)}</TableCell>
+                      <TableCell sx={{ color: uiColors.text.primary }}>{formatTime12Hour(slot.endTime)}</TableCell>
                       <TableCell>
                         <Button
                           variant="contained"
                           size="small"
-                          sx={{ minWidth: isMobile ? 60 : 120, color: 'white' }}
+                          sx={{
+                            minWidth: isMobile ? 60 : 120, 
+                            background: uiColors.gradient,
+                            color: "white",
+                            "&:hover": {
+                              background: uiColors.gradientHover,
+                              transform: "translateY(-2px)",
+                              boxShadow: "0 6px 20px rgba(17,203,226,0.4)"
+                            }
+                          }}
                           onClick={() => handleViewDetails(slot)}
                         >
                           {isMobile ? 'VIEW' : 'VIEW DETAILS'}
@@ -216,6 +243,18 @@ const FutureAppointments = () => {
         onPageChange={handleChangePage}
         rowsPerPage={rowsPerPage}
         onRowsPerPageChange={handleChangeRowsPerPage}
+        sx={{
+          color: "white",
+          "& .MuiTablePagination-actions .MuiIconButton-root": {
+            color: "white"
+          },
+          "& .MuiSelect-select, & .MuiInputBase-root, & .MuiTablePagination-displayedRows": {
+            color: "white"
+          },
+          "& .MuiTablePagination-selectIcon": {
+            color: "white"
+          }
+        }}
       />
       <SlotDetailsDialog
         open={dialogOpen}

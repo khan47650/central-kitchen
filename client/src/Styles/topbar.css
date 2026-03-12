@@ -1,8 +1,8 @@
 .topbar {
-  background-color: #fff;
-  color: #ff6f00;
-  border-bottom: 1px solid #eee;
-  padding: 5px 5px;
+  background: linear-gradient( 90deg, #22E3FF, #2F5BFF, #8A4DFF);
+  color: #ffffff; 
+  border-bottom: 1px solid rgba(255,255,255,0.2);
+  padding: 2px 2px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -21,6 +21,7 @@
   font-weight: 600;
   font-size: 1.25rem;
   line-height: 1;
+  color: #ffffff; 
 }
 
 .topbar-right {
@@ -31,40 +32,27 @@
 
 .topbar-greeting {
   font-weight: 500;
-  color: #666;
+  color: #ffffff; /* <-- white greeting */
   font-size: 0.95rem;
 }
 
-.topbar-logout {
-  font-weight: 600;
-  text-transform: none;
-  border-radius: 8px;
-  border: 1px solid #d32f2f;
-  color: #d32f2f;
-  background-color: transparent;
-  padding: 6px 12px;
-  cursor: pointer;
-  transition: background-color 0.15s ease, color 0.15s ease;
-}
-
+.topbar-logout,
 .topbar-home {
   font-weight: 600;
   text-transform: none;
   border-radius: 8px;
-  border: 1px solid #ff6f00;
-  color: #ff6f00;
-  background-color: transparent;
+  border: 1px solid rgba(255,255,255,0.6); 
+  color: #ffffff; 
+  background-color: rgba(255,255,255,0.1);
   padding: 6px 12px;
   cursor: pointer;
-  transition: background-color 0.15s ease, color 0.15s ease;
+  transition: background-color 0.2s ease, transform 0.2s ease;
 }
 
-.topbar-logout:hover {
-  background-color: rgba(211, 47, 47, 0.06);
-}
-
-.topbar-home:hover{
-  background-color: rgba(211, 47, 47, 0.06);
+.topbar-logout:hover,
+.topbar-home:hover {
+  background-color: rgba(255,255,255,0.25); 
+  transform: translateY(-1px);
 }
 
 @media (max-width: 600px) {
@@ -75,4 +63,3 @@
     border-radius: 5px;
   }
 }
-

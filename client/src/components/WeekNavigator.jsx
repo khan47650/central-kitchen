@@ -1,6 +1,7 @@
 import React from 'react';
-import { Box, Button } from '@mui/material';
+import { Box, Button, colors } from '@mui/material';
 import moment from 'moment-timezone';
+import uiColors from '../Styles/uiColors';
 
 const AZ_TIMEZONE = 'America/Phoenix';
 
@@ -13,11 +14,11 @@ const WeekNavigator = ({ selectedWeek, setSelectedWeek }) => {
 
   return (
     <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-      <Button onClick={handlePrev}>← Previous</Button>
-      <Box>
+      <Button sx={{color:uiColors.teal}} onClick={handlePrev}>← Previous</Button>
+      <Box sx={{color:uiColors.text.primary}} >
         {startOfWeek.format('MMM D')} - {endOfWeek.format('MMM D, YYYY')}
       </Box>
-      <Button onClick={handleNext}>Next →</Button>
+      <Button sx={{color:uiColors.teal}} onClick={handleNext}>Next →</Button>
     </Box>
   );
 };

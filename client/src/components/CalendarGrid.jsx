@@ -2,6 +2,7 @@ import React from 'react';
 import { Box, Typography } from '@mui/material';
 import moment from 'moment-timezone';
 import { useAuth } from '../context/AuthContext';
+import uiColors from '../Styles/uiColors';
 
 const AZ_TIMEZONE = 'America/Phoenix';
 
@@ -32,7 +33,7 @@ const CalendarGrid = ({ selectedWeek, slots = [], users = {}, onEmptyCellClick, 
   );
 
   const now = moment.tz(AZ_TIMEZONE);
-  const {user}=useAuth();
+  const { user } = useAuth();
 
   const getSlotsForCell = (day, slotTime) => {
     const slotMoment = moment.tz(
@@ -77,14 +78,15 @@ const CalendarGrid = ({ selectedWeek, slots = [], users = {}, onEmptyCellClick, 
             position: 'sticky',
             left: 0,
             zIndex: 3,
-            background: '#fff',
+            background: uiColors.background,
+            color:uiColors.text.primary
           }}
         >
           Time
         </Typography>
 
         {days.map((day, i) => (
-          <Typography key={i} fontWeight="bold" textAlign="center">
+          <Typography key={i} fontWeight="bold" textAlign="center" sx={{color:uiColors.text.primary}}>
             {day.format('ddd, MMM D')}
           </Typography>
         ))}
@@ -96,9 +98,10 @@ const CalendarGrid = ({ selectedWeek, slots = [], users = {}, onEmptyCellClick, 
                 position: 'sticky',
                 left: 3,
                 zIndex: 2,
-                background: '#fff',
+                background: uiColors.background,
                 fontSize: 14,
                 mt: 1.2,
+                color:uiColors.text.primary,
                 fontWeight: "bold"
               }}
             >
@@ -118,63 +121,46 @@ const CalendarGrid = ({ selectedWeek, slots = [], users = {}, onEmptyCellClick, 
 
                     if (bookedSlots.length) {
                       const slotData = bookedSlots[0];
-
                       const s1 = slotData.sections.section1;
                       const s2 = slotData.sections.section2;
-
-                      const myId = user?._id; // ya props me bhejo
+                      const myId = user?._id;
                       const isAdmin = user.role === "admin";
 
-                      // ADMIN → click any booked slot
                       if (isAdmin) {
-                        onBookedCellClick({
-                          type: "admin",
-                          slot: slotData
-                        });
+                        onBookedCellClick({ type: "admin", slot: slotData });
                         return;
                       }
 
-                      // CLIENT → only his section slots clickable
                       if (s1.bookedBy === myId) {
-                        onBookedCellClick({
-                          type: "client",
-                          slot: slotData,
-                          section: "section1"
-                        });
+                        onBookedCellClick({ type: "client", slot: slotData, section: "section1" });
                         return;
                       }
 
                       if (s2.bookedBy === myId) {
-                        onBookedCellClick({
-                          type: "client",
-                          slot: slotData,
-                          section: "section2"
-                        });
+                        onBookedCellClick({ type: "client", slot: slotData, section: "section2" });
                         return;
                       }
 
-                      return; // other users can't click
+                      return;
                     }
 
                     if (!bookedSlots.length && !pastSlot) {
-                      onEmptyCellClick({
-                        date: day.format('YYYY-MM-DD'),
-                        startTime: slot,
-                      });
+                      onEmptyCellClick({ date: day.format('YYYY-MM-DD'), startTime: slot });
                     }
                   }}
                   sx={{
                     height: 40,
-                    border: '1px solid #ccc',
+                    borderRadius: 2, // card-style
+                    border: '1px solid #333',
                     backgroundColor: bookedSlots.length
                       ? bookedSlots.some(s => s.unavailable)
-                        ? '#cccccc'
-                        : '#fde613'
+                        ? '#6c757d' // unavailable gray
+                        : uiColors.primary // booked color (teal)
                       : pastSlot
-                        ? '#e0e0e0'
+                        ? '#444' // past slots dark gray
                         : isDisabledSlot
-                          ? '#f5f5f5'
-                          : '#fff',
+                          ? '#222' // disabled dark
+                          : uiColors.cardBackground, // empty cell card color
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -186,26 +172,20 @@ const CalendarGrid = ({ selectedWeek, slots = [], users = {}, onEmptyCellClick, 
                         : pastSlot
                           ? 'not-allowed'
                           : 'pointer',
-                    color: isDisabledSlot
-                      ? '#aaa'
-                      : bookedSlots.length
-                        ? '#000'
-                        : pastSlot
-                          ? '#999'
-                          : '#000',
+                    color: '#fff', // text white for dark theme
                     flexDirection: 'column',
                     '&:hover': {
-                      backgroundColor: !isDisabledSlot && !bookedSlots.length && !pastSlot ? '#e3f2fd' : undefined,
+                      backgroundColor: !isDisabledSlot && !bookedSlots.length && !pastSlot
+                        ? uiColors.hoverCard // slight lighten hover
+                        : undefined,
                     },
                   }}
                 >
                   {bookedSlots.length > 0 && (() => {
-                    // Check if slot is unavailable
                     if (bookedSlots.some(s => s.unavailable)) {
                       return <Typography fontSize={11} noWrap>Unavailable</Typography>;
                     }
 
-                    // Otherwise, show booked names
                     const nameSet = new Set();
                     bookedSlots.forEach(slotItem => {
                       const s1 = slotItem.sections?.section1?.bookedBy;

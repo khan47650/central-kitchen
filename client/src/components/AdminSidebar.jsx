@@ -6,10 +6,12 @@ import {
 } from '@mui/material';
 import {
   ExpandLess, ExpandMore, Event, Person, Settings,
-  CalendarMonth, Group, PendingActions, LockClock, HowToReg, Block, LockReset, AccessTime,Apps
+  CalendarMonth, Group, PendingActions, LockClock, HowToReg, Block, LockReset, AccessTime, Apps
 } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
 import CampaignIcon from '@mui/icons-material/Campaign';
+import uiColors from '../Styles/uiColors';
+
 
 const drawerWidth = 240;
 
@@ -23,25 +25,25 @@ const AdminSidebar = ({ mobileOpen, setMobileOpen }) => {
   const isActive = (path) => location.pathname === path;
 
   const itemStyle = {
-    color: 'white',
+    color: uiColors.sidebar.itemColor,
     '&.Mui-selected': {
-      backgroundColor: '#f5970cff',
+      backgroundColor: uiColors.sidebar.itemSelectedBg,
       fontWeight: 'bold',
     },
     '&:hover': {
-      backgroundColor: '#ef7707ff',
+      backgroundColor: uiColors.sidebar.itemHoverBg,
     },
   };
 
   const subItemStyle = {
     pl: 4,
-    color: 'white',
+    color: uiColors.sidebar.subItemColor,
     '&.Mui-selected': {
-      backgroundColor: '#fc8c03ff',
+      backgroundColor: uiColors.sidebar.subItemSelectedBg,
       fontWeight: 'bold',
     },
     '&:hover': {
-      backgroundColor: '#ef8529ff',
+      backgroundColor: uiColors.sidebar.subItemHoverBg,
     },
   };
 
@@ -203,7 +205,7 @@ const AdminSidebar = ({ mobileOpen, setMobileOpen }) => {
           <ListItemText primary="Manage Shops" />
         </ListItemButton>
 
-         <ListItemButton
+        <ListItemButton
           sx={itemStyle}
           selected={isActive('/admin/shops')}
           onClick={() => handleNavigate('/admin/shops')}
@@ -223,7 +225,7 @@ const AdminSidebar = ({ mobileOpen, setMobileOpen }) => {
           </ListItemIcon>
           <ListItemText primary="Announcement" />
         </ListItemButton>
-        
+
       </List>
     </>
   );
@@ -235,7 +237,7 @@ const AdminSidebar = ({ mobileOpen, setMobileOpen }) => {
         variant="permanent"
         sx={{
           display: { xs: 'none', md: 'block' },
-          '& .MuiDrawer-paper': { width: drawerWidth, boxSizing: 'border-box', backgroundColor: '#006232', color: 'white', minHeight: '100vh' },
+          '& .MuiDrawer-paper': { width: drawerWidth, boxSizing: 'border-box', background: uiColors.card, color: 'white', minHeight: '100vh' },
         }}
         open
       >
@@ -253,14 +255,14 @@ const AdminSidebar = ({ mobileOpen, setMobileOpen }) => {
           '& .MuiDrawer-paper': {
             width: drawerWidth,
             boxSizing: 'border-box',
-            backgroundColor: '#006232',
+            background: uiColors.card,
             color: 'white',
           },
         }}
       >
-       
+
         {/* <Toolbar /> */}
-        <Box sx={{height:"20px"}}>
+        <Box sx={{ height: "20px" }}>
         </Box>
 
         {drawerContent}

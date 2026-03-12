@@ -2,7 +2,7 @@
    Top Header: Logo + Auth Buttons
    =============================== */
 .header-top {
-  background: #ffffff;
+  background: linear-gradient(90deg, #22E3FF, #2F5BFF, #8A4DFF);
   padding: 0.8rem 1.5rem;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   z-index: 1020;
@@ -29,7 +29,7 @@
 .header-top .sitename {
   font-size: 1.5rem;
   font-weight: 600;
-  color: #006232;
+  color: #fff;
   margin: 0;
 }
 
@@ -45,33 +45,33 @@
   font-weight: 500;
   font-size: 0.95rem;
   padding: 0.48rem 1.4rem;
-  border: 1.8px solid #f97316;
+  border: 1.8px solid #11CBE2;
   transition: all 0.3s ease;
   white-space: nowrap;
 }
 
 .login-btn {
   background: transparent;
-  color: #f97316 !important;
+  color: #fff !important;
 }
 
 .signup-btn {
   background-color: transparent;
-  color: #f97316 !important;
+  color: #fff !important;
 }
 
 .auth-section .btn:hover {
-  background-color: #f97316 !important;
+  background-color: #11CBE2 !important;
   color: #fff !important;
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);
+  box-shadow: 0 4px 12px rgba(17, 203, 226, 0.35);
 }
 
 /* ===============================
    Navigation Header
    =============================== */
 .header-nav {
-  background: transparent;
+  background: #262644;
   z-index: 1010;
   margin-top: 2px;
 }
@@ -80,9 +80,9 @@
   width: 100% !important;
   max-width: none;
   border-radius: 50px;
-  background: #ffffff !important;
+  background: #16213E !important;
   backdrop-filter: blur(10px);
-  border: 1px solid #ffffff;
+  border: 1px solid #2a3441;
   box-shadow: 0 6px 25px rgba(0, 0, 0, 0.08);
   transition: all 0.3s ease;
 }
@@ -94,7 +94,7 @@
 
 /* Nav Links */
 .navbar-nav .nav-link {
-  color: #333 !important;
+  color: #fff !important;
   font-weight: 500;
   font-size: 1rem;
   position: relative;
@@ -108,13 +108,13 @@
   left: 50%;
   width: 0%;
   height: 2px;
-  background: #f97316;
+  background: #11CBE2;
   transition: width 0.3s ease, left 0.3s ease;
   transform: translateX(-50%);
 }
 
 .navbar-nav .nav-link:hover {
-  color: #f97316 !important;
+  color: #11CBE2 !important;
 }
 
 .navbar-nav .nav-link:hover::after {
@@ -125,72 +125,40 @@
 .navbar-toggler {
   border: none !important;
   outline: none !important;
+  z-index: 1050;
 }
 
 .navbar-toggler:focus {
   box-shadow: none !important;
 }
 
+.navbar-toggler i {
+  color: #fff;
+  font-size: 1.8rem;
+}
+
 /* ===============================
    Responsive Adjustments
    =============================== */
 @media (max-width: 992px) {
-  .curved-navbar {
-    border-radius: 35px;
-    padding: 0.9rem 1.4rem;
+  .navbar-collapse {
+    background: #16213E; /* dark dropdown */
+    border-radius: 25px;
+    margin-top: 0.8rem;
+    padding: 1rem 0;
   }
 
   .navbar-nav {
-    gap: 0.8rem;
-     display: flex;
-     justify-content: center;
-     width: 100%;
-  }
-
-  .auth-section {
     flex-direction: column;
     align-items: center;
-    min-width: 100%;
-    margin-top: 1rem;
-    gap: 0.8rem;
+    gap: 0.7rem;
   }
 
-  .auth-section .btn {
-    width: 180px;
+  .navbar-nav .nav-link {
+    font-size: 1.1rem;
   }
 }
 
-
-@media (max-width: 576px) {
-  .header-top .logo img {
-    width: 38px;
-    height: 38px;
-  }
-
-  .header-top .sitename {
-    font-size: 1.2rem;
-  }
-
-  .curved-navbar {
-    width: 100%;
-    border-radius: 25px;
-    padding: 0.7rem 1rem;
-    
-  }
-
-  .auth-section .btn {
-    width: 170px;
-  }
-
-
-
-
-}
-
-
- /* ===============================
-   MOBILE: Top Header Fix
-   =============================== */
 @media (max-width: 768px) {
   .header-top .container-fluid {
     flex-direction: column;
@@ -208,45 +176,29 @@
     padding: 0.45rem 1.1rem;
     font-size: 0.9rem;
   }
-}
 
-/* ===============================
-   TABLET + MOBILE: Navbar collapse
-   =============================== */
-@media (max-width: 992px) {
-  .navbar-collapse {
-    background: #fff;
-    border-radius: 25px;
-    margin-top: 0.8rem;
-    padding: 1rem 0;
-  }
-
-  .navbar-nav {
-    flex-direction: column;
-    align-items: center;
-    gap: 0.7rem;
-  }
-}
-
-/* ===============================
-   Sticky Header Overlap Fix
-   =============================== */
-.header-nav {
-  position: sticky;
-  top: 70px;
-}
-
-@media (max-width: 768px) {
   .header-nav {
     top: 110px;
   }
 }
 
-/* ===============================
-   EXTRA SMALL SCREENS
-   =============================== */
 @media (max-width: 576px) {
+  .header-top .logo img {
+    width: 38px;
+    height: 38px;
+  }
+
+  .header-top .sitename {
+    font-size: 1.2rem;
+  }
+
   .curved-navbar {
     width: 96%;
+    border-radius: 25px;
+    padding: 0.7rem 1rem;
+  }
+
+  .auth-section .btn {
+    width: 170px;
   }
 }

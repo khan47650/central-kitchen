@@ -5,6 +5,7 @@ import axios from "axios";
 import moment from "moment-timezone";
 import { Skeleton } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import uiColors from "../Styles/uiColors";
 
 const DEFAULT_API = process.env.REACT_APP_API_URL || "";
 const AZ_TIMEZONE = "America/Phoenix";

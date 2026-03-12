@@ -2,11 +2,12 @@ import React, { useState, useContext } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Link, replace, useNavigate } from "react-router-dom";
-import logo from "../assets/img/logo3.png";
+import logo from "../assets/img/new_logo.svg";
 import { AuthContext } from "../context/AuthContext";
 import "../CSS/authWrapper.css"
 import { Box, useTheme, useMediaQuery, IconButton, Typography } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import uiColors from "../Styles/uiColors";
 
 
 
@@ -75,9 +76,9 @@ const ResetPassword = () => {
         gap: 2,
       }}>
         <IconButton onClick={() => navigate(-1)}>
-          <ArrowBackIcon />
+          <ArrowBackIcon sx={{color:uiColors.text.primary}} />
         </IconButton>
-        <Typography variant={isMobile ? 'h6' : 'h5'}>
+        <Typography variant={isMobile ? 'h6' : 'h5'} sx={{color:uiColors.text.primary}}>
           Reset Password
         </Typography>
       </Box>

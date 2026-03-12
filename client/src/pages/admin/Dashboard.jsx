@@ -30,6 +30,7 @@ import { Skeleton } from "@mui/material";
 import { useNavigate } from 'react-router-dom';
 import "../../Styles/dashboard.css"
 import Marquee from "react-fast-marquee"
+import uiColors from '../../Styles/uiColors';
 
 
 
@@ -84,14 +85,23 @@ const AdminDashboard = () => {
         boxSizing: 'border-box',
       }}>
         {/* Header */}
-        <Skeleton variant="text" width={200} height={40} />
-        <Skeleton variant="text" width={300} height={20} />
+        <Skeleton variant="text" width={200} height={40} sx={{
+          bgcolor: uiColors.skeleton.baseColor,
+          "&::after": { bgcolor: uiColors.skeleton.highlightColor }
+        }} />
+        <Skeleton variant="text" width={300} height={20} sx={{
+          bgcolor: uiColors.skeleton.baseColor,
+          "&::after": { bgcolor: uiColors.skeleton.highlightColor }
+        }} />
 
         {/* Stat cards */}
         <Grid container spacing={2} sx={{ mt: 2 }}>
           {[1, 2, 3, 4].map((i) => (
             <Grid item xs={12} sm={6} md={3} key={i}>
-              <Skeleton variant="rounded" height={150} />
+              <Skeleton variant="rounded" height={150} sx={{
+                bgcolor: uiColors.skeleton.baseColor,
+                "&::after": { bgcolor: uiColors.skeleton.highlightColor }
+              }} />
             </Grid>
           ))}
         </Grid>
@@ -99,10 +109,16 @@ const AdminDashboard = () => {
         {/* Content */}
         <Grid container spacing={2} sx={{ mt: 2 }}>
           <Grid item xs={12} md={8}>
-            <Skeleton variant="rounded" height={350} />
+            <Skeleton variant="rounded" height={350} sx={{
+              bgcolor: uiColors.skeleton.baseColor,
+              "&::after": { bgcolor: uiColors.skeleton.highlightColor }
+            }} />
           </Grid>
           <Grid item xs={12} md={4}>
-            <Skeleton variant="rounded" height={350} />
+            <Skeleton variant="rounded" height={350} sx={{
+              bgcolor: uiColors.skeleton.baseColor,
+              "&::after": { bgcolor: uiColors.skeleton.highlightColor }
+            }} />
           </Grid>
         </Grid>
       </Box>
@@ -157,10 +173,14 @@ const AdminDashboard = () => {
       {/* Header */}
       <Box sx={{ mb: 3, display: 'flex', flexDirection: { xs: 'column', md: 'row' }, justifyContent: 'space-between', alignItems: { xs: 'flex-start', md: 'center' }, gap: 2, flexWrap: 'wrap', }}>
         <Box sx={{ minWidth: 0 }}>
-          <Typography variant="h5" fontWeight={700}>
+          <Typography variant="h5" fontWeight={700} sx={{
+            background: uiColors.gradient,
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent"
+          }}>
             Welcome Admin
           </Typography>
-          <Typography variant="body2" color="text.secondary">
+          <Typography variant="body2" sx={{ color: uiColors.text.secondary }}>
             Here's a quick overview of today's activity
           </Typography>
         </Box>
@@ -171,18 +191,32 @@ const AdminDashboard = () => {
           sx={{ mt: { xs: 2, sm: 0 }, width: { xs: '100%', sm: 'auto' }, flexWrap: 'wrap' }}
         >
           <Button variant="contained" sx={{
+            background: uiColors.gradient,
             width: { xs: '100%', sm: 'auto' },
             fontSize: { xs: 14, sm: 16 },
             minWidth: 120,
-            color: "white"
+            color: "white",
+            "&:hover": {
+              background: uiColors.gradientHover,
+              transform: "translateY(-2px)",
+              boxShadow: "0 6px 20px rgba(17,203,226,0.4)"
+            }
+
           }}
             onClick={() => navigate("/admin/schedule")}>
             Create Slot
           </Button>
-          <Button variant="outlined" sx={{
+          <Button sx={{
+            background: uiColors.gradient,
             width: { xs: '100%', sm: 'auto' },
             fontSize: { xs: 14, sm: 16 },
             minWidth: 120,
+            color: "white",
+            "&:hover": {
+              background: uiColors.gradientHover,
+              transform: "translateY(-2px)",
+              boxShadow: "0 6px 20px rgba(17,203,226,0.4)"
+            }
           }}>
             Export Report
           </Button>
@@ -190,7 +224,7 @@ const AdminDashboard = () => {
         {announcements.length > 0 && (
           <Box
             sx={{
-              bgcolor: "#16a34a",
+              background: uiColors.teal,
               color: "white",
               py: 1,
               px: 2,
@@ -230,6 +264,14 @@ const AdminDashboard = () => {
                 display: 'flex',
                 alignItems: 'center',
                 gap: 2,
+                bgcolor: uiColors.card,
+                color: uiColors.text.primary,
+                boxShadow: `0 0 10px ${uiColors.cardGlow}`,
+                transition: "all 0.3s",
+                "&:hover": {
+                  transform: "translateY(-4px)",
+                  boxShadow: `0 0 20px ${uiColors.teal}`
+                },
                 flexDirection: { xs: 'row', md: 'row' },
                 minHeight: 150,
                 overflow: 'hidden',
@@ -242,13 +284,13 @@ const AdminDashboard = () => {
                 {c.icon}
               </Avatar>
               <Box sx={{ flex: 1, minWidth: 0 }}>
-                <Typography variant="subtitle2" color="text.secondary" noWrap>
+                <Typography variant="subtitle2" color="#ffff" noWrap>
                   {c.label}
                 </Typography>
                 <Typography variant="h5" fontWeight={700} sx={{ mt: 0.5 }} noWrap>
                   {c.value}
                 </Typography>
-                <Typography variant="body2" color="text.secondary" noWrap>
+                <Typography variant="body2" color="#ffff" noWrap>
                   {c.sub}
                 </Typography>
               </Box>
@@ -260,22 +302,32 @@ const AdminDashboard = () => {
 
       <Grid container spacing={2}>
         <Grid item xs={12} md={8}>
-          <Paper elevation={2} sx={{ p: { xs: 2, md: 3 } }}>
+          <Paper elevation={2} sx={{
+            p: { xs: 2, md: 3 }, bgcolor: uiColors.card,
+            color: uiColors.text.primary,
+            boxShadow: `0 0 10px ${uiColors.cardGlow}`,
+            transition: "all 0.3s",
+            "&:hover": {
+              transform: "translateY(-4px)",
+              boxShadow: `0 0 20px ${uiColors.teal}`
+            },
+            cursor: "pointer"
+          }}>
             <Typography variant="h6" fontWeight={600} sx={{ mb: 1 }}>
               System Utilization
             </Typography>
 
             <Stack spacing={2}>
               <Box>
-                <Typography variant="body2" color="text.secondary">Booking Throughput</Typography>
+                <Typography variant="body2" color="uiColors.text.primary">Booking Throughput</Typography>
                 <LinearProgress variant="determinate" value={75} sx={{ height: 10, borderRadius: 2, mt: 1 }} />
               </Box>
               <Box>
-                <Typography variant="body2" color="text.secondary">Approval Rate</Typography>
+                <Typography variant="body2" color="uiColors.text.primary ">Approval Rate</Typography>
                 <LinearProgress variant="determinate" value={62} sx={{ height: 10, borderRadius: 2, mt: 1 }} color="success" />
               </Box>
               <Box>
-                <Typography variant="body2" color="text.secondary">Server Load</Typography>
+                <Typography variant="body2" color="uiColors.text.primary">Server Load</Typography>
                 <LinearProgress variant="determinate" value={42} sx={{ height: 10, borderRadius: 2, mt: 1 }} color="warning" />
               </Box>
             </Stack>
@@ -291,17 +343,17 @@ const AdminDashboard = () => {
               <Table size="small">
                 <TableHead>
                   <TableRow>
-                    <TableCell>User</TableCell>
-                    <TableCell>Action</TableCell>
-                    <TableCell>Date</TableCell>
+                    <TableCell sx={{ color: uiColors.text.primary }}>User</TableCell>
+                    <TableCell sx={{ color: uiColors.text.primary }}>Action</TableCell>
+                    <TableCell sx={{ color: uiColors.text.primary }}>Date</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
                   {recentActivities.map((r, index) => (
                     <TableRow key={index} hover>
-                      <TableCell>{r.user}</TableCell>
-                      <TableCell>{r.action}</TableCell>
-                      <TableCell>{moment.tz(r.date, AZ_TIMEZONE).format('YYYY-MM-DD HH:mm')}</TableCell>
+                      <TableCell sx={{ color: uiColors.text.primary }}>{r.user}</TableCell>
+                      <TableCell sx={{ color: uiColors.text.primary }}>{r.action}</TableCell>
+                      <TableCell sx={{ color: uiColors.text.primary }}>{moment.tz(r.date, AZ_TIMEZONE).format('YYYY-MM-DD HH:mm')}</TableCell>
 
                     </TableRow>
                   ))}
@@ -312,30 +364,48 @@ const AdminDashboard = () => {
         </Grid>
 
         <Grid item xs={12} md={4}>
-          <Paper elevation={2} sx={{ p: 2 }}>
+          <Paper elevation={2} sx={{
+            p: 2, bgcolor: uiColors.card,
+            color: uiColors.text.primary,
+            boxShadow: `0 0 10px ${uiColors.cardGlow}`,
+            transition: "all 0.3s",
+            "&:hover": {
+              transform: "translateY(-4px)",
+              boxShadow: `0 0 20px ${uiColors.teal}`
+            },
+            cursor: "pointer"
+          }}>
             <Typography variant="h6" fontWeight={600} sx={{ mb: 1 }}>
               Quick Stats
             </Typography>
 
             <Stack spacing={2}>
               <Box>
-                <Typography variant="subtitle2" color="text.secondary">Today</Typography>
+                <Typography variant="subtitle2" color="uiColors.text.primary ">Today</Typography>
                 <Typography variant="h5" fontWeight={700}> {stats?.todayAppointments?.total ? `${stats?.todayAppointments?.total} bookings`
                   : "0 bookings"}</Typography>
               </Box>
               <Box>
-                <Typography variant="subtitle2" color="text.secondary">This Week</Typography>
+                <Typography variant="subtitle2" color="uiColors.text.primary ">This Week</Typography>
                 <Typography variant="h5" fontWeight={700}>  {stats?.currentWeekBookedSlots ? `${stats?.currentWeekBookedSlots} bookings` : "0 bookings"}</Typography>
               </Box>
               <Box>
-                <Typography variant="subtitle2" color="text.secondary">Active Users</Typography>
+                <Typography variant="subtitle2" color="uiColors.text.primary ">Active Users</Typography>
                 <Typography variant="h5" fontWeight={700}> {stats?.activeUsers.total ?? 0}</Typography>
               </Box>
             </Stack>
 
             <Divider sx={{ my: 2 }} />
 
-            <Button variant="contained" fullWidth startIcon={<BarChart />}>View Analytics</Button>
+            <Button variant="contained" sx={{
+              color: "white",
+              background: uiColors.gradient,
+              "&:hover": {
+                background: uiColors.gradientHover,
+                transform: "translateY(-2px)",
+                boxShadow: "0 6px 20px rgba(17,203,226,0.4)"
+              }
+            }} fullWidth startIcon={<BarChart />}>View Analytics</Button>
           </Paper>
         </Grid>
       </Grid>

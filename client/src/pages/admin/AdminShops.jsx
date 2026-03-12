@@ -5,6 +5,7 @@ import moment from "moment-timezone";
 import { Skeleton, IconButton } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { ArrowBack } from "@mui/icons-material";
+import uiColors from "../../Styles/uiColors";
 
 
 const DEFAULT_API = process.env.REACT_APP_API_URL || "";
@@ -87,9 +88,9 @@ const AdminShops = () => {
             <div className="page-content">
                 <div style={{ marginTop: "24px", marginBottom: "5px", display: "flex" }}>
                     <IconButton size="small" onClick={() => navigate(-1)}>
-                        <ArrowBack />
+                        <ArrowBack sx={{ color: uiColors.text.primary }} />
                     </IconButton>
-                    <h4 style={{ fontWeight: 600, paddingLeft: "20px", paddingTop: "5px" }}>
+                    <h4 style={{ fontWeight: 600, paddingLeft: "20px", paddingTop: "5px", color:"white" }}>
                         Food Trucks
                     </h4>
                 </div>
@@ -135,7 +136,7 @@ const AdminShops = () => {
                                                 </p>
                                             </>
                                         ) : (
-                                            <p className="timing closed">No timings available</p>
+                                            <p className="timing-closed">No timings available</p>
                                         )}
 
                                         {todayInfo.breakStart && todayInfo.breakEnd && (

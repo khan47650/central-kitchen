@@ -13,10 +13,10 @@ import {
   CircularProgress
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { AddAPhoto, Store, LocationOn, Image as ImageIcon } from '@mui/icons-material';
-import { Description } from '@mui/icons-material';
+import { AddAPhoto, Store, LocationOn, Image as ImageIcon, Description } from '@mui/icons-material';
 import axios from 'axios';
 import { useAuth } from "../context/AuthContext";
+import uiColors from "../Styles/uiColors";
 
 const DEFAULT_API = process.env.REACT_APP_API_URL || "";
 
@@ -38,10 +38,9 @@ const AddShopDialog = ({ open, onSuccess, onClose }) => {
     const file = e.target.files[0];
     if (!file) return;
 
-    setImageFile(file);                       // actual file
-    setImagePreview(URL.createObjectURL(file)); // preview
+    setImageFile(file);
+    setImagePreview(URL.createObjectURL(file));
   };
-
 
   const handleSave = async () => {
     if (!shopName || !address || !description || !imageFile) return;
@@ -56,10 +55,8 @@ const AddShopDialog = ({ open, onSuccess, onClose }) => {
       formData.append("address", address);
       formData.append("userId", user?._id);
 
-      const res = await axios.post(`${DEFAULT_API}/api/shops/add/${user._id}`, formData, {
-        headers: {
-          "Content-Type": "multipart/form-data"
-        }
+      await axios.post(`${DEFAULT_API}/api/shops/add/${user._id}`, formData, {
+        headers: { "Content-Type": "multipart/form-data" }
       });
 
       setLoading(false);
@@ -78,8 +75,6 @@ const AddShopDialog = ({ open, onSuccess, onClose }) => {
     }
   };
 
-
-
   const isDisabled =
     loading ||
     !shopName.trim() ||
@@ -93,20 +88,26 @@ const AddShopDialog = ({ open, onSuccess, onClose }) => {
       fullScreen={isMobile}
       maxWidth={isTablet ? 'sm' : 'xs'}
       fullWidth
+      PaperProps={{
+        sx: {
+          bgcolor: uiColors.card, // dialog background
+          borderRadius: 2,
+          p: isMobile ? 2 : 3
+        }
+      }}
     >
       <DialogTitle
         textAlign="center"
-        sx={{ fontSize: isMobile ? 18 : 20, fontWeight: 600 }}
+        sx={{
+          fontSize: isMobile ? 18 : 20,
+          fontWeight: 600,
+          color: uiColors.text.primary // heading color
+        }}
       >
         Add Shop
       </DialogTitle>
 
-      <DialogContent
-        sx={{
-          px: isMobile ? 2 : 4,
-          pb: isMobile ? 3 : 4
-        }}
-      >
+      <DialogContent sx={{ px: isMobile ? 2 : 4, pb: isMobile ? 3 : 4 }}>
         <Stack spacing={isMobile ? 2 : 3} alignItems="center">
 
           {/* Image Section */}
@@ -120,12 +121,7 @@ const AddShopDialog = ({ open, onSuccess, onClose }) => {
               }}
             >
               {!imagePreview && (
-                <ImageIcon
-                  sx={{
-                    fontSize: isMobile ? 32 : 40,
-                    color: 'grey.500'
-                  }}
-                />
+                <ImageIcon sx={{ fontSize: isMobile ? 32 : 40, color: 'grey.500' }} />
               )}
             </Avatar>
 
@@ -147,6 +143,7 @@ const AddShopDialog = ({ open, onSuccess, onClose }) => {
             </IconButton>
           </Box>
 
+          {/* Shop Name */}
           <TextField
             fullWidth
             size={isMobile ? 'small' : 'medium'}
@@ -155,12 +152,18 @@ const AddShopDialog = ({ open, onSuccess, onClose }) => {
             value={shopName}
             onChange={(e) => setShopName(e.target.value)}
             InputProps={{
-              startAdornment: (
-                <Store sx={{ mr: 1, color: 'text.secondary' }} />
-              )
+              startAdornment: <Store sx={{ mr: 1, color: 'text.secondary' }} />
+            }}
+            sx={{
+              bgcolor: uiColors.inputBg,
+              "& .MuiInputBase-input": { color: "#fff" },
+              "& .MuiInputLabel-root": { color: "#fff" },
+              "& .MuiOutlinedInput-notchedOutline": { borderColor: "rgba(255,255,255,0.3)" },
+              "&:hover .MuiOutlinedInput-notchedOutline": { borderColor: "rgba(255,255,255,0.6)" }
             }}
           />
 
+          {/* Description */}
           <TextField
             fullWidth
             size={isMobile ? 'small' : 'medium'}
@@ -169,13 +172,20 @@ const AddShopDialog = ({ open, onSuccess, onClose }) => {
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             rows={isMobile ? 2 : 4}
+            multiline
             InputProps={{
-              startAdornment: (
-                <Description sx={{ mr: 1, color: 'text.secondary' }} />
-              )
+              startAdornment: <Description sx={{ mr: 1, color: 'text.secondary' }} />
+            }}
+            sx={{
+              bgcolor: uiColors.inputBg,
+              "& .MuiInputBase-input": { color: "#fff" },
+              "& .MuiInputLabel-root": { color: "#fff" },
+              "& .MuiOutlinedInput-notchedOutline": { borderColor: "rgba(255,255,255,0.3)" },
+              "&:hover .MuiOutlinedInput-notchedOutline": { borderColor: "rgba(255,255,255,0.6)" }
             }}
           />
 
+          {/* Address */}
           <TextField
             fullWidth
             size={isMobile ? 'small' : 'medium'}
@@ -184,10 +194,16 @@ const AddShopDialog = ({ open, onSuccess, onClose }) => {
             value={address}
             onChange={(e) => setAddress(e.target.value)}
             rows={isMobile ? 2 : 3}
+            multiline
             InputProps={{
-              startAdornment: (
-                <LocationOn sx={{ mr: 1, color: 'text.secondary' }} />
-              )
+              startAdornment: <LocationOn sx={{ mr: 1, color: 'text.secondary' }} />
+            }}
+            sx={{
+              bgcolor: uiColors.inputBg,
+              "& .MuiInputBase-input": { color: "#fff" },
+              "& .MuiInputLabel-root": { color: "#fff" },
+              "& .MuiOutlinedInput-notchedOutline": { borderColor: "rgba(255,255,255,0.3)" },
+              "&:hover .MuiOutlinedInput-notchedOutline": { borderColor: "rgba(255,255,255,0.6)" }
             }}
           />
 
@@ -199,10 +215,16 @@ const AddShopDialog = ({ open, onSuccess, onClose }) => {
               mt: 1,
               py: isMobile ? 1 : 1.2,
               borderRadius: 2,
-              color: "#fff"
+              color: "#fff",
+              background: uiColors.gradient,
+              "&:hover": {
+                background: uiColors.gradientHover,
+                transform: "translateY(-2px)",
+                boxShadow: "0 6px 20px rgba(17,203,226,0.4)"
+              }
             }}
             disabled={isDisabled}
-            onClick={() => handleSave()}
+            onClick={handleSave}
           >
             {loading ? <CircularProgress size={22} sx={{ color: "#fff" }} /> : "Save"}
           </Button>

@@ -27,6 +27,8 @@ import axios from 'axios';
 import moment from 'moment-timezone';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useNavigate } from 'react-router-dom';
+import uiColors from '../../Styles/uiColors';
+import { darkSelectStyle, darkSelectMenuProps } from '../../Styles/uiSelectStyle';
 
 
 const TIME_OPTIONS = Array.from({ length: 17 }, (_, i) => {
@@ -54,7 +56,7 @@ const ClientTimings = () => {
   const [openDialog, setOpenDialog] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [savingId, setSavingId] = useState(null);
-  const navigate=useNavigate();
+  const navigate = useNavigate();
 
   const fileInputRef = useRef(null);
   const activeShopIndex = useRef(null);
@@ -191,7 +193,7 @@ const ClientTimings = () => {
     if (!file) return;
 
     const copy = [...shops];
-    copy[activeShopIndex.current].shopImage = URL.createObjectURL(file); 
+    copy[activeShopIndex.current].shopImage = URL.createObjectURL(file);
     copy[activeShopIndex.current].newFile = file;
     copy[activeShopIndex.current].dirty = true;
     setShops(copy);
@@ -256,10 +258,10 @@ const ClientTimings = () => {
           }}
         >
           <IconButton onClick={() => navigate(-1)}>
-            <ArrowBackIcon />
+            <ArrowBackIcon sx={{ color: uiColors.text.primary }} />
           </IconButton>
-          <Typography variant={isMobile ? 'h6' : 'h5'}>
-             Manage Shop
+          <Typography variant={isMobile ? 'h6' : 'h5'} sx={{ color: uiColors.text.primary }}>
+            Manage Shop
           </Typography>
         </Box>
 
@@ -267,12 +269,18 @@ const ClientTimings = () => {
           <Button
             onClick={() => setOpenDialog(true)}
             variant="contained"
-            startIcon={<AddIcon />}
+            startIcon={<AddIcon sx={{ color: uiColors.text.primary }} />}
             sx={{
               color: "#fff",
               px: { xs: 1.5, sm: 3 },
               fontSize: { xs: "0.75rem", sm: "0.85rem" },
-              height: { xs: 32, sm: 36 }
+              height: { xs: 32, sm: 36 },
+              background: uiColors.gradient,
+              "&:hover": {
+                background: uiColors.gradientHover,
+                transform: "translateY(-2px)",
+                boxShadow: "0 6px 20px rgba(17,203,226,0.4)"
+              }
             }}
           >
             ADD
@@ -281,15 +289,15 @@ const ClientTimings = () => {
       </Box>
 
       {loading && [...Array(2)].map((_, i) => (
-        <Skeleton key={i} height={200} sx={{ mb: 2, borderRadius: 2 }} />
+        <Skeleton key={i} height={200} sx={{ mb: 2, borderRadius: 2, bgcolor: uiColors.skeleton.baseColor }} />
       ))}
 
       {!loading && !shops.length && (
-        <Typography align="center">No shops found</Typography>
+        <Typography align="center" sx={{ color: uiColors.text.primary }}>No shops found</Typography>
       )}
 
       {shops.map((shop, shopIndex) => (
-        <Paper key={shop._id} sx={{ p: 2, mb: 3, borderRadius: 3 }}>
+        <Paper key={shop._id} sx={{ p: 2, mb: 3, borderRadius: 3, bgcolor: uiColors.card }}>
           <Box display="flex" gap={2} mb={2}>
             <Box position="relative">
               <Box
@@ -312,8 +320,8 @@ const ClientTimings = () => {
             </Box>
 
             <Box flexGrow={1}>
-              <Typography fontWeight={600}>{shop.shopName}</Typography>
-              <Typography variant="body2" color="text.secondary"> {shop.address} </Typography>
+              <Typography fontWeight={400} sx={{ color: uiColors.text.primary }} >{shop.shopName}</Typography>
+              <Typography variant="body2" sx={{ color: uiColors.text.secondary }}> {shop.address} </Typography>
               <Typography
                 variant="caption"
                 sx={{
@@ -331,7 +339,6 @@ const ClientTimings = () => {
             </Box>
 
             <Button
-              variant="outlined"
               size={isMobile ? "small" : "medium"}
               onClick={() => deleteShop(shop._id)}
               sx={{
@@ -340,10 +347,17 @@ const ClientTimings = () => {
                 px: isMobile ? 1 : 2,
                 fontSize: isMobile ? "0.7rem" : "0.85rem",
                 whiteSpace: "nowrap",
+                color: "white",
+                background: uiColors.gradient,
+                "&:hover": {
+                  background: uiColors.gradientHover,
+                  transform: "translateY(-2px)",
+                  boxShadow: "0 6px 20px rgba(17,203,226,0.4)"
+                }
               }}
             >
               {deleteLoading ? (
-                <CircularProgress size={16} />
+                <CircularProgress size={16} sx={{ color: uiColors.text.primary }} />
               ) : (
                 "DELETE"
               )}
@@ -355,13 +369,13 @@ const ClientTimings = () => {
             <Table size="small">
               <TableHead>
                 <TableRow>
-                  <TableCell>Day</TableCell>
-                  <TableCell>Open</TableCell>
-                  <TableCell>Open Time</TableCell>
-                  <TableCell>Close Time</TableCell>
-                  <TableCell>Break</TableCell>
-                  <TableCell>Break Start</TableCell>
-                  <TableCell>Break End</TableCell>
+                  <TableCell sx={{ color: uiColors.text.primary }}>Day</TableCell>
+                  <TableCell sx={{ color: uiColors.text.primary }}>Open</TableCell>
+                  <TableCell sx={{ color: uiColors.text.primary }}>Open Time</TableCell>
+                  <TableCell sx={{ color: uiColors.text.primary }}>Close Time</TableCell>
+                  <TableCell sx={{ color: uiColors.text.primary }}>Break</TableCell>
+                  <TableCell sx={{ color: uiColors.text.primary }}>Break Start</TableCell>
+                  <TableCell sx={{ color: uiColors.text.primary }}>Break End</TableCell>
                 </TableRow>
               </TableHead>
 
@@ -371,7 +385,7 @@ const ClientTimings = () => {
 
                   return (
                     <TableRow key={row.day}>
-                      <TableCell>{row.day}</TableCell>
+                      <TableCell sx={{ color: uiColors.text.primary }}>{row.day}</TableCell>
 
                       <TableCell>
                         <Checkbox
@@ -380,6 +394,12 @@ const ClientTimings = () => {
                           onChange={e =>
                             updateTiming(shopIndex, dayIndex, 'open', e.target.checked)
                           }
+                          sx={{
+                            color: uiColors.text.primary,
+                            "&.Mui-checked": {
+                              color: uiColors.teal
+                            }
+                          }}
                         />
                       </TableCell>
 
@@ -392,6 +412,8 @@ const ClientTimings = () => {
                             if (isSameTime(e.target.value, row.closeTime)) return;
                             updateTiming(shopIndex, dayIndex, 'openTime', e.target.value)
                           }}
+                          sx={darkSelectStyle}
+                          MenuProps={darkSelectMenuProps}
                         >
                           {TIME_OPTIONS.map(t =>
                             <MenuItem key={t.value} value={t.value}>
@@ -407,6 +429,8 @@ const ClientTimings = () => {
                           size="small"
                           value={row.closeTime}
                           disabled={!row.open || locked}
+                          sx={darkSelectStyle}
+                          MenuProps={darkSelectMenuProps}
                           onChange={e => {
                             if (isSameTime(e.target.value, row.openTime)) return;
                             updateTiming(shopIndex, dayIndex, 'closeTime', e.target.value)
@@ -432,6 +456,12 @@ const ClientTimings = () => {
                         <Checkbox
                           checked={row.break}
                           disabled={locked}
+                          sx={{
+                            color: uiColors.text.primary,
+                            "&.Mui-checked": {
+                              color: uiColors.teal
+                            }
+                          }}
                           onChange={e =>
                             updateTiming(shopIndex, dayIndex, 'break', e.target.checked)
                           }
@@ -443,6 +473,8 @@ const ClientTimings = () => {
                           size="small"
                           value={row.breakStart}
                           disabled={!row.break || locked}
+                          sx={darkSelectStyle}
+                          MenuProps={darkSelectMenuProps}
                           onChange={e => {
                             if (isSameTime(e.target.value, row.breakEnd)) return;
                             updateTiming(shopIndex, dayIndex, 'breakStart', e.target.value)
@@ -461,6 +493,8 @@ const ClientTimings = () => {
                           size="small"
                           value={row.breakEnd}
                           disabled={!row.break || locked}
+                          sx={darkSelectStyle}
+                          MenuProps={darkSelectMenuProps}
                           onChange={e => {
                             if (isSameTime(e.target.value, row.breakStart)) return;
                             updateTiming(shopIndex, dayIndex, 'breakEnd', e.target.value)
@@ -491,11 +525,20 @@ const ClientTimings = () => {
           <Button
             variant="contained"
             color="warning"
-            sx={{ mt: 2 }}
+            sx={{
+              mt: 2,
+              color: "white",
+              background: shop.dirty && savingId !== shop._id ? uiColors.gradient : "grey", // active vs disabled
+              "&:hover": {
+                background: shop.dirty && savingId !== shop._id ? uiColors.gradientHover : "grey",
+                transform: shop.dirty && savingId !== shop._id ? "translateY(-2px)" : "none",
+                boxShadow: shop.dirty && savingId !== shop._id ? "0 6px 20px rgba(17,203,226,0.4)" : "none",
+              },
+            }}
             disabled={!shop.dirty || savingId === shop._id}
             onClick={() => saveSettings(shop)}
           >
-            {savingId === shop._id ? <CircularProgress size={18} /> : 'Save Settings'}
+            {savingId === shop._id ? <CircularProgress size={18} sx={{color:uiColors.text.primary}} /> : 'Save Settings'}
           </Button>
         </Paper>
       ))}

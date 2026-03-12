@@ -1,20 +1,20 @@
 /* ====================================
-   Central Kitchen Signup Page — Glorism Aesthetic
+   Central Kitchen Login Page — Dark Theme
    ==================================== */
 
-/* Fullscreen wrapper with elegant background gradient */
+/* Fullscreen wrapper with dark background */
 .auth-wrapper {
   min-height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
-  background-attachment: fixed;
+  background: #0D0D22; /* uiColors.background */
   position: relative;
   overflow: hidden;
   animation: fadeIn 1.2s ease-out;
 }
 
-/* Optional animated background glow */
+/* Optional animated glow */
 .auth-wrapper::before {
   content: "";
   position: absolute;
@@ -33,20 +33,17 @@
   z-index: 1;
   width: 100%;
   max-width: 420px;
-  background: rgba(255, 255, 255, 0.55);
-  backdrop-filter: blur(16px) saturate(180%);
-  -webkit-backdrop-filter: blur(16px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.35);
+  background: #262644; /* uiColors.card */
   border-radius: 24px;
   padding: 2.5rem 2rem;
-  box-shadow: 0 10px 35px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 10px 35px rgba(255,255,255,0.12); /* uiColors.cardGlow */
   transition: all 0.4s ease;
   animation: floatIn 0.9s ease-out;
 }
 
 .auth-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 12px 40px rgba(249, 115, 22, 0.25);
+  box-shadow: 0 12px 40px rgba(17,203,226,0.25); /* teal glow */
 }
 
 /* Logo styling */
@@ -54,47 +51,56 @@
   width: 65px;
   height: 65px;
   object-fit: contain;
-  filter: drop-shadow(0 3px 5px rgba(249, 115, 22, 0.2));
+  filter: drop-shadow(0 3px 5px rgba(17,203,226,0.2));
 }
 
 /* Title */
 .auth-title {
   font-weight: 700;
-  color: #2d2d2d;
+  color: #11CBE2; /* uiColors.teal */
   letter-spacing: 0.5px;
+  margin-top: 0.5rem;
 }
 
+/* Subtext below title */
 .auth-subtext {
-  color: #666;
+  color: #b0b3c7; /* uiColors.text.secondary */
   font-size: 0.95rem;
+  margin-top: 0.2rem;
 }
 
 /* Input fields */
 .form-control {
-  border: 1px solid rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(255,255,255,0.12);
   border-radius: 12px;
   padding: 0.8rem 1rem;
-  background-color: rgba(255, 255, 255, 0.8);
-  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
+  background-color: #2a3441; /* uiColors.inputBg */
+  color: #fff;
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
   transition: all 0.25s ease;
 }
 
+.form-control::placeholder {
+  color: #b0b3c7; /* uiColors.text.secondary */
+}
+
 .form-control:focus {
-  border-color: #f97316;
-  box-shadow: 0 0 10px rgba(249, 115, 22, 0.3);
-  background-color: rgba(255, 255, 255, 1);
+  border-color: #11CBE2; /* uiColors.teal */
+  box-shadow: 0 0 10px rgba(17,203,226,0.3);
+  background-color: #2a3441; /* keep input dark */
+  color: #fff;
 }
 
 /* Labels */
 label {
-  color: #444;
+  color: #fff; /* primary text */
   font-weight: 500;
   font-size: 0.9rem;
 }
 
-/* Button — glowing luxury gradient */
+/* Button — gradient style */
 .auth-btn {
-  background: linear-gradient(135deg, #f97316, #fb923c);
+  background: linear-gradient(90deg, #11CBE2, #2243B0, #7933E9); /* uiColors.gradient */
   border: none;
   border-radius: 999px;
   padding: 0.9rem 1rem;
@@ -103,12 +109,12 @@ label {
   letter-spacing: 0.3px;
   font-size: 1rem;
   transition: all 0.3s ease;
-  box-shadow: 0 0 15px rgba(249, 115, 22, 0.35);
+  box-shadow: 0 0 15px rgba(17,203,226,0.35); /* teal glow */
 }
 
 .auth-btn:hover {
-  background: linear-gradient(135deg, #a65a31, #f97316);
-  box-shadow: 0 0 30px rgba(249, 115, 22, 0.5);
+  background: linear-gradient(90deg, #22E3FF, #2F5BFF, #8A4DFF); /* uiColors.gradientHover */
+  box-shadow: 0 0 30px rgba(17,203,226,0.5);
   transform: translateY(-2px);
 }
 
@@ -116,60 +122,38 @@ label {
 .auth-bottom-text {
   font-size: 0.95rem;
   margin-top: 1rem;
-  color: #555;
+  color: #b0b3c7; /* uiColors.text.secondary */
 }
 
 .auth-bottom-text a {
-  color: #f97316;
+  color: #11CBE2; /* uiColors.teal */
   font-weight: 600;
   text-decoration: none;
   transition: color 0.3s ease;
 }
 
 .auth-bottom-text a:hover {
-  color: #ea580c;
+  color: #22E3FF; /* lighter teal hover */
   text-decoration: underline;
 }
 
-/* =====================
-   Animations
-   ===================== */
+/* Animations */
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes pulseGlow {
-  from {
-    opacity: 0.6;
-    transform: scale(1);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1.1);
-  }
+  from { opacity: 0.6; transform: scale(1); }
+  to { opacity: 1; transform: scale(1.1); }
 }
 
 @keyframes floatIn {
-  from {
-    transform: translateY(30px);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
+  from { transform: translateY(30px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
 }
 
-/* =====================
-   Responsive Design
-   ===================== */
+/* Responsive */
 @media (max-width: 576px) {
   .auth-card {
     padding: 2rem 1.5rem;

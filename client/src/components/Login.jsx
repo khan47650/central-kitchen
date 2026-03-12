@@ -3,8 +3,10 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "../CSS/Login.css";
-import logo from "../assets/img/logo3.png";
+import logo from "../assets/img/new_logo.svg";
 import { AuthContext } from "../context/AuthContext";
+
+
 
 const DEFAULT_API = process.env.REACT_APP_API_URL || "";
 const ADMIN_EMAIL = process.env.REACT_APP_ADMIN_EMAIL;

@@ -22,6 +22,7 @@ import {
 import axios from "axios";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import HoverZoomImage from "./HoverZoomImage";
+import uiColors from "../Styles/uiColors";
 
 const DEFAULT_API = process.env.REACT_APP_API_URL || "";
 
@@ -71,20 +72,20 @@ const ShopsDetail = () => {
   }, [shopId]);
 
   return (
-    <Box p={{ xs: 2, md: 3 }}>
+    <Box p={{ xs: 2, md: 3   }} sx={{background:uiColors.background, minHeight: "100vh"}}>
       {/* TOP BAR */}
       <Box sx={{ mb: 3 }}>
         <Grid container alignItems="center">
           <Grid item xs={2}>
             <IconButton onClick={() => navigate(-1)}>
-              <ArrowBack />
+              <ArrowBack sx={{ color: uiColors.text.primary }} />
             </IconButton>
           </Grid>
           <Grid item xs={8}>
-            <Typography textAlign="center" fontWeight="bold" variant="h6">
+            <Typography textAlign="center" fontWeight="bold" variant="h6" sx={{ color: uiColors.teal }}>
               {shopName}
             </Typography>
-            <Typography sx={{ py: 1 }} textAlign="center" variant="body2" color="primary">
+            <Typography sx={{ py: 1,color: uiColors.text.secondary }} textAlign="center" variant="body2">
               Menu Items
             </Typography>
           </Grid>
@@ -94,19 +95,19 @@ const ShopsDetail = () => {
       {/* LOADING */}
       {loading &&
         [...Array(3)].map((_, i) => (
-          <Card key={i} sx={{ mb: 2 }}>
+          <Card key={i} sx={{ mb: 2 ,bgcolor: uiColors.card, color: uiColors.text.primary  }}>
             <CardContent>
-              <Skeleton width="40%" height={28} />
-              <Skeleton width="25%" height={20} />
+              <Skeleton width="40%" height={28} sx={{ bgcolor: uiColors.skeleton }} />
+              <Skeleton width="25%" height={20} sx={{ bgcolor: uiColors.skeleton }} />
               <Divider sx={{ my: 1 }} />
-              <Skeleton variant="rectangular" height={40} />
+              <Skeleton variant="rectangular" height={40} sx={{ bgcolor: uiColors.skeleton }} />
             </CardContent>
           </Card>
         ))}
 
       {/* EMPTY */}
       {!loading && categories.length === 0 && (
-        <Typography textAlign="center">No Menus found</Typography>
+        <Typography textAlign="center" sx={{ color:uiColors.text.primary }}>No Menus found</Typography>
       )}
 
 
@@ -115,14 +116,14 @@ const ShopsDetail = () => {
           const isOpen = openCard === category._id;
 
           return (
-            <Card key={category._id} sx={{ mb: 2 }}>
+            <Card key={category._id} sx={{ mb: 2 ,bgcolor: uiColors.card, color: uiColors.text.primary  }}>
               <CardContent>
                 <Grid container alignItems="center">
                   <Grid item xs={8} sm={6}>
-                    <Typography fontWeight="bold">
+                    <Typography fontWeight="bold" sx={{color:uiColors.text.primary}}>
                       {category.categoryName}
                     </Typography>
-                    <Typography variant="body2" color="text.secondary">
+                    <Typography variant="body2" sx={{ color: uiColors.text.secondary }}>
                       {category.items.length} items in this category
                     </Typography>
                   </Grid>
@@ -132,14 +133,14 @@ const ShopsDetail = () => {
                     <>
                       <Grid item sm={2}>
                         {isOpen && (
-                          <Typography fontWeight="bold" textAlign="right">
+                          <Typography fontWeight="bold" textAlign="right" sx={{color:uiColors.text.primary}}>
                             Price
                           </Typography>
                         )}
                       </Grid>
                       <Grid item sm={2}>
                         {isOpen && (
-                          <Typography fontWeight="bold" textAlign="right" sx={{ pr: 3 }}>
+                          <Typography fontWeight="bold" textAlign="right" sx={{ pr: 3,color:uiColors.text.primary }}>
                             Status
                           </Typography>
                         )}
@@ -160,9 +161,9 @@ const ShopsDetail = () => {
                       }
                     >
                       {isOpen ? (
-                        <KeyboardArrowDown />
+                        <KeyboardArrowDown sx={{color:uiColors.text.primary}} />
                       ) : (
-                        <KeyboardArrowRight />
+                        <KeyboardArrowRight sx={{color:uiColors.text.primary}} />
                       )}
                     </IconButton>
                   </Grid>
@@ -176,8 +177,7 @@ const ShopsDetail = () => {
                     {category.items.length === 0 && (
                       <Typography
                         textAlign="center"
-                        color="text.secondary"
-                        sx={{ py: 2 }}
+                        sx={{ py: 2,color:uiColors.text.primary }}
                       >
                         No items found
                       </Typography>
@@ -235,33 +235,6 @@ const ShopsDetail = () => {
                               </Typography>
                             </Box>
                           </Grid>
-
-
-                          {/* <Grid item xs={12} sm={2}>
-                            <Box
-                              display="flex"
-                              justifyContent={
-                                isDesktop ? "flex-end" : "stretch"
-                              }
-                            >
-                              <Button
-                                fullWidth={!isDesktop}
-                                size="small"
-                                variant="outlined"
-                                disabled={addingCart === item._id}
-                                onClick={() => handleAddToCart(item._id)}
-                                sx={{
-                                  minWidth: isDesktop ? 130 : "100%",
-                                }}
-                              >
-                                {addingCart === item._id ? (
-                                  <CircularProgress size={16} />
-                                ) : (
-                                  "Add to Cart"
-                                )}
-                              </Button>
-                            </Box>
-                          </Grid> */}
                         </Grid>
 
                         {index !== category.items.length - 1 && <Divider />}

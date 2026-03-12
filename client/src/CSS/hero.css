@@ -1,6 +1,40 @@
+.index-page {
+  background-color: #0D0D22
+}
+
 .hero {
   position: relative;
   overflow: hidden;
+}
+
+.main {
+  background-color: #0D0D22;
+}
+
+.hero-section-dark-background {
+  background: #0D0D22;
+  position: relative;
+  min-height: 100vh;
+  overflow: hidden;
+}
+
+#hero-carousel,
+#hero-carousel .carousel-inner,
+#hero-carousel .carousel-item {
+  background: #0D0D22 !important;
+  border-radius: 0 !important;
+  height: 100vh;
+}
+
+.carousel-item {
+  background: #0D0D22;
+}
+
+.carousel-item img {
+  width: 100%;
+  height: 100vh;
+  object-fit: cover;
+  display: block;
 }
 
 .carousel-item img {
@@ -15,10 +49,10 @@
   left: 50%;
   transform: translate(-50%, -50%);
   text-align: center;
-  color: #fff;
+  color: #0D0D22;
   padding: 2rem;
   z-index: 10;
-  
+
 }
 
 .carousel-container h2 {
@@ -29,7 +63,7 @@
 }
 
 .btn-get-started {
-  background-color: #f9b625;
+  background: linear-gradient(90deg, #11CBE2, #2243B0, #7933E9);
   color: #fff;
   padding: 0.75rem 1.8rem;
   border-radius: 30px;
@@ -37,19 +71,45 @@
   font-size: 1.1rem;
   text-decoration: none;
   transition: all 0.3s ease;
+  border: none;
+  /* optional, removes default button border */
 }
 
 .btn-get-started:hover {
-  background-color: #e89e00;
+  background: linear-gradient(90deg, #22E3FF, #2F5BFF, #8A4DFF);
   transform: translateY(-2px);
 }
+
+#scroll-top {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: linear-gradient(90deg, #11CBE2, #2243B0, #7933E9);
+  color: #fff;
+  font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  cursor: pointer;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease;
+}
+
+#scroll-top:hover {
+  transform: translateY(-4px) scale(1.1);
+  box-shadow: 0 8px 24px rgba(17, 203, 226, 0.6);
+}
+
 
 
 /* MOBILE FIXES */
 /* ========================= */
 @media (max-width: 768px) {
   .carousel-item img {
-    height: 85vh; 
+    height: 85vh;
   }
 
   .carousel-container {

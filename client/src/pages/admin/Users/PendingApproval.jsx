@@ -11,6 +11,7 @@ import { useTheme, useMediaQuery, TableContainer } from '@mui/material';
 import UserDetailsDialog from '../../../components/UserDetailsDialog';
 import { useNavigate } from 'react-router-dom';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import uiColors from '../../../Styles/uiColors';
 
 
 
@@ -87,23 +88,23 @@ const PendingApproval = () => {
         gap: 2
       }}>
         <IconButton onClick={() => navigate(-1)}>
-          <ArrowBackIcon />
+          <ArrowBackIcon sx={{ color: uiColors.text.primary }} />
         </IconButton>
-        <Typography variant={isMobile ? 'h6' : 'h5'}>
+        <Typography variant={isMobile ? 'h6' : 'h5'} sx={{ color: uiColors.text.primary }}>
           Pending Approval
         </Typography>
       </Box>
 
 
-      <TableContainer sx={{ maxWidth: '100%', overflowX: 'auto' }}>
+      <TableContainer sx={{ maxWidth: '100%', overflowX: 'auto', bgcolor: uiColors.card, borderRadius: 1 }}>
         <Table size={isMobile ? 'small' : 'medium'}>
           <TableHead>
             <TableRow>
-              <TableCell>Name</TableCell>
-              <TableCell>Email</TableCell>
-              <TableCell>Role</TableCell>
-              <TableCell>Status</TableCell>
-              <TableCell>Action</TableCell>
+              <TableCell sx={{ color: uiColors.text.primary }}>Name</TableCell>
+              <TableCell sx={{ color: uiColors.text.primary }}>Email</TableCell>
+              <TableCell sx={{ color: uiColors.text.primary }}>Role</TableCell>
+              <TableCell sx={{ color: uiColors.text.primary }}>Status</TableCell>
+              <TableCell sx={{ color: uiColors.text.primary }}>Action</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -111,14 +112,32 @@ const PendingApproval = () => {
             {loading && (
               Array.from({ length: rowsPerPage }).map((_, index) => (
                 <TableRow key={index}>
-                  <TableCell><Skeleton width="80%" /></TableCell>
-                  <TableCell><Skeleton width="90%" /></TableCell>
-                  <TableCell><Skeleton width="60%" /></TableCell>
-                  <TableCell><Skeleton width="50%" /></TableCell>
+                  <TableCell><Skeleton width="80%" sx={{
+                    bgcolor: uiColors.skeleton.baseColor,
+                    "&::after": { bgcolor: uiColors.skeleton.highlightColor }
+                  }} /></TableCell>
+                  <TableCell><Skeleton width="90%" sx={{
+                    bgcolor: uiColors.skeleton.baseColor,
+                    "&::after": { bgcolor: uiColors.skeleton.highlightColor }
+                  }} /></TableCell>
+                  <TableCell><Skeleton width="60%" sx={{
+                    bgcolor: uiColors.skeleton.baseColor,
+                    "&::after": { bgcolor: uiColors.skeleton.highlightColor }
+                  }} /></TableCell>
+                  <TableCell><Skeleton width="50%" sx={{
+                    bgcolor: uiColors.skeleton.baseColor,
+                    "&::after": { bgcolor: uiColors.skeleton.highlightColor }
+                  }} /></TableCell>
                   <TableCell>
                     <Box display="flex" gap={1}>
-                      <Skeleton variant="rounded" width={80} height={30} />
-                      <Skeleton variant="rounded" width={70} height={30} />
+                      <Skeleton variant="rounded" width={80} height={30} sx={{
+                        bgcolor: uiColors.skeleton.baseColor,
+                        "&::after": { bgcolor: uiColors.skeleton.highlightColor }
+                      }} />
+                      <Skeleton variant="rounded" width={70} height={30} sx={{
+                        bgcolor: uiColors.skeleton.baseColor,
+                        "&::after": { bgcolor: uiColors.skeleton.highlightColor }
+                      }} />
                     </Box>
                   </TableCell>
                 </TableRow>
@@ -129,7 +148,7 @@ const PendingApproval = () => {
             {!loading && users.length === 0 && (
               <TableRow>
                 <TableCell colSpan={5} align="center">
-                  <Typography color="text.secondary" sx={{ py: 3 }}>
+                  <Typography sx={{ py: 3, color: uiColors.text.primary }}>
                     No pending users
                   </Typography>
                 </TableCell>
@@ -141,30 +160,44 @@ const PendingApproval = () => {
               .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
               .map((user, index) => (
                 <TableRow key={index}>
-                  <TableCell>{user.fullName}</TableCell>
-                  <TableCell>{user.email}</TableCell>
-                  <TableCell>{user.role}</TableCell>
-                  <TableCell>{user.status}</TableCell>
+                  <TableCell sx={{ color: uiColors.text.primary }}>{user.fullName}</TableCell>
+                  <TableCell sx={{ color: uiColors.text.primary }}>{user.email}</TableCell>
+                  <TableCell sx={{ color: uiColors.text.primary }}>{user.role}</TableCell>
+                  <TableCell sx={{ color: uiColors.text.primary }}>{user.status}</TableCell>
                   <TableCell>
                     <Box
                       display="flex"
                       gap={1}
-                      flexWrap="nowrap"      // <- add this
-                      justifyContent="flex-start" // optional, left align
+                      flexWrap="nowrap"     
+                      justifyContent="flex-start" 
                     >
                       <Button
-                        sx={{ minWidth: isMobile ? 60 : 80 }}
-                        variant="outlined"
+                        sx={{
+                          minWidth: isMobile ? 60 : 80, background: uiColors.gradient,
+                          color: "white",
+                          "&:hover": {
+                            background: uiColors.gradientHover,
+                            transform: "translateY(-2px)",
+                            boxShadow: "0 6px 20px rgba(17,203,226,0.4)"
+                          }
+                        }}
                         size="small"
                         onClick={() => approveUser(user._id)}
                         disabled={loadingId === user._id}
                       >
-                        {loadingId === user._id ? <CircularProgress size={18} /> : (isMobile ? "APPROVE" : "APPROVE")}
+                        {loadingId === user._id ? <CircularProgress size={18} sx={{ color: uiColors.text.primary }} /> : (isMobile ? "APPROVE" : "APPROVE")}
                       </Button>
 
                       <Button
-                        sx={{ minWidth: isMobile ? 60 : 80 }}
-                        variant="outlined"
+                        sx={{
+                          minWidth: isMobile ? 60 : 80, background: uiColors.gradient,
+                          color: "white",
+                          "&:hover": {
+                            background: uiColors.gradientHover,
+                            transform: "translateY(-2px)",
+                            boxShadow: "0 6px 20px rgba(17,203,226,0.4)"
+                          }
+                        }}
                         size="small"
                         onClick={() => rejectUser(user._id)}
                       >
@@ -172,9 +205,16 @@ const PendingApproval = () => {
                       </Button>
 
                       <Button
-                        variant="outlined"
                         size="small"
-                        sx={{ minWidth: isMobile ? 50 : 80 }}
+                        sx={{
+                          minWidth: isMobile ? 50 : 80, background: uiColors.gradient,
+                          color: "white",
+                          "&:hover": {
+                            background: uiColors.gradientHover,
+                            transform: "translateY(-2px)",
+                            boxShadow: "0 6px 20px rgba(17,203,226,0.4)"
+                          }
+                        }}
                         onClick={() => handleViewUser(user)}
                       >
                         VIEW
@@ -196,6 +236,18 @@ const PendingApproval = () => {
         onRowsPerPageChange={(e) => {
           setRowsPerPage(parseInt(e.target.value, 10));
           setPage(0);
+        }}
+        sx={{
+          color: "white",
+          "& .MuiTablePagination-actions .MuiIconButton-root": {
+            color: "white"
+          },
+          "& .MuiSelect-select, & .MuiInputBase-root, & .MuiTablePagination-displayedRows": {
+            color: "white"
+          },
+          "& .MuiTablePagination-selectIcon": {
+            color: "white"
+          }
         }}
       />
 

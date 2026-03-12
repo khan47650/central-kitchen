@@ -1,18 +1,26 @@
-/* Signup page professional styles */
+/* ----------------- Signup Page Dark Theme ----------------- */
 .signup-page {
-  background: linear-gradient(180deg, #fbfbfc 0%, #f6f8fa 100%);
+  background: #0D0D22; /* uiColors.background */
   min-height: 100vh;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
   padding: 40px 0;
+  color: #fff;
+}
+
+.signup-heading + small {
+  color: #b0b3c7 !important; /* uiColors.text.secondary */
+  font-weight: 400;
 }
 
 /* Card */
-.signup-card {
-  background: #fff;
+.signup-card,
+.inner-card {
+  background: #262644; /* uiColors.card */
+  color: #fff;
   border-radius: 12px;
   overflow: hidden;
   padding: 2rem;
-  box-shadow: 0 12px 30px rgba(0,0,0,0.06);
+  box-shadow: 0 12px 30px rgba(255,255,255,0.12); /* uiColors.cardGlow */
 }
 
 /* Logo + heading */
@@ -23,10 +31,15 @@
 }
 
 .signup-heading {
-  color: #f97316;
+  color: #11CBE2; /* uiColors.teal */
   font-weight: 700;
   margin: 0;
   font-size: 1.8rem;
+}
+
+.signup-heading + small {
+  color: #b0b3c7; /* uiColors.text.secondary */
+  font-weight: 400;
 }
 
 /* Stepper (top-right desktop) */
@@ -40,39 +53,39 @@
   width: 34px;
   height: 34px;
   border-radius: 50%;
-  background: #e9ecef;
-  color: #657080;
+  background: #2a3441; /* inputBg as neutral inactive */
+  color: #b0b3c7; /* secondary text */
   display: inline-flex;
   justify-content: center;
   align-items: center;
   font-weight: 600;
-  border: 2px solid rgba(0,0,0,0.04);
+  border: 2px solid rgba(255,255,255,0.08);
   transition: all 0.3s ease;
 }
 
 .step.active {
-  background: #f97316;
+  background: #11CBE2; /* uiColors.teal */
   color: #fff;
-  box-shadow: 0 6px 16px rgba(249, 115, 22, 0.12);
+  box-shadow: 0 6px 16px rgba(17,203,226,0.2);
 }
 
 .stepline {
   width: 48px;
   height: 3px;
-  background: #e9ecef;
+  background: #444;
   border-radius: 2px;
   transition: all 0.3s ease;
 }
 
 .stepline.active {
-  background: linear-gradient(90deg, #f97316, #fb923c);
+  background: linear-gradient(90deg, #11CBE2, #2243B0, #7933E9); /* uiColors.gradient */
 }
 
 /* inner card with accent border */
 .inner-card {
   border-radius: 8px;
-  background: transparent;
-  border: 2px solid rgba(249,115,22,0.06);
+  background: #262644; /* uiColors.card */
+  border: 2px solid rgba(255,255,255,0.06);
   padding: 1.2rem;
 }
 
@@ -81,47 +94,53 @@
   font-size: 1.1rem;
   font-weight: 700;
   margin-bottom: 1rem;
+  color: #11CBE2; /* teal */
 }
 
-/* accent border label on the top-left */
-.border-accent {
-  position: relative;
-  padding-top: 1.2rem;
+/* Form Labels */
+.form-label {
+  color: #b0b3c7; /* uiColors.text.secondary */
+  font-weight: 500;
 }
 
-.border-accent::before {
-  content: "Business Information";
-  position: absolute;
-  left: 16px;
-  top: -12px;
-  background: #fff;
-  padding: 0 .5rem;
-  color: #f97316;
-  font-weight: 600;
-  font-size: .85rem;
-}
-
-/* form controls styling */
+/* Form Controls: inputs, selects, textareas */
 .form-control,
 .form-select,
 textarea.form-control {
   border-radius: 8px;
-  border: 1px solid #e6e6e6;
+  border: 1px solid #444;
   padding: .75rem .9rem;
   box-shadow: none;
   transition: all 0.3s ease;
+  background: #2a3441; /* uiColors.inputBg */
+  color: #fff;
 }
 
+.form-control::placeholder,
+textarea.form-control::placeholder {
+  color: #b0b3c7; /* text.secondary */
+}
+
+/* Select dropdown text white */
+.form-select option {
+  color: #000;
+}
+
+/* Focused Inputs */
 .form-control:focus,
 .form-select:focus,
 textarea.form-control:focus {
-  border-color: #f97316;
-  box-shadow: 0 4px 18px rgba(249,115,22,0.08);
+  border-color: #11CBE2; /* teal */
+  box-shadow: 0 4px 18px rgba(17,203,226,0.15);
   outline: none;
+  background: #2a3441;
+  color: #fff;
 }
 
-/* buttons */
-.btn-next, .btn-prev, .btn-submit {
+/* Buttons */
+.btn-next,
+.btn-prev,
+.btn-submit {
   border-radius: 999px;
   padding: .55rem 1.1rem;
   font-weight: 600;
@@ -130,31 +149,34 @@ textarea.form-control:focus {
 
 .btn-next {
   background: transparent;
-  border: 1.5px solid #f97316;
-  color: #f97316;
+  border: 1.5px solid #11CBE2; /* teal */
+  color: #fff;
 }
 
 .btn-next:hover {
-  background: linear-gradient(90deg,#f97316,#fb923c);
+  background: #11CBE2; /* uiColors.gradientHover */
   color: #fff;
   border-color: transparent;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(17,203,226,0.35);
 }
 
 .btn-prev {
   background: transparent;
-  border: 1px solid #d6d6d6;
-  color: #333;
+  border: 1px solid #444;
+  color: #fff;
 }
 
 .btn-prev:hover {
-  background: #f1f1f1;
+  background: #3a3a5c;
+  color: #fff;
 }
 
 .btn-submit {
-  background: linear-gradient(90deg,#f97316,#fb923c);
+  background: linear-gradient(90deg, #11CBE2, #2243B0, #7933E9); /* uiColors.gradient */
   border: none;
   color: #fff;
-  box-shadow: 0 10px 30px rgba(249,115,22,0.18);
+  box-shadow: 0 10px 30px rgba(17,203,226,0.18);
 }
 
 .btn-submit:disabled {
@@ -162,12 +184,13 @@ textarea.form-control:focus {
   cursor: not-allowed;
 }
 
-/* small helper text */
+/* Small helper text */
 .progress-labels small {
   font-weight: 600;
+  color: #b0b3c7; /* secondary */
 }
 
-/* step pane transitions */
+/* Step pane transitions */
 .step-pane {
   transition: opacity 0.35s ease, transform 0.35s ease;
 }
@@ -184,10 +207,9 @@ textarea.form-control:focus {
   transform: translateY(0);
 }
 
-/* responsive tweaks */
+/* Responsive tweaks */
 @media (max-width: 992px) {
   .stepper { display: none; }
-  .border-accent::before { left: 12px; top: -10px; font-size: .8rem; }
   .inner-card { padding: 1rem; }
   .signup-card { padding: 1rem; }
 }

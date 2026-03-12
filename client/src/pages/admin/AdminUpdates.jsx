@@ -22,6 +22,7 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
 import HoverZoomImage from "../../components/HoverZoomImage";
+import uiColors from "../../Styles/uiColors";
 
 const DEFAULT_API = process.env.REACT_APP_API_URL || "";
 
@@ -124,13 +125,21 @@ const AdminUpdates = () => {
             {/* Top bar */}
             <Box display="flex" alignItems="center" justifyContent="space-between" mb={3} flexWrap="wrap">
                 <Box display="flex" alignItems="center">
-                    <IconButton onClick={handleBack}><ArrowBack /></IconButton>
-                    <Typography variant={isMobile ? "h6" : "h5"} ml={1}>Announcements</Typography>
+                    <IconButton onClick={handleBack}><ArrowBack sx={{ color: uiColors.text.primary }} /></IconButton>
+                    <Typography variant={isMobile ? "h6" : "h5"} ml={1} sx={{ color: uiColors.text.primary }} >Announcements</Typography>
                 </Box>
                 <Button
                     variant="contained"
                     onClick={handleOpenDialog}
-                    sx={{ mt: isMobile ? 1 : 0, width: isMobile ? "100%" : "auto", color: "white" }}
+                    sx={{
+                        mt: isMobile ? 1 : 0, width: isMobile ? "100%" : "auto", background: uiColors.gradient,
+                        color: "white",
+                        "&:hover": {
+                            background: uiColors.gradientHover,
+                            transform: "translateY(-2px)",
+                            boxShadow: "0 6px 20px rgba(17,203,226,0.4)"
+                        }
+                    }}
                 >
                     New Announcement
                 </Button>
@@ -139,16 +148,16 @@ const AdminUpdates = () => {
             <Box display="flex" flexDirection="column" gap={2}>
                 {loadingData ? (
                     Array.from({ length: 3 }).map((_, i) => (
-                        <Card key={i}>
+                        <Card key={i} sx={{ bgcolor: uiColors.card, color: uiColors.text.primary }}>
                             <CardContent sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-                                <Skeleton variant="rectangular" width={60} height={60} sx={{ borderRadius: 1 }} />
+                                <Skeleton variant="rectangular" width={60} height={60} sx={{ borderRadius: 1, bgcolor: uiColors.skeleton }} />
                                 <Box flex={1}>
-                                    <Skeleton width="80%" height={20} sx={{ mb: 1 }} />
-                                    <Skeleton width="50%" height={15} />
+                                    <Skeleton width="80%" height={20} sx={{ mb: 1, bgcolor: uiColors.skeleton }} />
+                                    <Skeleton width="50%" height={15} sx={{ bgcolor: uiColors.skeleton }} />
                                 </Box>
                                 <Box display="flex" gap={1}>
-                                    <Skeleton variant="circular" width={40} height={40} />
-                                    <Skeleton variant="circular" width={40} height={40} />
+                                    <Skeleton variant="circular" width={40} height={40} sx={{ bgcolor: uiColors.skeleton }} />
+                                    <Skeleton variant="circular" width={40} height={40} sx={{ bgcolor: uiColors.skeleton }} />
                                 </Box>
                             </CardContent>
                         </Card>
@@ -156,23 +165,45 @@ const AdminUpdates = () => {
                 ) : announcements.length === 0 ? (
 
                     <Box width="100%" textAlign="center" mt={4}>
-                        <Typography variant="h6" color="text.secondary">
+                        <Typography variant={isMobile ? 'h6' : 'h5'} sx={{ color: uiColors.text.primary }}>
                             No Announcement Found
                         </Typography>
                     </Box>
 
                 ) : (
                     announcements.map((a) => (
-                        <Card key={a._id} sx={{ "&:hover img": { transform: "scale(1.1)", transition: "0.3s" } }}>
-                            <CardContent sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+                        <Card
+                            key={a._id}
+                            sx={{
+                                bgcolor: uiColors.card,
+                                color: uiColors.text.primary,
+                                boxShadow: `0 0 10px ${uiColors.cardGlow}`,
+                                transition: "all 0.3s",
+                                "&:hover": {
+                                    boxShadow: `0 0 20px ${uiColors.teal}`,
+                                },
+                                cursor: "pointer"
+                            }}
+                        >
+                            <CardContent
+                                sx={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    gap: 2,
+                                    position: "relative",
+                                }}
+                            >
                                 <Box
                                     width={60}
                                     height={60}
                                     borderRadius={1}
-                                    bgcolor={a.image ? "transparent" : "#f3f4f6"}
+                                    bgcolor={a.image ? "transparent" : uiColors.card}
                                     display="flex"
                                     alignItems="center"
                                     justifyContent="center"
+                                    sx={{
+                                        zIndex: 1,
+                                    }}
                                 >
                                     {a.image ? (
                                         <HoverZoomImage src={a.image} size={60} zoomSize={200} />
@@ -183,20 +214,14 @@ const AdminUpdates = () => {
 
                                 <Box flex={1}>
                                     <Typography>{a.title}</Typography>
-                                    <Typography variant="caption">
-                                        Duration: {a.duration}
-                                    </Typography>
+                                    <Typography variant="caption">Duration: {a.duration}</Typography>
                                 </Box>
 
                                 <Box display="flex" gap={1}>
-                                    <IconButton onClick={() => handleEdit(a)}>
+                                    <IconButton onClick={() => handleEdit(a)} sx={{ color: uiColors.text.primary }}>
                                         <Edit />
                                     </IconButton>
-
-                                    <IconButton
-                                        onClick={() => handleDelete(a._id)}
-                                        sx={{ color: "red" }}
-                                    >
+                                    <IconButton onClick={() => handleDelete(a._id)} sx={{ color: "red" }}>
                                         <Delete />
                                     </IconButton>
                                 </Box>
@@ -207,8 +232,10 @@ const AdminUpdates = () => {
             </Box>
 
             {/* Dialog */}
-            <Dialog open={open} onClose={handleCloseDialog} maxWidth="sm" fullWidth>
-                <DialogTitle>{editingId ? "Edit Announcement" : "New Announcement"}</DialogTitle>
+            <Dialog open={open} onClose={handleCloseDialog} maxWidth="sm" fullWidth PaperProps={{
+                sx: { bgcolor: uiColors.card, color: uiColors.text.primary }
+            }}>
+                <DialogTitle sx={{ color: uiColors.text.primary }}>{editingId ? "Edit Announcement" : "New Announcement"}</DialogTitle>
                 <DialogContent sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
                     {/* Dialog Image Selector */}
                     <Box position="relative" textAlign="center" mb={2}>
@@ -257,17 +284,81 @@ const AdminUpdates = () => {
                         </Box>
                     </Box>
 
-                    <TextField fullWidth label="Title" value={title} onChange={e => setTitle(e.target.value)} sx={{ mb: 2 }} />
-                    <TextField fullWidth multiline rows={4} label="Description" value={description} onChange={e => setDescription(e.target.value)} sx={{ mb: 2 }} />
-                    <TextField select fullWidth label="Duration" value={duration} onChange={e => setDuration(e.target.value)} sx={{ mb: 2 }}>
+                    <TextField
+                        fullWidth
+                        label="Title"
+                        value={title}
+                        onChange={e => setTitle(e.target.value)}
+                        sx={{
+                            mb: 2,
+                            "& .MuiOutlinedInput-root": {
+                                backgroundColor: uiColors.inputBg,
+                                color: "#fff",
+                                "& fieldset": { borderColor: "#6b7280" },
+                                "&:hover fieldset": { borderColor: "#9ca3af" },
+                                "&.Mui-focused fieldset": { borderColor: "#9ca3af" }
+                            },
+                            "& .MuiInputLabel-root": { color: "#fff" }
+                        }}
+                    />
+
+                    <TextField
+                        fullWidth
+                        multiline
+                        rows={4}
+                        label="Description"
+                        value={description}
+                        onChange={e => setDescription(e.target.value)}
+                        sx={{
+                            mb: 2,
+                            "& .MuiOutlinedInput-root": {
+                                backgroundColor: uiColors.inputBg,
+                                color: "#fff",
+                                "& fieldset": { borderColor: "#6b7280" },
+                                "&:hover fieldset": { borderColor: "#9ca3af" },
+                                "&.Mui-focused fieldset": { borderColor: "#9ca3af" }
+                            },
+                            "& .MuiInputLabel-root": { color: "#fff" }
+                        }}
+                    />
+
+                    <TextField
+                        select
+                        fullWidth
+                        label="Duration"
+                        value={duration}
+                        onChange={e => setDuration(e.target.value)}
+                        sx={{
+                            mb: 2,
+                            "& .MuiOutlinedInput-root": {
+                                backgroundColor: uiColors.inputBg,
+                                color: "#fff",
+                                "& fieldset": { borderColor: "#6b7280" },
+                                "&:hover fieldset": { borderColor: "#9ca3af" },
+                                "&.Mui-focused fieldset": { borderColor: "#9ca3af" }
+                            },
+                            "& .MuiInputLabel-root": { color: "#fff" },
+                            "& .MuiSvgIcon-root": { color: "#fff" }
+                        }}
+                        SelectProps={{
+                            MenuProps: {
+                                PaperProps: {
+                                    sx: {
+                                        bgcolor: uiColors.inputBg, // dropdown background
+                                        color: "#fff"
+                                    }
+                                }
+                            }
+                        }}
+                    >
                         <MenuItem value="1 day">1 day</MenuItem>
                         <MenuItem value="1 week">1 week</MenuItem>
                         <MenuItem value="1 month">1 month</MenuItem>
                     </TextField>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleCloseDialog}>Cancel</Button>
-                    <Button variant="contained" onClick={handleSaveAnnouncement} disabled={loading} sx={{ color: "white" }}>
+                    <Button onClick={handleCloseDialog} sx={{ color: uiColors.text.primary }}>Cancel</Button>
+                    <Button onClick={handleSaveAnnouncement} disabled={loading} sx={{ color: "white", background: uiColors.gradient, "&:hover": { background: uiColors.gradientHover }, minWidth: 120 }}>
                         {loading ? "Saving..." : editingId ? "Update" : "Save"}
                     </Button>
                 </DialogActions>
