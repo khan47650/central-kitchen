@@ -3,7 +3,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    background: linear-gradient(180deg, #fbfbfc 0%, #f6f8fa 100%);
+    background:#0D0D22;
     position: relative;
     padding: 1rem;
 }
@@ -11,14 +11,14 @@
 .success_card {
     width: 100%;
     max-width: 420px;
-    background: #fff;
+    background: #262644;
     border-radius: 16px;
     padding: 2.5rem 2rem;
     box-shadow: 0 12px 35px rgba(249, 115, 22, 0.15);
     text-align: center;
     position: relative;
     animation: floatIn 0.8s ease-out;
-    border-top: 6px solid #f97316; /* Accent for theme consistency */
+    border-top: 6px solid #11CBE2; /* Accent for theme consistency */
 }
 
 .content_area {
@@ -26,7 +26,7 @@
 }
 
 .success_text {
-    color: #16a34a;
+    color: #11CBE2;
     font-size: 2rem;
     font-weight: 700;
     margin-bottom: 0.75rem;
@@ -34,7 +34,7 @@
 
 .sub-text {
     font-size: 1rem;
-    color: #555;
+    color: #fff;
     margin-top: 0.5rem;
     line-height: 1.5;
 }
