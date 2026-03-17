@@ -14,7 +14,7 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import { getPublicUser, setPublicUser, clearPublicUser } from "../utils/publicUser";
-import logo from "../assets/img/new_logo.svg";
+import logo from "../assets/img/new_logo_white.png";
 import { useNavigate } from "react-router-dom";
 import uiColors from "../Styles/uiColors";
 

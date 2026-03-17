@@ -3,9 +3,9 @@
   "name": "Central Kitchen Dashboard",
   "icons": [
     {
-      "src": "vite.svg",
-      "sizes": "192x192",
-      "type": "image/svg+xml"
+      "src": "new_logo_black.png",
+      "sizes": "512x512",
+      "type": "image/svg+xml+png"
     }
   ],
   "start_url": ".",

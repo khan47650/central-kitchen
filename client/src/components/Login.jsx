@@ -3,7 +3,7 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "../CSS/Login.css";
-import logo from "../assets/img/new_logo.svg";
+import logo from "../assets/img/new_logo_white.png";
 import { AuthContext } from "../context/AuthContext";
 
 

@@ -2,7 +2,7 @@ import React, { useState, useContext } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
-import logo from "../assets/img/logo3.png";
+import logo from "../assets/img/new_logo_white.png";
 import { AuthContext } from "../context/AuthContext";
 import {useTheme, useMediaQuery } from "@mui/material";
 import axios from "axios"

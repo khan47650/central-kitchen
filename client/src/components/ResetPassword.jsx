@@ -2,7 +2,7 @@ import React, { useState, useContext } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Link, replace, useNavigate } from "react-router-dom";
-import logo from "../assets/img/new_logo.svg";
+import logo from "../assets/img/new_logo_white.png";
 import { AuthContext } from "../context/AuthContext";
 import "../CSS/authWrapper.css"
 import { Box, useTheme, useMediaQuery, IconButton, Typography } from "@mui/material";

@@ -2,7 +2,7 @@
    Top Header: Logo + Auth Buttons
    =============================== */
 .header-top {
-  background: linear-gradient(90deg, #22E3FF, #2F5BFF, #8A4DFF);
+  background: #262644;
   padding: 0.8rem 1.5rem;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   z-index: 1020;
@@ -80,7 +80,7 @@
   width: 100% !important;
   max-width: none;
   border-radius: 50px;
-  background: #16213E !important;
+  background: linear-gradient(90deg, #22E3FF, #2F5BFF, #8A4DFF);
   backdrop-filter: blur(10px);
   border: 1px solid #2a3441;
   box-shadow: 0 6px 25px rgba(0, 0, 0, 0.08);
@@ -142,8 +142,9 @@
    =============================== */
 @media (max-width: 992px) {
   .navbar-collapse {
-    background: #16213E; /* dark dropdown */
-    border-radius: 25px;
+    background: linear-gradient(90deg, #22E3FF, #2F5BFF, #8A4DFF);
+    /* dark dropdown */
+    border-radius: 10px;
     margin-top: 0.8rem;
     padding: 1rem 0;
   }

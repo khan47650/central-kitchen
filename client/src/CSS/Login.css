@@ -48,8 +48,8 @@
 
 /* Logo styling */
 .auth-logo {
-  width: 65px;
-  height: 65px;
+  width: 75px;
+  height: 75px;
   object-fit: contain;
   filter: drop-shadow(0 3px 5px rgba(17,203,226,0.2));
 }
