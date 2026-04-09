@@ -10,7 +10,7 @@ import '../CSS/About.css';
 import '../CSS/Contact.css';
 import '../CSS/footer.css';
 import logo from "../assets/img/new_logo_white.png";
-import hero1 from "../assets/img/home_image.jpeg";
+import hero1 from "../assets/img/new_kitchen_2.jpg";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Link } from "react-router-dom";
